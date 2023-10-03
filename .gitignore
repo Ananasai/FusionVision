@@ -50,3 +50,39 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+################################### Altium
+# Various Altium files
+*.PrjPCBStructure
+*.SchDocPreview
+*.PcbDocPreview
+__Previews
+*.PrjPcbStructure
+*.Dat
+*.REP 
+*.TLT
+*.LOG
+*.log
+*.htm
+*.$$$
+
+#useless dirs
+FusionVisionPCB/Project/Outputs
+FusionVisionPCB/Project/Logs
+Project Outputs for*
+
+#History
+FusionVisionPCB/History/
+
+FusionVisionCode/CM4/Debug/
+FusionVisionCode/CM7/Debug/
+
+#Exports, but not manual ones
+FusionVisionPCB/exports/*
+!FusionVisionPCB/exports/manual
+
+#Python stuff
+scripts/__pycache__/
+*.bak
+*.dwl
+*.dwl2
