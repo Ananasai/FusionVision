@@ -287,6 +287,10 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
+[GeneratedDocument1]
+DocumentPath=Project Outputs\Design Rule Check - CameraBoard.html
+DItemRevisionGUID=
+
 [Parameter1]
 Name=CAGE_CODE
 Value=1

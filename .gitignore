@@ -73,6 +73,7 @@ Project Outputs for*
 
 #History
 FusionVisionPCB/History/
+FusionVisionPCBScreen/History/
 
 FusionVisionCode/CM4/Debug/
 FusionVisionCode/CM7/Debug/
@@ -80,6 +81,9 @@ FusionVisionCode/CM7/Debug/
 #Exports, but not manual ones
 FusionVisionPCB/exports/*
 !FusionVisionPCB/exports/manual
+
+FusionVisionPCBScreen/exports/*
+!FusionVisionPCBScreen/exports/manual
 
 #Python stuff
 scripts/__pycache__/

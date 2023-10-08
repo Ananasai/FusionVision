@@ -1,0 +1,587 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<style type="text/css">
+		h1, h2, h3, h4, h5, h6 {
+			font-family : segoe ui;
+			color : black;
+			background-color : #EDE7D9;
+			padding: 0.3em;
+		}
+
+		h1 {
+			font-size: 1.2em;
+		}		
+
+		h2 {
+			font-size: 1.2em;
+		}
+
+		body {
+			font-family : segoe ui;
+		}
+
+		td, th {
+			padding: 0.5em;
+			text-align : left;
+			width: 10em;
+		}
+		th {
+			background-color : #EEEEEE;
+
+		}
+		th.column1, td.column1 {
+			text-align: left;
+			width : auto;
+		}
+		table {
+			width : 100%;
+			font-size: 0.9em;
+		}
+
+		.DRC_summary_header {
+			padding-bottom : 0.1em;
+			border : 0px solid black;
+			width: 100%;
+			align: left;
+		}
+
+		.DRC_summary_header_col1,
+		.DRC_summary_header_col2, 
+		.DRC_summary_header_col3 {
+			color : black;
+			font-size:100%;
+			padding : 0em;
+			padding-top : 0.2em;
+			padding-bottom 0.2em;
+			border : 0px solid black;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.DRC_summary_header_col1 {
+			font-weight: bold;
+			width: 9em;
+		}
+
+		.DRC_summary_header_col2 {
+			width: 0.1em;
+		
+		}
+
+		.DRC_summary_header_col3 {
+			width : auto;
+		}
+
+		.header_holder {
+		    Width = 100%;
+		    border = 0px solid green;
+		    padding = 0;
+		}
+
+
+		.front_matter, .front_matter_column1, .front_matter_column2, .front_matter_column3
+		{
+			left : 0;
+			top : 0;
+			padding: 0em;
+			padding-top : 0.1em;
+			border : 0px solid black;
+			width : 100%;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.front_matter_column1 {
+			width : 8em;
+			font-weight: bold;
+		}
+
+		.front_matter_column2 {
+			width: 0.1em;
+		}
+
+		.front_matter_column3 {
+			width : auto;
+		}
+
+		.total_column1, .total_column {
+			font-weight : bold;
+		}
+		.total_column1 {
+			text-align : left;
+		}
+		.warning, .error {
+			color : red;
+			font-weight : bold;
+		}
+		tr.onmouseout_odd {
+			background-color : #white;
+		}
+		tr.onmouseout_even { 
+			background-color : #FAFAFA;
+		}
+		tr.onmouseover_odd, tr.onmouseover_even { 
+			background-color : #EEEEEE;
+		} 
+		a:link, a:visited, .q a:link,.q a:active,.q {
+			color: #21489e; 
+		}
+		a:link.callback, a:visited.callback { 
+			color: #21489e;
+		}
+		a:link.customize, a:visited.customize {
+			color: #C0C0C0;
+			position: absolute; 
+			right: 10px;
+		}	
+		p.contents_level1 {
+			font-weight : bold;
+			font-size : 110%;
+			margin : 0.5em;
+		}
+		p.contents_level2 {
+			position : relative;
+			left : 20px;
+			margin : 0.5em;
+		}
+	</style><script type="text/javascript">
+		function coordToMils(coord) {
+			var number = coord / 10000;
+			
+			if (number != number.toFixed(3))
+				number = number.toFixed(3);
+
+			return number + 'mil'
+		}
+
+		function coordToMM(coord) {
+			var number = 0.0254 * coord / 10000;
+			
+			if (number != number.toFixed(4))
+				number = number.toFixed(4);
+			
+			return number + 'mm'
+		}
+	
+		function convertCoord(coordNode, units) {
+			for (var i = 0; i < coordNode.childNodes.length; i++) {
+				coordNode.removeChild(coordNode.childNodes[i]);
+			}
+
+			var coord = coordNode.getAttribute('value');
+			if (coord != null) {
+				if (units == 'mm') {
+					textNode = document.createTextNode(coordToMM(coord));
+					coordNode.appendChild(textNode);
+				} else if (units == 'mil') {
+					textNode = document.createTextNode(coordToMils(coord));		
+					coordNode.appendChild(textNode);	
+				}
+			}
+		}
+	
+		function convertUnits(unitNode, units) {
+			for (var i = 0; i < unitNode.childNodes.length; i++) {
+				unitNode.removeChild(unitNode.childNodes[i]);		
+			}
+		
+			textNode = document.createTextNode(units); 
+			unitNode.appendChild(textNode);
+		}
+	
+		function changeUnits(radio_input, units) {
+			if (radio_input.checked) {
+			
+				var elements = document.getElementsByName('coordinate');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertCoord(elements[i], units);
+					}
+				}
+	
+				var elements = document.getElementsByName('units');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertUnits(elements[i], units);
+					}
+				}
+			}
+		}
+	</script><title>Design Rule Verification Report</title>
+</head>
+<body onload=""><img ALT="Altium" src="
+			file://C:\Users\Public\Documents\Altium\AD22\Templates\AD_logo.png
+		"><h1>Design Rule Verification Report</h1>
+<table class="header_holder">
+<td class="column1">
+<table class="front_matter">
+<tr class="front_matter">
+<td class="front_matter_column1">Date:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">2023-10-08</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">11:49:10</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Elapsed Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">00:00:01</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Filename:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3"><a href="file:///C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc" class="file"><acronym title="C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc">C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc</acronym></a></td>
+</tr>
+</table>
+</td>
+<td class="column2">
+<table class="DRC_summary_header">
+<tr>
+<td class="DRC_summary_header_col1">Warnings:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">2</td></tr>
+<tr>
+<td class="DRC_summary_header_col1">Rule Violations:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">63</td></tr>
+</table>
+</td>
+</table><a name="IDWMLNZPWZLZXADDJJ4KEEJK5DAHGR4K00ZHPOTFOR0KNC04MI5MQP"><h2>Summary</h2></a><table>
+<tr>
+<th class="column1">Warnings</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID42MIXDTVDBRXFE3UUL5DHYME5ICZIRRQGJN3SMG4MWUCAUHPLPBN">Design contains shelved or modified (but not repoured) polygons. The result of DRC is not correct. Recommended to restore/repour all polygons and proceed with DRC again</a></td>
+<td class="column2">2</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">2</td>
+</tr>
+</table><br><table>
+<tr>
+<th class="column1">Rule Violations</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDDRIESWEDDB2LF50DSLS0WRFIBNWOV1Q5V0ELHMPXZHFMQ4S24RTI">Clearance Constraint (Gap=6mil) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDYGAGBYQQ0RRUU22TDHHHZUZUHDPSEBTQXEQYJDWQTM1N2V2IETP">Short-Circuit Constraint (Allowed=No) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDUKOTSH0FS1TBOF4UPQOXCOTXZK13MNJCH1J53IMXWV5MI2DVR1JD">Un-Routed Net Constraint ( (All) )</a></td>
+<td class="column2">8</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDDKRXJNMJXQJXHDS20O2OWRP2RKV23R34MVAT1VHJJRB2AVIKBY2D">Modified Polygon (Allow modified: No), (Allow shelved: No)</a></td>
+<td class="column2">2</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#ID21FKPN4SVMYDNID5CQ1MDQ2WNFTEWKCNY2RMZ3PSY3ZZVKWJTXFL">Width Constraint (Min=6mil) (Max=100mil) (Preferred=10mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDQJHOA0AMYV5GKWF51TI2EEXIIITA0FBAB4GNWBDDI3ZNEPU01J0K">Routing Layers(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDUETMXMPSFXGYG4JUWN5B4HBNYHW0QCZVPNBAQ5JW3U0ZEX2VBIDD">Routing Via (MinHoleWidth=11.811mil) (MaxHoleWidth=11.811mil) (PreferredHoleWidth=11.811mil) (MinWidth=18mil) (MaxWidth=50mil) (PreferedWidth=18mil) (All)</a></td>
+<td class="column2">16</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID3UHEAEAITJITM0N0NKU5SXBBVIJ4OAY2IWCKZFNL04VPSK2Q3KDO">Differential Pairs Uncoupled Length using the Gap Constraints (Min=10mil) (Max=10mil) (Prefered=10mil)  and Width Constraints (Min=10mil) (Max=10mil) (Prefered=10mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDTPQ5D5RXTISWHTG3HYSNL3KL5NFCP3YL0KJRH1NOSQRL2ZC5XR3">SMD Neck-Down Constraint (Percent=100%) (All)</a></td>
+<td class="column2">4</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDFPV3T13YEVNND2ST5XOMMSD4OBYLO2C3R3WOIMGB31DN2Q1P5MC">Power Plane Connect Rule(Relief Connect )(Expansion=20mil) (Conductor Width=10mil) (Air Gap=10mil) (Entries=4) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDCTAJSAXRQWK2DLGUV4B3BEKMKGQCXVEJCTN021CDIYD5044OMFKE">Minimum Annular Ring (Minimum=6mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDFLDSUAYEVIL0LQR5A5BJG2JAXJROG1TCYWFOCPDOMQOUYTYJYK2">Hole Size Constraint (Min=11.811mil) (Max=300mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDAQKYP3M3TAJMDPIJO41G1VPYOKEMFF3U1VMWLHMOKTE4VOKUPCLK">Pads and Vias to follow the Drill pairs settings</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDJZOICREAS5EYMBSMJAFHMHSA3K3LWDSSULQ4RLHSI331VIDRMWDC">Hole To Hole Clearance (Gap=10mil) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDH4P30G0AEI3FBVTFAM5DBNNMFPGL4TS2OQ4JXYLMATEJWB2XVDWE">Minimum Solder Mask Sliver (Gap=6mil) (All),(All)</a></td>
+<td class="column2">7</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID0J03L2NL52ZRK3HUI45GKTWNCNSCYORJ0ASJDWIDJWNVYCPEFHHN">Silk To Solder Mask (Clearance=10mil) (IsPad),(All)</a></td>
+<td class="column2">7</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDGWBBZD4ZIAWQKXM0YZCO1N5L2MPKMIRWAKHOW0C2XTARA1SJXYRN">Silk to Silk (Clearance=10mil) (All),(All)</a></td>
+<td class="column2">15</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDU4QAVQECVNDLCZW5QJV2YIAWFCQE3CW3KO33E4NKK2O1KLWO3A3D">Net Antennae (Tolerance=0mil) (All)</a></td>
+<td class="column2">4</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDC1SKBPO4NZTBNQHL4BUGJJJ5XFE3GSHTN2MAW5IMUZW3GHW01WZF">Component Clearance Constraint ( Horizontal Gap = 10mil, Vertical Gap = 10mil ) (All),(All) </a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDDCKVJQIJNMNGLAYEPH2BNZ2JPEDOGKPQQDHQ2MCSQKREBFZXYNCF">Height Constraint (Min=0mil) (Max=1000mil) (Prefered=500mil) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">63</td>
+</tr>
+</table><br><a name="IDBVLOOXOMLCRABBDYXSUPDMWUAEXXVUFR5DXQZ2MSC4OLRQX5FSYG"><h2>Warnings</h2></a><a name="ID42MIXDTVDBRXFE3UUL5DHYME5ICZIRRQGJN3SMG4MWUCAUHPLPBN"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="warning">Design contains shelved or modified (but not repoured) polygons. The result of DRC is not correct. Recommended to restore/repour all polygons and proceed with DRC again</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1">Polygon named: NONET_L-01_P-001 In net GND On Bottom Layer</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1">Polygon named: NONET_L-01_P-001 In net GND On Top Layer</td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDUKOTSH0FS1TBOF4UPQOXCOTXZK13MNJCH1J53IMXWV5MI2DVR1JD"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Un-Routed Net Constraint ( (All) )</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9163.52mil|Location2.X=10678.654mil|Location1.Y=6523.52mil|Location2.Y=7579.796mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9163.52mil|Location2.X=10678.654mil|Location1.Y=6523.52mil|Location2.Y=7579.796mil|Absolute=True">Un-Routed Net Constraint: Net 3V3 Between Pad U401-2(1742mil,2139mil) on Multi-Layer And Pad D500-2(3183mil,3121.142mil) on Multi-Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9417.193mil|Location2.X=9618.725mil|Location1.Y=7213.13mil|Location2.Y=7486.402mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9417.193mil|Location2.X=9618.725mil|Location1.Y=7213.13mil|Location2.Y=7486.402mil|Absolute=True">Un-Routed Net Constraint: Net 2V8 Between Track (2053.193mil,2886.13mil)(2054.724mil,2884.598mil) on Bottom Layer And Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer [Unplated] </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9894.938mil|Location2.X=9938.968mil|Location1.Y=7008.21mil|Location2.Y=7119.824mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9894.938mil|Location2.X=9938.968mil|Location1.Y=7008.21mil|Location2.Y=7119.824mil|Absolute=True">Un-Routed Net Constraint: Net 3V0 Between Pad R300-2(2452.748mil,2604.989mil) on Top Layer And Pad R301-2(2453.156mil,2669.044mil) on Top Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9704.157mil|Location2.X=9938.56mil|Location1.Y=6921.407mil|Location2.Y=7055.769mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9704.157mil|Location2.X=9938.56mil|Location1.Y=6921.407mil|Location2.Y=7055.769mil|Absolute=True">Un-Routed Net Constraint: Net 3V0 Between Via (2262.156mil,2516.406mil) from Top Layer to Bottom Layer And Pad R300-2(2452.748mil,2604.989mil) on Top Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8551.52mil|Location2.X=9336.481mil|Location1.Y=8076.52mil|Location2.Y=8161.481mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8551.52mil|Location2.X=9336.481mil|Location1.Y=8076.52mil|Location2.Y=8161.481mil|Absolute=True">Un-Routed Net Constraint: Net OV.D1 Between Pad U500-91(1130mil,3692mil) on Multi-Layer And Pad U500-105(1830mil,3692mil) on Multi-Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7651.535mil|Location2.X=10836.496mil|Location1.Y=8176.507mil|Location2.Y=8261.468mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7651.535mil|Location2.X=10836.496mil|Location1.Y=8176.507mil|Location2.Y=8261.468mil|Absolute=True">Un-Routed Net Constraint: Net OV.D2 Between Pad U500-74(230.015mil,3791.987mil) on Multi-Layer And Pad U500-136(3330.015mil,3791.987mil) on Multi-Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7751.535mil|Location2.X=8736.481mil|Location1.Y=8076.52mil|Location2.Y=8261.468mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7751.535mil|Location2.X=8736.481mil|Location1.Y=8076.52mil|Location2.Y=8261.468mil|Absolute=True">Un-Routed Net Constraint: Net OV.D0 Between Pad U500-76(330.015mil,3791.987mil) on Multi-Layer And Pad U500-93(1230mil,3692mil) on Multi-Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9417.193mil|Location2.X=9778.677mil|Location1.Y=7213.13mil|Location2.Y=7078.997mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9417.193mil|Location2.X=9778.677mil|Location1.Y=7213.13mil|Location2.Y=7078.997mil|Absolute=True">Un-Routed Net Constraint: Net 2V8 Between Track (2053.193mil,2886.13mil)(2054.724mil,2884.598mil) on Bottom Layer And Track (2214.519mil,2551.839mil)(2214.676mil,2551.997mil) on Bottom Layer </acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDDKRXJNMJXQJXHDS20O2OWRP2RKV23R34MVAT1VHJJRB2AVIKBY2D"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Modified Polygon (Allow modified: No), (Allow shelved: No)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7464mil|Location2.X=11401.001mil|Location1.Y=5576.653mil|Location2.Y=8364.001mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7464mil|Location2.X=11401.001mil|Location1.Y=5576.653mil|Location2.Y=8364.001mil|Absolute=True">Modified Polygon: Polygon Shelved  (NONET_L-01_P-001) on Bottom Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7464mil|Location2.X=11401.001mil|Location1.Y=5576.653mil|Location2.Y=8364.001mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7464mil|Location2.X=11401.001mil|Location1.Y=5576.653mil|Location2.Y=8364.001mil|Absolute=True">Modified Polygon: Polygon Shelved  (NONET_L-01_P-001) on Top Layer </acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDUETMXMPSFXGYG4JUWN5B4HBNYHW0QCZVPNBAQ5JW3U0ZEX2VBIDD"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Routing Via (MinHoleWidth=11.811mil) (MaxHoleWidth=11.811mil) (PreferredHoleWidth=11.811mil) (MinWidth=18mil) (MaxWidth=50mil) (PreferedWidth=18mil) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9707.386mil|Location2.X=9740.386mil|Location1.Y=7039.582mil|Location2.Y=7072.582mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9707.386mil|Location2.X=9740.386mil|Location1.Y=7039.582mil|Location2.Y=7072.582mil|Absolute=True">Routing Via Style: Via (2259.885mil,2629.081mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9708.673mil|Location2.X=9741.673mil|Location1.Y=6985.585mil|Location2.Y=7018.585mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9708.673mil|Location2.X=9741.673mil|Location1.Y=6985.585mil|Location2.Y=7018.585mil|Absolute=True">Routing Via Style: Via (2261.172mil,2575.084mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9709.657mil|Location2.X=9742.657mil|Location1.Y=6926.907mil|Location2.Y=6959.907mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9709.657mil|Location2.X=9742.657mil|Location1.Y=6926.907mil|Location2.Y=6959.907mil|Absolute=True">Routing Via Style: Via (2262.156mil,2516.406mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9753.93mil|Location2.X=9786.93mil|Location1.Y=7068.673mil|Location2.Y=7101.673mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9753.93mil|Location2.X=9786.93mil|Location1.Y=7068.673mil|Location2.Y=7101.673mil|Absolute=True">Routing Via Style: Via (2306.43mil,2658.172mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9758.87mil|Location2.X=9791.87mil|Location1.Y=6984.601mil|Location2.Y=7017.601mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9758.87mil|Location2.X=9791.87mil|Location1.Y=6984.601mil|Location2.Y=7017.601mil|Absolute=True">Routing Via Style: Via (2311.369mil,2574.1mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9760.838mil|Location2.X=9793.838mil|Location1.Y=6926.907mil|Location2.Y=6959.907mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9760.838mil|Location2.X=9793.838mil|Location1.Y=6926.907mil|Location2.Y=6959.907mil|Absolute=True">Routing Via Style: Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9778.752mil|Location2.X=9811.752mil|Location1.Y=6881.98mil|Location2.Y=6914.98mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9778.752mil|Location2.X=9811.752mil|Location1.Y=6881.98mil|Location2.Y=6914.98mil|Absolute=True">Routing Via Style: Via (2331.252mil,2471.48mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9788.713mil|Location2.X=9821.713mil|Location1.Y=7139.505mil|Location2.Y=7172.505mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9788.713mil|Location2.X=9821.713mil|Location1.Y=7139.505mil|Location2.Y=7172.505mil|Absolute=True">Routing Via Style: Via (2341.213mil,2729.005mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9819.501mil|Location2.X=9852.501mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9819.501mil|Location2.X=9852.501mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True">Routing Via Style: Via (2372mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9839.501mil|Location2.X=9872.501mil|Location1.Y=7139.505mil|Location2.Y=7172.505mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9839.501mil|Location2.X=9872.501mil|Location1.Y=7139.505mil|Location2.Y=7172.505mil|Absolute=True">Routing Via Style: Via (2392mil,2729.005mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9849.067mil|Location2.X=9882.067mil|Location1.Y=7015.489mil|Location2.Y=7048.489mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9849.067mil|Location2.X=9882.067mil|Location1.Y=7015.489mil|Location2.Y=7048.489mil|Absolute=True">Routing Via Style: Via (2401.567mil,2604.989mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9849.476mil|Location2.X=9882.476mil|Location1.Y=7079.544mil|Location2.Y=7112.544mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9849.476mil|Location2.X=9882.476mil|Location1.Y=7079.544mil|Location2.Y=7112.544mil|Absolute=True">Routing Via Style: Via (2401.975mil,2669.044mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9860.76mil|Location2.X=9893.76mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9860.76mil|Location2.X=9893.76mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True">Routing Via Style: Via (2413.26mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9902.57mil|Location2.X=9935.57mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9902.57mil|Location2.X=9935.57mil|Location1.Y=6880.067mil|Location2.Y=6913.067mil|Absolute=True">Routing Via Style: Via (2455.07mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9955.72mil|Location2.X=9988.72mil|Location1.Y=6887.812mil|Location2.Y=6920.812mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9955.72mil|Location2.X=9988.72mil|Location1.Y=6887.812mil|Location2.Y=6920.812mil|Absolute=True">Routing Via Style: Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9955.819mil|Location2.X=9988.819mil|Location1.Y=6939.092mil|Location2.Y=6972.092mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9955.819mil|Location2.X=9988.819mil|Location1.Y=6939.092mil|Location2.Y=6972.092mil|Absolute=True">Routing Via Style: Via (2508.318mil,2528.592mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDTPQ5D5RXTISWHTG3HYSNL3KL5NFCP3YL0KJRH1NOSQRL2ZC5XR3"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">SMD Neck-Down Constraint (Percent=100%) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9444.001mil|Location2.X=9543.125mil|Location1.Y=7298.819mil|Location2.Y=7332.007mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9444.001mil|Location2.X=9543.125mil|Location1.Y=7298.819mil|Location2.Y=7332.007mil|Absolute=True">SMD Neck-Down Constraint: Between Pad C305-2(1995mil,2886.819mil) on Bottom Layer And Track (1995mil,2886.819mil)(1995.689mil,2886.13mil) on Bottom Layer Relative Track Width: 105.83%</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9711.688mil|Location2.X=9798.125mil|Location1.Y=6849.804mil|Location2.Y=6877.414mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9711.688mil|Location2.X=9798.125mil|Location1.Y=6849.804mil|Location2.Y=6877.414mil|Absolute=True">SMD Neck-Down Constraint: Between Pad U400-16(2260.188mil,2435.304mil) on Bottom Layer And Track (2260.188mil,2435.304mil)(2260.188mil,2514.438mil) on Bottom Layer Relative Track Width: 101.60%</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9666.019mil|Location2.X=9752.456mil|Location1.Y=6966.34mil|Location2.Y=6993.949mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9666.019mil|Location2.X=9752.456mil|Location1.Y=6966.34mil|Location2.Y=6993.949mil|Absolute=True">SMD Neck-Down Constraint: Between Pad U400-19(2214.519mil,2551.839mil) on Bottom Layer And Track (2214.519mil,2551.839mil)(2214.676mil,2551.997mil) on Bottom Layer Relative Track Width: 101.60%</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10005.232mil|Location2.X=10091.669mil|Location1.Y=6931.064mil|Location2.Y=6958.674mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10005.232mil|Location2.X=10091.669mil|Location1.Y=6931.064mil|Location2.Y=6958.674mil|Absolute=True">SMD Neck-Down Constraint: Between Pad U400-7(2553.889mil,2516.406mil) on Bottom Layer And Track (2553.731mil,2516.564mil)(2553.889mil,2516.406mil) on Bottom Layer Relative Track Width: 101.60%</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDH4P30G0AEI3FBVTFAM5DBNNMFPGL4TS2OQ4JXYLMATEJWB2XVDWE"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Minimum Solder Mask Sliver (Gap=6mil) (All),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7351.124mil|Location2.Y=7358.374mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7351.124mil|Location2.Y=7358.374mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (0.354mil &lt; 6mil) Between Pad C305-1(1995mil,2938mil) on Bottom Layer And Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7339.565mil|Location2.Y=7346.815mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7339.565mil|Location2.Y=7346.815mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (0.354mil &lt; 6mil) Between Pad C305-1(1995mil,2938mil) on Bottom Layer And Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7332.005mil|Location2.Y=7339.255mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9479.332mil|Location2.X=9486.582mil|Location1.Y=7332.005mil|Location2.Y=7339.255mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (0.354mil &lt; 6mil) Between Pad C305-2(1995mil,2886.819mil) on Bottom Layer And Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9887.653mil|Location2.X=9895.73mil|Location1.Y=6875.505mil|Location2.Y=6883.484mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9887.653mil|Location2.X=9895.73mil|Location1.Y=6875.505mil|Location2.Y=6883.484mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (0.745mil &lt; 6mil) Between Pad U400-11(2437.353mil,2435.304mil) on Bottom Layer And Via (2413.26mil,2469.567mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [0.745mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9850.66mil|Location2.X=9858.596mil|Location1.Y=6876.798mil|Location2.Y=6884.901mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9850.66mil|Location2.X=9858.596mil|Location1.Y=6876.798mil|Location2.Y=6884.901mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (4.784mil &lt; 6mil) Between Pad U400-12(2401.92mil,2435.304mil) on Bottom Layer And Via (2372mil,2469.567mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [4.784mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9968.595mil|Location2.X=9975.845mil|Location1.Y=6876.951mil|Location2.Y=6884.201mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9968.595mil|Location2.X=9975.845mil|Location1.Y=6876.951mil|Location2.Y=6884.201mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (3.472mil &lt; 6mil) Between Pad U400-9(2508.219mil,2435.304mil) on Bottom Layer And Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [3.472mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9782.67mil|Location2.X=9789.92mil|Location1.Y=6917.318mil|Location2.Y=6924.568mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9782.67mil|Location2.X=9789.92mil|Location1.Y=6917.318mil|Location2.Y=6924.568mil|Absolute=True">Minimum Solder Mask Sliver Constraint: (4.366mil &lt; 6mil) Between Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer And Via (2331.252mil,2471.48mil) from Top Layer to Bottom Layer [Top Solder] Mask Sliver [4.366mil] / [Bottom Solder] Mask Sliver [4.366mil]</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="ID0J03L2NL52ZRK3HUI45GKTWNCNSCYORJ0ASJDWIDJWNVYCPEFHHN"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Silk To Solder Mask (Clearance=10mil) (IsPad),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9982.166mil|Location2.X=9989.833mil|Location1.Y=6961.833mil|Location2.Y=6969.499mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9982.166mil|Location2.X=9989.833mil|Location1.Y=6961.833mil|Location2.Y=6969.499mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (Collision &lt; 10mil) Between Pad C300-2(2508.219mil,2528.493mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9542.627mil|Location2.X=9553.877mil|Location1.Y=7392.588mil|Location2.Y=7403.838mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9542.627mil|Location2.X=9553.877mil|Location1.Y=7392.588mil|Location2.Y=7403.838mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (7.874mil &lt; 10mil) Between Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer And Track (2092.126mil,2971.213mil)(2107.874mil,2971.213mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9574.123mil|Location2.X=9585.373mil|Location1.Y=7392.588mil|Location2.Y=7403.838mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9574.123mil|Location2.X=9585.373mil|Location1.Y=7392.588mil|Location2.Y=7403.838mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (7.874mil &lt; 10mil) Between Pad Y400-2(2145.276mil,2959.402mil) on Bottom Layer And Track (2092.126mil,2971.213mil)(2107.874mil,2971.213mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9574.123mil|Location2.X=9585.373mil|Location1.Y=7294.163mil|Location2.Y=7305.413mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9574.123mil|Location2.X=9585.373mil|Location1.Y=7294.163mil|Location2.Y=7305.413mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (7.874mil &lt; 10mil) Between Pad Y400-3(2145.276mil,2884.598mil) on Bottom Layer And Track (2092.126mil,2872.787mil)(2107.874mil,2872.787mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9542.627mil|Location2.X=9553.877mil|Location1.Y=7294.163mil|Location2.Y=7305.413mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9542.627mil|Location2.X=9553.877mil|Location1.Y=7294.163mil|Location2.Y=7305.413mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (7.874mil &lt; 10mil) Between Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer And Track (2092.126mil,2872.787mil)(2107.874mil,2872.787mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9873.545mil|Location2.X=9881.212mil|Location1.Y=7021.813mil|Location2.Y=7029.48mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9873.545mil|Location2.X=9881.212mil|Location1.Y=7021.813mil|Location2.Y=7029.48mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (Collision &lt; 10mil) Between Pad R300-1(2401.567mil,2604.989mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9897.712mil|Location2.X=9905.379mil|Location1.Y=7011.816mil|Location2.Y=7019.483mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9897.712mil|Location2.X=9905.379mil|Location1.Y=7011.816mil|Location2.Y=7019.483mil|Absolute=True">Silk To Solder Mask Clearance Constraint: (Collision &lt; 10mil) Between Pad R300-2(2452.748mil,2604.989mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDGWBBZD4ZIAWQKXM0YZCO1N5L2MPKMIRWAKHOW0C2XTARA1SJXYRN"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Silk to Silk (Clearance=10mil) (All),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7624.704mil|Location2.X=7635.954mil|Location1.Y=5692.497mil|Location2.Y=5703.747mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7624.704mil|Location2.X=7635.954mil|Location1.Y=5692.497mil|Location2.Y=5703.747mil|Absolute=True">Silk To Silk Clearance Constraint: (7.687mil &lt; 10mil) Between Text "1" (146.156mil,1271.121mil) on Top Overlay And Track (174.109mil,1239.034mil)(174.109mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [7.687mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7624.704mil|Location2.X=7635.954mil|Location1.Y=8092.497mil|Location2.Y=8103.747mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7624.704mil|Location2.X=7635.954mil|Location1.Y=8092.497mil|Location2.Y=8103.747mil|Absolute=True">Silk To Silk Clearance Constraint: (7.687mil &lt; 10mil) Between Text "1" (146.156mil,3671.121mil) on Top Overlay And Track (174.109mil,3639.034mil)(174.109mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [7.687mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8269.81mil|Location2.X=8281.06mil|Location1.Y=6680.678mil|Location2.Y=6691.928mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8269.81mil|Location2.X=8281.06mil|Location1.Y=6680.678mil|Location2.Y=6691.928mil|Absolute=True">Silk To Silk Clearance Constraint: (2.886mil &lt; 10mil) Between Text "17" (875.858mil,2219.315mil) on Bottom Overlay And Track (804.992mil,2034.276mil)(804.992mil,3097.268mil) on Bottom Overlay Silk Text to Silk Clearance [2.886mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8341.246mil|Location2.X=8352.496mil|Location1.Y=6640.69mil|Location2.Y=6651.94mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8341.246mil|Location2.X=8352.496mil|Location1.Y=6640.69mil|Location2.Y=6651.94mil|Absolute=True">Silk To Silk Clearance Constraint: (8.024mil &lt; 10mil) Between Text "17" (875.858mil,2219.315mil) on Bottom Overlay And Track (890.819mil,2086.047mil)(890.819mil,2291.953mil) on Bottom Overlay Silk Text to Silk Clearance [8.024mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8269.81mil|Location2.X=8281.06mil|Location1.Y=6575.588mil|Location2.Y=6586.838mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8269.81mil|Location2.X=8281.06mil|Location1.Y=6575.588mil|Location2.Y=6586.838mil|Absolute=True">Silk To Silk Clearance Constraint: (2.886mil &lt; 10mil) Between Text "18" (875.858mil,2120.89mil) on Bottom Overlay And Track (804.992mil,2034.276mil)(804.992mil,3097.268mil) on Bottom Overlay Silk Text to Silk Clearance [2.886mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8341.246mil|Location2.X=8352.496mil|Location1.Y=6542.265mil|Location2.Y=6553.515mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8341.246mil|Location2.X=8352.496mil|Location1.Y=6542.265mil|Location2.Y=6553.515mil|Absolute=True">Silk To Silk Clearance Constraint: (8.024mil &lt; 10mil) Between Text "18" (875.858mil,2120.89mil) on Bottom Overlay And Track (890.819mil,2086.047mil)(890.819mil,2291.953mil) on Bottom Overlay Silk Text to Silk Clearance [8.024mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7625.463mil|Location2.X=7636.713mil|Location1.Y=5798.796mil|Location2.Y=5810.046mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7625.463mil|Location2.X=7636.713mil|Location1.Y=5798.796mil|Location2.Y=5810.046mil|Absolute=True">Silk To Silk Clearance Constraint: (6.169mil &lt; 10mil) Between Text "2" (134.345mil,1377.42mil) on Top Overlay And Track (174.109mil,1239.034mil)(174.109mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [6.169mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7625.463mil|Location2.X=7636.713mil|Location1.Y=8198.796mil|Location2.Y=8210.046mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7625.463mil|Location2.X=7636.713mil|Location1.Y=8198.796mil|Location2.Y=8210.046mil|Absolute=True">Silk To Silk Clearance Constraint: (6.169mil &lt; 10mil) Between Text "2" (134.345mil,3777.42mil) on Top Overlay And Track (174.109mil,3639.034mil)(174.109mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [6.169mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9264.68mil|Location2.X=9275.93mil|Location1.Y=6542.265mil|Location2.Y=6553.515mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9264.68mil|Location2.X=9275.93mil|Location1.Y=6542.265mil|Location2.Y=6553.515mil|Absolute=True">Silk To Silk Clearance Constraint: (8.925mil &lt; 10mil) Between Text "2" (1840.425mil,2120.89mil) on Bottom Overlay And Track (1797.906mil,2086.047mil)(1797.906mil,2291.953mil) on Bottom Overlay Silk Text to Silk Clearance [8.925mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=5732.484mil|Location2.Y=5743.734mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=5732.484mil|Location2.Y=5743.734mil|Absolute=True">Silk To Silk Clearance Constraint: (5.268mil &lt; 10mil) Between Text "71" (3798.125mil,1271.121mil) on Top Overlay And Track (3785.92mil,1239.034mil)(3785.92mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=8132.484mil|Location2.Y=8143.734mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=8132.484mil|Location2.Y=8143.734mil|Absolute=True">Silk To Silk Clearance Constraint: (5.268mil &lt; 10mil) Between Text "71" (3798.125mil,3671.121mil) on Top Overlay And Track (3785.92mil,3639.034mil)(3785.92mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=5838.783mil|Location2.Y=5850.033mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=5838.783mil|Location2.Y=5850.033mil|Absolute=True">Silk To Silk Clearance Constraint: (5.268mil &lt; 10mil) Between Text "72" (3798.125mil,1377.42mil) on Top Overlay And Track (3785.92mil,1239.034mil)(3785.92mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=8238.783mil|Location2.Y=8250.033mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=11250.867mil|Location2.X=11262.117mil|Location1.Y=8238.783mil|Location2.Y=8250.033mil|Absolute=True">Silk To Silk Clearance Constraint: (5.268mil &lt; 10mil) Between Text "72" (3798.125mil,3777.42mil) on Top Overlay And Track (3785.92mil,3639.034mil)(3785.92mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10053.2mil|Location2.X=10060.866mil|Location1.Y=6965.158mil|Location2.Y=6972.824mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10053.2mil|Location2.X=10060.866mil|Location1.Y=6965.158mil|Location2.Y=6972.824mil|Absolute=True">Silk To Silk Clearance Constraint: (Collision &lt; 10mil) Between Text "C300" (2583.036mil,2482.01mil) on Top Overlay And Text "C301" (2597.493mil,2598.646mil) on Top Overlay Silk Text to Silk Clearance [0mil]</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9867.722mil|Location2.X=9875.388mil|Location1.Y=6961.833mil|Location2.Y=6969.499mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9867.722mil|Location2.X=9875.388mil|Location1.Y=6961.833mil|Location2.Y=6969.499mil|Absolute=True">Silk To Silk Clearance Constraint: (Collision &lt; 10mil) Between Text "C301" (2597.493mil,2598.646mil) on Top Overlay And Text "R300" (2448.601mil,2313.206mil) on Top Overlay Silk Text to Silk Clearance [0mil]</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDU4QAVQECVNDLCZW5QJV2YIAWFCQE3CW3KO33E4NKK2O1KLWO3A3D"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Net Antennae (Tolerance=0mil) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9749.87mil|Location2.X=9810.466mil|Location1.Y=6975.601mil|Location2.Y=7071.818mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9749.87mil|Location2.X=9810.466mil|Location1.Y=6975.601mil|Location2.Y=7071.818mil|Absolute=True">Net Antennae: Via (2311.369mil,2574.1mil) from Top Layer to Bottom Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9751.838mil|Location2.X=9812.435mil|Location1.Y=6917.907mil|Location2.Y=7014.124mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9751.838mil|Location2.X=9812.435mil|Location1.Y=6917.907mil|Location2.Y=7014.124mil|Absolute=True">Net Antennae: Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9830.501mil|Location2.X=9891.097mil|Location1.Y=7130.505mil|Location2.Y=7226.722mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9830.501mil|Location2.X=9891.097mil|Location1.Y=7130.505mil|Location2.Y=7226.722mil|Absolute=True">Net Antennae: Via (2392mil,2729.005mil) from Top Layer to Bottom Layer </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9946.72mil|Location2.X=10007.317mil|Location1.Y=6878.812mil|Location2.Y=6975.029mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=9946.72mil|Location2.X=10007.317mil|Location1.Y=6878.812mil|Location2.Y=6975.029mil|Absolute=True">Net Antennae: Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer </acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br></body>
+</html>

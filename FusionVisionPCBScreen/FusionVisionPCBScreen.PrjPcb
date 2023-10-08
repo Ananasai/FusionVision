@@ -97,7 +97,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=FOXKUMJQ
 
 [Document4]
 DocumentPath=..\..\..\..\VHDL\Uni_Projektas\FPGA_ADC_SHIELD_PCB2\Schlib1.SchLib
@@ -115,6 +115,10 @@ ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for FusionVisionPCBScreen\Design Rule Check - ScreenBoard.html
+DItemRevisionGUID=
 
 [Configuration1]
 Name=Sources
