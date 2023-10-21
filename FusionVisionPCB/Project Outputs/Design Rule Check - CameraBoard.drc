@@ -1,10 +1,11 @@
 Protel Design System Design Rule Check
 PCB File : C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc
 Date     : 2023-10-21
-Time     : 16:45:45
+Time     : 17:30:26
 
 WARNING: Design contains shelved or modified (but not repoured) polygons. The result of DRC is not correct. Recommended to restore/repour all polygons and proceed with DRC again
    Polygon named: NONET_L-01_P-001 In net GND On Bottom Layer
+   Polygon named: NONET_L-01_P-001 In net GND On Top Layer
    Polygon named: NONET_L-01_P-001 In net GND On Top Layer
 
 Processing Rule : Clearance Constraint (Gap=6mil) (All),(All)
@@ -14,11 +15,11 @@ Processing Rule : Short-Circuit Constraint (Allowed=No) (All),(All)
 Rule Violations :0
 
 Processing Rule : Un-Routed Net Constraint ( (All) )
-   Violation between Un-Routed Net Constraint: Net 3V0 Between Pad C302-1(2262.156mil,2516.406mil) on Top Layer And Pad R300-2(2452.748mil,2604.989mil) on Top Layer 
    Violation between Un-Routed Net Constraint: Net 3V3 Between Pad U401-2(1742mil,2139mil) on Multi-Layer And Pad D500-2(3179.689mil,3126.042mil) on Multi-Layer 
-   Violation between Un-Routed Net Constraint: Net 2V8 Between Track (2053.193mil,2886.13mil)(2054.724mil,2884.598mil) on Bottom Layer And Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer [Unplated] 
-   Violation between Un-Routed Net Constraint: Net 3V0 Between Pad R300-2(2452.748mil,2604.989mil) on Top Layer And Pad R301-2(2453.156mil,2669.044mil) on Top Layer 
-   Violation between Un-Routed Net Constraint: Net 2V8 Between Track (2053.193mil,2886.13mil)(2054.724mil,2884.598mil) on Bottom Layer And Via (2261.172mil,2575.084mil) from Top Layer to Bottom Layer 
+   Violation between Un-Routed Net Constraint: Net 2V8 Between Track (2064.083mil,3051.36mil)(2065.614mil,3049.828mil) on Bottom Layer And Pad Y400-1(2065.614mil,3124.632mil) on Bottom Layer [Unplated] 
+   Violation between Un-Routed Net Constraint: Net 3V0 Between Pad R300-2(2635.5mil,3072.978mil) on Top Layer And Pad R301-2(2635.5mil,3136.443mil) on Top Layer 
+   Violation between Un-Routed Net Constraint: Net 3V0 Between Via (2273.046mil,2681.636mil) from Top Layer to Bottom Layer And Pad R300-2(2635.5mil,3072.978mil) on Top Layer 
+   Violation between Un-Routed Net Constraint: Net 2V8 Between Track (2064.083mil,3051.36mil)(2065.614mil,3049.828mil) on Bottom Layer And Track (2225.409mil,2717.069mil)(2225.566mil,2717.227mil) on Bottom Layer 
 Rule Violations :5
 
 Processing Rule : Modified Polygon (Allow modified: No), (Allow shelved: No)
@@ -33,32 +34,32 @@ Processing Rule : Routing Layers(All)
 Rule Violations :0
 
 Processing Rule : Routing Via (MinHoleWidth=11.811mil) (MaxHoleWidth=11.811mil) (PreferredHoleWidth=11.811mil) (MinWidth=18mil) (MaxWidth=50mil) (PreferedWidth=18mil) (All)
-   Violation between Routing Via Style: Via (2259.885mil,2629.081mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2261.172mil,2575.084mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2262.156mil,2516.406mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2306.43mil,2658.172mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2311.369mil,2574.1mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2331.252mil,2471.48mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2341.213mil,2729.005mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2372mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2392mil,2729.005mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2401.567mil,2604.989mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2401.975mil,2669.044mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2413.26mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2455.07mil,2469.567mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
-   Violation between Routing Via Style: Via (2508.318mil,2528.592mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2270.775mil,2794.311mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2272.062mil,2740.314mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2273.046mil,2681.636mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2315.76mil,3433.495mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2317.32mil,2823.402mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2322.259mil,2739.33mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2324.227mil,2681.636mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2342.142mil,2636.71mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2352.102mil,2894.235mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2382.89mil,2634.797mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2412.81mil,2891.159mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2424.15mil,2634.797mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2465.96mil,2634.797mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2519.109mil,2642.541mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2519.208mil,2693.912mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
+   Violation between Routing Via Style: Via (2519.208mil,2876.518mil) from Top Layer to Bottom Layer Actual Size : 24mil Actual Hole Size : 12mil
 Rule Violations :16
 
 Processing Rule : Differential Pairs Uncoupled Length using the Gap Constraints (Min=10mil) (Max=10mil) (Prefered=10mil)  and Width Constraints (Min=10mil) (Max=10mil) (Prefered=10mil) (All)
 Rule Violations :0
 
 Processing Rule : SMD Neck-Down Constraint (Percent=100%) (All)
-   Violation between SMD Neck-Down Constraint: Between Pad C305-2(1995mil,2886.819mil) on Bottom Layer And Track (1995mil,2886.819mil)(1995.689mil,2886.13mil) on Bottom Layer Relative Track Width: 105.83%
-   Violation between SMD Neck-Down Constraint: Between Pad U400-16(2260.188mil,2435.304mil) on Bottom Layer And Track (2260.188mil,2435.304mil)(2260.188mil,2514.438mil) on Bottom Layer Relative Track Width: 101.60%
-   Violation between SMD Neck-Down Constraint: Between Pad U400-19(2214.519mil,2551.839mil) on Bottom Layer And Track (2214.519mil,2551.839mil)(2214.676mil,2551.997mil) on Bottom Layer Relative Track Width: 101.60%
-   Violation between SMD Neck-Down Constraint: Between Pad U400-7(2553.889mil,2516.406mil) on Bottom Layer And Track (2520.346mil,2516.564mil)(2553.731mil,2516.564mil) on Bottom Layer Relative Track Width: 101.60%
+   Violation between SMD Neck-Down Constraint: Between Pad C305-2(2005.89mil,3052.049mil) on Bottom Layer And Track (2005.89mil,3052.049mil)(2006.579mil,3051.36mil) on Bottom Layer Relative Track Width: 105.83%
+   Violation between SMD Neck-Down Constraint: Between Pad U400-16(2271.078mil,2600.534mil) on Bottom Layer And Track (2271.078mil,2600.534mil)(2271.078mil,2679.668mil) on Bottom Layer Relative Track Width: 101.60%
+   Violation between SMD Neck-Down Constraint: Between Pad U400-19(2225.409mil,2717.069mil) on Bottom Layer And Track (2225.409mil,2717.069mil)(2225.566mil,2717.227mil) on Bottom Layer Relative Track Width: 101.60%
+   Violation between SMD Neck-Down Constraint: Between Pad U400-7(2564.779mil,2681.636mil) on Bottom Layer And Track (2564.621mil,2681.794mil)(2564.779mil,2681.636mil) on Bottom Layer Relative Track Width: 101.60%
 Rule Violations :4
 
 Processing Rule : Power Plane Connect Rule(Relief Connect )(Expansion=20mil) (Conductor Width=10mil) (Air Gap=10mil) (Entries=4) (All)
@@ -77,27 +78,29 @@ Processing Rule : Hole To Hole Clearance (Gap=10mil) (All),(All)
 Rule Violations :0
 
 Processing Rule : Minimum Solder Mask Sliver (Gap=6mil) (All),(All)
-   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-1(1995mil,2938mil) on Bottom Layer And Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-1(1995mil,2938mil) on Bottom Layer And Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-2(1995mil,2886.819mil) on Bottom Layer And Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (0.745mil < 6mil) Between Pad U400-11(2437.353mil,2435.304mil) on Bottom Layer And Via (2413.26mil,2469.567mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [0.745mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (4.784mil < 6mil) Between Pad U400-12(2401.92mil,2435.304mil) on Bottom Layer And Via (2372mil,2469.567mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [4.784mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (3.472mil < 6mil) Between Pad U400-9(2508.219mil,2435.304mil) on Bottom Layer And Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [3.472mil]
-   Violation between Minimum Solder Mask Sliver Constraint: (4.366mil < 6mil) Between Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer And Via (2331.252mil,2471.48mil) from Top Layer to Bottom Layer [Top Solder] Mask Sliver [4.366mil] / [Bottom Solder] Mask Sliver [4.366mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-1(2005.89mil,3103.23mil) on Bottom Layer And Pad Y400-1(2065.614mil,3124.632mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-1(2005.89mil,3103.23mil) on Bottom Layer And Pad Y400-4(2065.614mil,3049.828mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (0.354mil < 6mil) Between Pad C305-2(2005.89mil,3052.049mil) on Bottom Layer And Pad Y400-4(2065.614mil,3049.828mil) on Bottom Layer [Bottom Solder] Mask Sliver [0.354mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (0.745mil < 6mil) Between Pad U400-11(2448.243mil,2600.534mil) on Bottom Layer And Via (2424.15mil,2634.797mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [0.745mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (4.784mil < 6mil) Between Pad U400-12(2412.81mil,2600.534mil) on Bottom Layer And Via (2382.89mil,2634.797mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [4.784mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (3.472mil < 6mil) Between Pad U400-9(2519.109mil,2600.534mil) on Bottom Layer And Via (2519.109mil,2642.541mil) from Top Layer to Bottom Layer [Bottom Solder] Mask Sliver [3.472mil]
+   Violation between Minimum Solder Mask Sliver Constraint: (4.366mil < 6mil) Between Via (2324.227mil,2681.636mil) from Top Layer to Bottom Layer And Via (2342.142mil,2636.71mil) from Top Layer to Bottom Layer [Top Solder] Mask Sliver [4.366mil] / [Bottom Solder] Mask Sliver [4.366mil]
 Rule Violations :7
 
 Processing Rule : Silk To Solder Mask (Clearance=10mil) (IsPad),(All)
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad C300-2(2508.219mil,2528.493mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-1(2054.724mil,2959.402mil) on Bottom Layer And Track (2092.126mil,2971.213mil)(2107.874mil,2971.213mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-2(2145.276mil,2959.402mil) on Bottom Layer And Track (2092.126mil,2971.213mil)(2107.874mil,2971.213mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-3(2145.276mil,2884.598mil) on Bottom Layer And Track (2092.126mil,2872.787mil)(2107.874mil,2872.787mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-4(2054.724mil,2884.598mil) on Bottom Layer And Track (2092.126mil,2872.787mil)(2107.874mil,2872.787mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R300-1(2401.567mil,2604.989mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
-   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R300-2(2452.748mil,2604.989mil) on Top Layer And Text "C301" (2597.493mil,2598.646mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
-Rule Violations :7
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad C300-2(2519.109mil,2693.723mil) on Top Layer And Text "C301" (2608.383mil,2763.876mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-1(2065.614mil,3124.632mil) on Bottom Layer And Track (2103.016mil,3136.443mil)(2118.764mil,3136.443mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-2(2156.166mil,3124.632mil) on Bottom Layer And Track (2103.016mil,3136.443mil)(2118.764mil,3136.443mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-3(2156.166mil,3049.828mil) on Bottom Layer And Track (2103.016mil,3038.017mil)(2118.764mil,3038.017mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (7.874mil < 10mil) Between Pad Y400-4(2065.614mil,3049.828mil) on Bottom Layer And Track (2103.016mil,3038.017mil)(2118.764mil,3038.017mil) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [7.874mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R300-1(2584.319mil,3072.978mil) on Top Layer And Text "C304" (2579.995mil,3149.943mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R300-2(2635.5mil,3072.978mil) on Top Layer And Text "C304" (2579.995mil,3149.943mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R301-1(2584.319mil,3136.443mil) on Top Layer And Text "C304" (2579.995mil,3149.943mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
+   Violation between Silk To Solder Mask Clearance Constraint: (Collision < 10mil) Between Pad R301-2(2635.5mil,3136.443mil) on Top Layer And Text "C304" (2579.995mil,3149.943mil) on Top Overlay [Top Overlay] to [Top Solder] clearance [0mil]
+Rule Violations :9
 
 Processing Rule : Silk to Silk (Clearance=10mil) (All),(All)
-   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text ".Designator" (2745.077mil,2855.155mil) on Bottom Overlay And Text "U400" (2598.429mil,2856.14mil) on Bottom Overlay Silk Text to Silk Clearance [0mil]
+   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text ".Designator" (2755.967mil,3020.385mil) on Bottom Overlay And Text "U400" (2609.319mil,3021.37mil) on Bottom Overlay Silk Text to Silk Clearance [0mil]
    Violation between Silk To Silk Clearance Constraint: (7.687mil < 10mil) Between Text "1" (146.156mil,1271.121mil) on Top Overlay And Track (174.109mil,1239.034mil)(174.109mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [7.687mil]
    Violation between Silk To Silk Clearance Constraint: (7.687mil < 10mil) Between Text "1" (146.156mil,3671.121mil) on Top Overlay And Track (174.109mil,3639.034mil)(174.109mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [7.687mil]
    Violation between Silk To Silk Clearance Constraint: (6.169mil < 10mil) Between Text "2" (134.345mil,1377.42mil) on Top Overlay And Track (174.109mil,1239.034mil)(174.109mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [6.169mil]
@@ -107,16 +110,16 @@ Processing Rule : Silk to Silk (Clearance=10mil) (All),(All)
    Violation between Silk To Silk Clearance Constraint: (5.268mil < 10mil) Between Text "71" (3798.125mil,3671.121mil) on Top Overlay And Track (3785.92mil,3639.034mil)(3785.92mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]
    Violation between Silk To Silk Clearance Constraint: (5.268mil < 10mil) Between Text "72" (3798.125mil,1377.42mil) on Top Overlay And Track (3785.92mil,1239.034mil)(3785.92mil,1444.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]
    Violation between Silk To Silk Clearance Constraint: (5.268mil < 10mil) Between Text "72" (3798.125mil,3777.42mil) on Top Overlay And Track (3785.92mil,3639.034mil)(3785.92mil,3844.94mil) on Top Overlay Silk Text to Silk Clearance [5.268mil]
-   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text "C300" (2583.036mil,2482.01mil) on Top Overlay And Text "C301" (2597.493mil,2598.646mil) on Top Overlay Silk Text to Silk Clearance [0mil]
-   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text "C301" (2597.493mil,2598.646mil) on Top Overlay And Text "R300" (2448.601mil,2313.206mil) on Top Overlay Silk Text to Silk Clearance [0mil]
-Rule Violations :12
+   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text "C300" (2593.926mil,2647.24mil) on Top Overlay And Text "C301" (2608.383mil,2763.876mil) on Top Overlay Silk Text to Silk Clearance [0mil]
+   Violation between Silk To Silk Clearance Constraint: (7.319mil < 10mil) Between Text "C301" (2608.383mil,2763.876mil) on Top Overlay And Text "R300" (2631.353mil,2781.195mil) on Top Overlay Silk Text to Silk Clearance [7.319mil]
+   Violation between Silk To Silk Clearance Constraint: (Collision < 10mil) Between Text "C304" (2579.995mil,3149.943mil) on Top Overlay And Text "R300" (2631.353mil,2781.195mil) on Top Overlay Silk Text to Silk Clearance [0mil]
+Rule Violations :13
 
 Processing Rule : Net Antennae (Tolerance=0mil) (All)
-   Violation between Net Antennae: Via (2311.369mil,2574.1mil) from Top Layer to Bottom Layer 
-   Violation between Net Antennae: Via (2313.338mil,2516.406mil) from Top Layer to Bottom Layer 
-   Violation between Net Antennae: Via (2392mil,2729.005mil) from Top Layer to Bottom Layer 
-   Violation between Net Antennae: Via (2508.219mil,2477.311mil) from Top Layer to Bottom Layer 
-Rule Violations :4
+   Violation between Net Antennae: Via (2322.259mil,2739.33mil) from Top Layer to Bottom Layer 
+   Violation between Net Antennae: Via (2324.227mil,2681.636mil) from Top Layer to Bottom Layer 
+   Violation between Net Antennae: Via (2519.109mil,2642.541mil) from Top Layer to Bottom Layer 
+Rule Violations :3
 
 Processing Rule : Component Clearance Constraint ( Horizontal Gap = 10mil, Vertical Gap = 10mil ) (All),(All) 
 Rule Violations :0
@@ -125,6 +128,6 @@ Processing Rule : Height Constraint (Min=0mil) (Max=1000mil) (Prefered=500mil) (
 Rule Violations :0
 
 
-Violations Detected : 57
+Violations Detected : 59
 Waived Violations : 0
-Time Elapsed        : 00:00:02
+Time Elapsed        : 00:00:01
