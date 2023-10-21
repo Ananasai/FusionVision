@@ -72,11 +72,13 @@ __Previews
 #useless dirs
 FusionVisionPCB/Project/Outputs
 FusionVisionPCB/Project/Logs
-Project Outputs for*
+FusionVisionPCB/Project Outputs
+FusionVisionPCBScreen/Project Outputs
 
 #History
 FusionVisionPCB/History/
 FusionVisionPCBScreen/History/
+
 
 FusionVisionCode/CM4/Debug/
 FusionVisionCode/CM7/Debug/
