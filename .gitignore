@@ -66,6 +66,9 @@ __Previews
 *.htm
 *.$$$
 
+.html
+.drc
+
 #useless dirs
 FusionVisionPCB/Project/Outputs
 FusionVisionPCB/Project/Logs
