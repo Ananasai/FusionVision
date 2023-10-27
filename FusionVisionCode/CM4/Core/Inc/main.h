@@ -58,6 +58,8 @@ void MX_USART3_UART_Init(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define ADC_LIGHT_SENSOR_Pin GPIO_PIN_0
+#define ADC_LIGHT_SENSOR_GPIO_Port GPIOA
 #define STLINK_RX_Pin GPIO_PIN_8
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
