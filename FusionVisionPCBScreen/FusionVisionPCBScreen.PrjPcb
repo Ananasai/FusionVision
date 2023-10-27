@@ -102,11 +102,11 @@ DocumentUniqueId=FFMOOWCK
 [Document4]
 DocumentPath=ScreenBoard.SchDoc
 AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
+AnnotateStartValue=100
+AnnotationIndexControlEnabled=1
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=0
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -114,7 +114,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=VHYKTQKM
 
 [GeneratedDocument1]
 DocumentPath=Project Outputs for FusionVisionPCBScreen\Design Rule Check - ScreenBoard.html
