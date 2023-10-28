@@ -76,11 +76,13 @@ FusionVisionPCB/Project/Outputs
 FusionVisionPCB/Project/Logs
 FusionVisionPCB/Project Outputs
 FusionVisionPCBScreen/Project Outputs
+FusionVisionPCBMultiboard/Project Outputs
 
 #History
 FusionVisionPCB/History/
 FusionVisionPCBScreen/History/
 FusionVisionPCBLight/History/
+FusionVisionPCBMultiboard/History/
 
 FusionVisionCode/CM4/Debug/
 FusionVisionCode/CM7/Debug/

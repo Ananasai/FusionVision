@@ -1,0 +1,8 @@
+Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=..\FusionVisionPCBLight\FusionVisionPCBLight.PrjPcb
+Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\FusionVisionPCBLight\FusionVisionPCBLight.PrjPcb
+Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=..\FusionVisionPCBScreen\FusionVisionPCBScreen.PrjPcb
+Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\FusionVisionPCBScreen\FusionVisionPCBScreen.PrjPcb
+Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=3|Source=..\FusionVisionPCB\FusionVisionPCB.PrjPcb
+Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\FusionVisionPCB\FusionVisionPCB.PrjPcb
+Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=4|Source=..\..\..\..\..\..\Downloads\MB1363-C01\MB1363.PrjPcb
+Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\..\..\..\..\..\Downloads\MB1363-C01\MB1363.PrjPcb
