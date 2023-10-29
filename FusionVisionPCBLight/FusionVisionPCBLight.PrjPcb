@@ -166,7 +166,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=FOXKUMJQ
 
 [Document8]
 DocumentPath=..\..\..\..\VHDL\Uni_Projektas\FPGA_ADC_SHIELD_PCB2\Schlib1.SchLib
@@ -183,7 +183,11 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=IBXKNLRF
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs\Design Rule Check - LightBoard.html
+DItemRevisionGUID=
 
 [Parameter1]
 Name=CAGE_CODE
