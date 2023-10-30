@@ -1,24 +1,30 @@
 Protel Design System Design Rule Check
 PCB File : C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc
 Date     : 2023-10-30
-Time     : 11:52:15
-
-Processing Rule : Clearance Constraint (Gap=0.254mm) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))
-Rule Violations :0
+Time     : 19:38:46
 
 Processing Rule : Clearance Constraint (Gap=0.1mm) (All),(All)
+Rule Violations :0
+
+Processing Rule : Clearance Constraint (Gap=0.254mm) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))
 Rule Violations :0
 
 Processing Rule : Short-Circuit Constraint (Allowed=No) (All),(All)
 Rule Violations :0
 
 Processing Rule : Un-Routed Net Constraint ( (All) )
-Rule Violations :0
+   Violation between Un-Routed Net Constraint: Net NetC200_2 Between Pad SB200-1(73.327mm,67.473mm) on Top Layer And Pad L200-2(75.852mm,65.781mm) on Top Layer 
+   Violation between Un-Routed Net Constraint: Net 1V2 Between Via (65.558mm,71.948mm) from Top Layer to Bottom Layer And Pad SB200-2(70.457mm,67.499mm) on Top Layer 
+   Violation between Un-Routed Net Constraint: Net NetC204_2 Between Pad SB201-1(72.887mm,53.917mm) on Top Layer And Pad TP201-1(75.44mm,51.118mm) on Top Layer 
+   Violation between Un-Routed Net Constraint: Net 2V8 Between Pad SB201-2(70.017mm,53.942mm) on Top Layer And Via (70.153mm,59.129mm) from Top Layer to Bottom Layer 
+   Violation between Un-Routed Net Constraint: Net 2V8 Between Pad SB400-2(53.457mm,59.331mm) on Bottom Layer And Via (54.088mm,59.342mm) from Top Layer to Bottom Layer 
+   Violation between Un-Routed Net Constraint: Net 5V Between Pad SB500-2(14.323mm,41.323mm) on Bottom Layer And Via (14.754mm,41.616mm) from Top Layer to Bottom Layer 
+Rule Violations :6
 
 Processing Rule : Modified Polygon (Allow modified: No), (Allow shelved: No)
 Rule Violations :0
 
-Processing Rule : Width Constraint (Min=0.152mm) (Max=2.54mm) (Preferred=0.5mm) (All)
+Processing Rule : Width Constraint (Min=0.254mm) (Max=10mm) (Preferred=0.254mm) (All)
 Rule Violations :0
 
 Processing Rule : Routing Layers(All)
@@ -71,13 +77,24 @@ Processing Rule : Silk To Solder Mask (Clearance=0.254mm) (IsPad),(All)
    Violation between Silk To Solder Mask Clearance Constraint: (0.25mm < 0.254mm) Between Pad Q100-4(48.467mm,47.337mm) on Bottom Layer And Track (46.005mm,48.237mm)(49.029mm,48.237mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.25mm]
    Violation between Silk To Solder Mask Clearance Constraint: (0.25mm < 0.254mm) Between Pad Q100-5(47.517mm,47.337mm) on Bottom Layer And Track (46.005mm,48.237mm)(49.029mm,48.237mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.25mm]
    Violation between Silk To Solder Mask Clearance Constraint: (0.25mm < 0.254mm) Between Pad Q100-6(46.567mm,47.337mm) on Bottom Layer And Track (46.005mm,48.237mm)(49.029mm,48.237mm) on Bottom Overlay [Bottom Overlay] to [Bottom Solder] clearance [0.25mm]
-Rule Violations :19
+   Violation between Silk To Solder Mask Clearance Constraint: (0.083mm < 0.254mm) Between Pad R500-2(53.618mm,70.952mm) on Top Layer And Text "C407" (54.128mm,70.719mm) on Top Overlay [Top Overlay] to [Top Solder] clearance [0.083mm]
+Rule Violations :20
 
 Processing Rule : Silk to Silk (Clearance=0.254mm) (All),(All)
-Rule Violations :0
+   Violation between Silk To Silk Clearance Constraint: (0.146mm < 0.254mm) Between Text "C400" (56.318mm,69.416mm) on Top Overlay And Text "C401" (59.291mm,70.165mm) on Top Overlay Silk Text to Silk Clearance [0.146mm]
+   Violation between Silk To Silk Clearance Constraint: (Collision < 0.254mm) Between Text "C401" (59.291mm,70.165mm) on Top Overlay And Text "C404" (61.279mm,70.249mm) on Top Overlay Silk Text to Silk Clearance [0mm]
+   Violation between Silk To Silk Clearance Constraint: (0.053mm < 0.254mm) Between Text "C402" (51.841mm,61.49mm) on Bottom Overlay And Text "C403" (48.843mm,61.49mm) on Bottom Overlay Silk Text to Silk Clearance [0.053mm]
+Rule Violations :3
 
 Processing Rule : Net Antennae (Tolerance=0mm) (All)
 Rule Violations :0
+
+Processing Rule : Room U_Connectors (Bounding Region = (0mm, 0mm, 50.8mm, 25.4mm) (InComponentClass('U_Connectors'))
+   Violation between Room Definition: Between Component J100-M20-8770546 (42.36mm,54.841mm) on Bottom Layer And Room U_Connectors (Bounding Region = (0mm, 0mm, 50.8mm, 25.4mm) (InComponentClass('U_Connectors')) 
+   Violation between Room Definition: Between Room U_Connectors (Bounding Region = (0mm, 0mm, 50.8mm, 25.4mm) (InComponentClass('U_Connectors')) And Small Component J101-Header_2.54_1x1 (20.447mm,86.465mm) on Top Layer 
+   Violation between Room Definition: Between Room U_Connectors (Bounding Region = (0mm, 0mm, 50.8mm, 25.4mm) (InComponentClass('U_Connectors')) And SMT Small Component R100-0402 (49.866mm,48.637mm) on Bottom Layer 
+   Violation between Room Definition: Between Room U_Connectors (Bounding Region = (0mm, 0mm, 50.8mm, 25.4mm) (InComponentClass('U_Connectors')) And SOIC Component Q100-SI3460DDV-T1-BE3 (47.517mm,48.637mm) on Bottom Layer 
+Rule Violations :4
 
 Processing Rule : Component Clearance Constraint ( Horizontal Gap = 0.254mm, Vertical Gap = 0.254mm ) (All),(All) 
 Rule Violations :0
@@ -86,6 +103,6 @@ Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (Al
 Rule Violations :0
 
 
-Violations Detected : 19
+Violations Detected : 33
 Waived Violations : 0
-Time Elapsed        : 00:00:03
+Time Elapsed        : 00:00:02
