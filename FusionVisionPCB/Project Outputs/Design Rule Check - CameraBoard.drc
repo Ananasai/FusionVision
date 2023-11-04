@@ -1,7 +1,7 @@
 Protel Design System Design Rule Check
 PCB File : C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc
-Date     : 2023-11-03
-Time     : 23:46:55
+Date     : 2023-11-04
+Time     : 10:23:00
 
 WARNING: Unplated multi-layer pad(s) detected
    Pad MP103-1(15mm,74mm) on Multi-Layer on Net GND
@@ -10,17 +10,7 @@ WARNING: Unplated multi-layer pad(s) detected
    Pad MP100-1(85mm,74mm) on Multi-Layer on Net GND
 
 Processing Rule : Clearance Constraint (Gap=0.152mm) (All),(All)
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-1(83.138mm,30.787mm) on Top Layer And Pad U200-13(81.788mm,31.912mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-10(80.438mm,31.687mm) on Top Layer And Pad U200-13(81.788mm,31.912mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-11(80.438mm,31.237mm) on Top Layer And Pad U200-13(81.788mm,31.912mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-12(80.438mm,30.787mm) on Top Layer And Pad U200-13(81.788mm,31.912mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-2(83.138mm,31.237mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-4(83.138mm,32.137mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-5(83.138mm,32.587mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-6(83.138mm,33.037mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-7(80.438mm,33.037mm) on Top Layer 
-   Violation between Clearance Constraint: (0.15mm < 0.152mm) Between Pad U200-13(81.788mm,31.912mm) on Top Layer And Pad U200-8(80.438mm,32.587mm) on Top Layer 
-Rule Violations :10
+Rule Violations :0
 
 Processing Rule : Clearance Constraint (Gap=0.254mm) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))
 Rule Violations :0
@@ -87,6 +77,6 @@ Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (Al
 Rule Violations :0
 
 
-Violations Detected : 14
+Violations Detected : 4
 Waived Violations : 0
 Time Elapsed        : 00:00:02
