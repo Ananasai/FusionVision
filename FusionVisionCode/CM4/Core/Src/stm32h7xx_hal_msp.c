@@ -118,11 +118,12 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**ADC1 GPIO Configuration
     PA0     ------> ADC1_INP16
+    PA3     ------> ADC1_INP15
     */
-    GPIO_InitStruct.Pin = ADC_LIGHT_SENSOR_Pin;
+    GPIO_InitStruct.Pin = ADC_LIGHT_SENSOR_Pin|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(ADC_LIGHT_SENSOR_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
@@ -149,8 +150,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
     /**ADC1 GPIO Configuration
     PA0     ------> ADC1_INP16
+    PA3     ------> ADC1_INP15
     */
-    HAL_GPIO_DeInit(ADC_LIGHT_SENSOR_GPIO_Port, ADC_LIGHT_SENSOR_Pin);
+    HAL_GPIO_DeInit(GPIOA, ADC_LIGHT_SENSOR_Pin|GPIO_PIN_3);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
