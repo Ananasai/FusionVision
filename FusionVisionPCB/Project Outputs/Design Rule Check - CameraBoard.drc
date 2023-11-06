@@ -1,18 +1,18 @@
 Protel Design System Design Rule Check
 PCB File : C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc
-Date     : 2023-11-05
-Time     : 20:47:30
+Date     : 2023-11-06
+Time     : 21:18:15
 
 WARNING: Unplated multi-layer pad(s) detected
-   Pad MP103-1(590.551mil,2913.386mil) on Multi-Layer on Net GND
-   Pad MP102-1(590.551mil,-78.74mil) on Multi-Layer on Net GND
-   Pad MP101-1(3346.457mil,-78.74mil) on Multi-Layer on Net GND
-   Pad MP100-1(3346.457mil,2913.386mil) on Multi-Layer on Net GND
+   Pad MP103-1(15mm,74mm) on Multi-Layer on Net GND
+   Pad MP102-1(15mm,-2mm) on Multi-Layer on Net GND
+   Pad MP101-1(85mm,-2mm) on Multi-Layer on Net GND
+   Pad MP100-1(85mm,74mm) on Multi-Layer on Net GND
 
-Processing Rule : Clearance Constraint (Gap=5.984mil) (All),(All)
+Processing Rule : Clearance Constraint (Gap=0.152mm) (All),(All)
 Rule Violations :0
 
-Processing Rule : Clearance Constraint (Gap=10mil) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))
+Processing Rule : Clearance Constraint (Gap=0.254mm) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))
 Rule Violations :0
 
 Processing Rule : Short-Circuit Constraint (Allowed=No) (All),(All)
@@ -24,59 +24,59 @@ Rule Violations :0
 Processing Rule : Modified Polygon (Allow modified: No), (Allow shelved: No)
 Rule Violations :0
 
-Processing Rule : Width Constraint (Min=10mil) (Max=393.701mil) (Preferred=10mil) (All)
+Processing Rule : Width Constraint (Min=0.254mm) (Max=10mm) (Preferred=0.254mm) (All)
 Rule Violations :0
 
 Processing Rule : Routing Layers(All)
 Rule Violations :0
 
-Processing Rule : Routing Via (MinHoleWidth=11.811mil) (MaxHoleWidth=3937.008mil) (PreferredHoleWidth=11.811mil) (MinWidth=23.779mil) (MaxWidth=50mil) (PreferedWidth=23.779mil) (All)
+Processing Rule : Routing Via (MinHoleWidth=0.3mm) (MaxHoleWidth=100mm) (PreferredHoleWidth=0.3mm) (MinWidth=0.604mm) (MaxWidth=1.27mm) (PreferedWidth=0.604mm) (All)
 Rule Violations :0
 
-Processing Rule : Differential Pairs Uncoupled Length using the Gap Constraints (Min=10mil) (Max=10mil) (Prefered=10mil)  and Width Constraints (Min=10mil) (Max=10mil) (Prefered=10mil) (All)
+Processing Rule : Differential Pairs Uncoupled Length using the Gap Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm)  and Width Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm) (All)
 Rule Violations :0
 
 Processing Rule : SMD Neck-Down Constraint (Percent=100%) (Disabled)(All)
 Rule Violations :0
 
-Processing Rule : Power Plane Connect Rule(Relief Connect )(Expansion=20mil) (Conductor Width=10mil) (Air Gap=10mil) (Entries=4) (All)
+Processing Rule : Power Plane Connect Rule(Relief Connect )(Expansion=0.508mm) (Conductor Width=0.254mm) (Air Gap=0.254mm) (Entries=4) (All)
 Rule Violations :0
 
-Processing Rule : Minimum Annular Ring (Minimum=6mil) (All)
-   Violation between Minimum Annular Ring: (No Ring) Pad MP100-1(3346.457mil,2913.386mil) on Multi-Layer (Annular Ring missing on Mid Layer 1)
-   Violation between Minimum Annular Ring: (No Ring) Pad MP101-1(3346.457mil,-78.74mil) on Multi-Layer (Annular Ring missing on Mid Layer 1)
-   Violation between Minimum Annular Ring: (No Ring) Pad MP102-1(590.551mil,-78.74mil) on Multi-Layer (Annular Ring missing on Mid Layer 1)
-   Violation between Minimum Annular Ring: (No Ring) Pad MP103-1(590.551mil,2913.386mil) on Multi-Layer (Annular Ring missing on Mid Layer 1)
+Processing Rule : Minimum Annular Ring (Minimum=0.152mm) (All)
+   Violation between Minimum Annular Ring: (No Ring) Pad MP100-1(85mm,74mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)
+   Violation between Minimum Annular Ring: (No Ring) Pad MP101-1(85mm,-2mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)
+   Violation between Minimum Annular Ring: (No Ring) Pad MP102-1(15mm,-2mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)
+   Violation between Minimum Annular Ring: (No Ring) Pad MP103-1(15mm,74mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)
 Rule Violations :4
 
-Processing Rule : Hole Size Constraint (Min=11.811mil) (Max=393.701mil) (All)
+Processing Rule : Hole Size Constraint (Min=0.3mm) (Max=10mm) (All)
 Rule Violations :0
 
 Processing Rule : Pads and Vias to follow the Drill pairs settings
 Rule Violations :0
 
-Processing Rule : Hole To Hole Clearance (Gap=10mil) (All),(All)
+Processing Rule : Hole To Hole Clearance (Gap=0.254mm) (All),(All)
 Rule Violations :0
 
-Processing Rule : Minimum Solder Mask Sliver (Gap=6mil) (All),(All)
+Processing Rule : Minimum Solder Mask Sliver (Gap=0.152mm) (All),(All)
 Rule Violations :0
 
-Processing Rule : Silk To Solder Mask (Clearance=5.906mil) (IsPad),(All)
+Processing Rule : Silk To Solder Mask (Clearance=0.15mm) (IsPad),(All)
 Rule Violations :0
 
-Processing Rule : Silk to Silk (Clearance=10mil) (All),(All)
+Processing Rule : Silk to Silk (Clearance=0.254mm) (All),(All)
 Rule Violations :0
 
-Processing Rule : Net Antennae (Tolerance=0mil) (All)
+Processing Rule : Net Antennae (Tolerance=0mm) (All)
 Rule Violations :0
 
-Processing Rule : Component Clearance Constraint ( Horizontal Gap = 10mil, Vertical Gap = 10mil ) (All),(All) 
+Processing Rule : Component Clearance Constraint ( Horizontal Gap = 0.254mm, Vertical Gap = 0.254mm ) (All),(All) 
 Rule Violations :0
 
-Processing Rule : Height Constraint (Min=0mil) (Max=1000mil) (Prefered=500mil) (All)
+Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)
 Rule Violations :0
 
 
 Violations Detected : 4
 Waived Violations : 0
-Time Elapsed        : 00:00:02
+Time Elapsed        : 00:00:01
