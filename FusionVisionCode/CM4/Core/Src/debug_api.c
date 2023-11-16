@@ -20,7 +20,7 @@ extern UART_HandleTypeDef huart3; //TODO: check if works
 
 static char send_buffer[MAX_LOG_MESSAGE_LEN] = {0};
 static uint32_t current_copy_index = 0;
-
+//TODO: ADD MUTEX
 void DEBUG_API_LOG (char *message, char *info_string, char *error_string, ...) {
     if ((message == NULL) || (info_string == NULL)) {
         return;
