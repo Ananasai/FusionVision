@@ -66,20 +66,41 @@ __Previews
 *.htm
 *.$$$
 
+*.html
+*.drc
+
+*.outJob
+
 #useless dirs
 FusionVisionPCB/Project/Outputs
 FusionVisionPCB/Project/Logs
-Project Outputs for*
+FusionVisionPCB/Project Outputs
+FusionVisionPCBScreen/Project Outputs
+FusionVisionPCBMultiboard/Project Outputs
 
 #History
 FusionVisionPCB/History/
+FusionVisionPCBScreen/History/
+FusionVisionPCBLight/History/
+FusionVisionPCBMultiboard/History/
 
 FusionVisionCode/CM4/Debug/
 FusionVisionCode/CM7/Debug/
 
 #Exports, but not manual ones
 FusionVisionPCB/exports/*
+FusionVisionPCBScreen/exports/*
+FusionVisionPCBLight/exports/*
 !FusionVisionPCB/exports/manual
+!FusionVisionPCBScreen/exports/manual
+!FusionVisionPCBLight/exports/manual
+
+FusionVisionPCB/exports/*
+FusionVisionPCBLight/exports/*
+FusionVisionPCBScreen/exports/*
+!FusionVisionPCBScreen/exports/manual
+!FusionVisionPCB/exports/manual
+!FusionVisionPCBLight/exports/manual
 
 #Python stuff
 scripts/__pycache__/

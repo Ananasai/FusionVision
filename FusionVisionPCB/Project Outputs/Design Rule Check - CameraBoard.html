@@ -1,0 +1,392 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<style type="text/css">
+		h1, h2, h3, h4, h5, h6 {
+			font-family : segoe ui;
+			color : black;
+			background-color : #EDE7D9;
+			padding: 0.3em;
+		}
+
+		h1 {
+			font-size: 1.2em;
+		}		
+
+		h2 {
+			font-size: 1.2em;
+		}
+
+		body {
+			font-family : segoe ui;
+		}
+
+		td, th {
+			padding: 0.5em;
+			text-align : left;
+			width: 10em;
+		}
+		th {
+			background-color : #EEEEEE;
+
+		}
+		th.column1, td.column1 {
+			text-align: left;
+			width : auto;
+		}
+		table {
+			width : 100%;
+			font-size: 0.9em;
+		}
+
+		.DRC_summary_header {
+			padding-bottom : 0.1em;
+			border : 0px solid black;
+			width: 100%;
+			align: left;
+		}
+
+		.DRC_summary_header_col1,
+		.DRC_summary_header_col2, 
+		.DRC_summary_header_col3 {
+			color : black;
+			font-size:100%;
+			padding : 0em;
+			padding-top : 0.2em;
+			padding-bottom 0.2em;
+			border : 0px solid black;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.DRC_summary_header_col1 {
+			font-weight: bold;
+			width: 9em;
+		}
+
+		.DRC_summary_header_col2 {
+			width: 0.1em;
+		
+		}
+
+		.DRC_summary_header_col3 {
+			width : auto;
+		}
+
+		.header_holder {
+		    Width = 100%;
+		    border = 0px solid green;
+		    padding = 0;
+		}
+
+
+		.front_matter, .front_matter_column1, .front_matter_column2, .front_matter_column3
+		{
+			left : 0;
+			top : 0;
+			padding: 0em;
+			padding-top : 0.1em;
+			border : 0px solid black;
+			width : 100%;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.front_matter_column1 {
+			width : 8em;
+			font-weight: bold;
+		}
+
+		.front_matter_column2 {
+			width: 0.1em;
+		}
+
+		.front_matter_column3 {
+			width : auto;
+		}
+
+		.total_column1, .total_column {
+			font-weight : bold;
+		}
+		.total_column1 {
+			text-align : left;
+		}
+		.warning, .error {
+			color : red;
+			font-weight : bold;
+		}
+		tr.onmouseout_odd {
+			background-color : #white;
+		}
+		tr.onmouseout_even { 
+			background-color : #FAFAFA;
+		}
+		tr.onmouseover_odd, tr.onmouseover_even { 
+			background-color : #EEEEEE;
+		} 
+		a:link, a:visited, .q a:link,.q a:active,.q {
+			color: #21489e; 
+		}
+		a:link.callback, a:visited.callback { 
+			color: #21489e;
+		}
+		a:link.customize, a:visited.customize {
+			color: #C0C0C0;
+			position: absolute; 
+			right: 10px;
+		}	
+		p.contents_level1 {
+			font-weight : bold;
+			font-size : 110%;
+			margin : 0.5em;
+		}
+		p.contents_level2 {
+			position : relative;
+			left : 20px;
+			margin : 0.5em;
+		}
+	</style><script type="text/javascript">
+		function coordToMils(coord) {
+			var number = coord / 10000;
+			
+			if (number != number.toFixed(3))
+				number = number.toFixed(3);
+
+			return number + 'mil'
+		}
+
+		function coordToMM(coord) {
+			var number = 0.0254 * coord / 10000;
+			
+			if (number != number.toFixed(4))
+				number = number.toFixed(4);
+			
+			return number + 'mm'
+		}
+	
+		function convertCoord(coordNode, units) {
+			for (var i = 0; i < coordNode.childNodes.length; i++) {
+				coordNode.removeChild(coordNode.childNodes[i]);
+			}
+
+			var coord = coordNode.getAttribute('value');
+			if (coord != null) {
+				if (units == 'mm') {
+					textNode = document.createTextNode(coordToMM(coord));
+					coordNode.appendChild(textNode);
+				} else if (units == 'mil') {
+					textNode = document.createTextNode(coordToMils(coord));		
+					coordNode.appendChild(textNode);	
+				}
+			}
+		}
+	
+		function convertUnits(unitNode, units) {
+			for (var i = 0; i < unitNode.childNodes.length; i++) {
+				unitNode.removeChild(unitNode.childNodes[i]);		
+			}
+		
+			textNode = document.createTextNode(units); 
+			unitNode.appendChild(textNode);
+		}
+	
+		function changeUnits(radio_input, units) {
+			if (radio_input.checked) {
+			
+				var elements = document.getElementsByName('coordinate');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertCoord(elements[i], units);
+					}
+				}
+	
+				var elements = document.getElementsByName('units');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertUnits(elements[i], units);
+					}
+				}
+			}
+		}
+	</script><title>Design Rule Verification Report</title>
+</head>
+<body onload=""><img ALT="Altium" src="
+			file://C:\Users\Public\Documents\Altium\AD22\Templates\AD_logo.png
+		"><h1>Design Rule Verification Report</h1>
+<table class="header_holder">
+<td class="column1">
+<table class="front_matter">
+<tr class="front_matter">
+<td class="front_matter_column1">Date:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">2023-11-06</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">22:10:42</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Elapsed Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">00:00:01</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Filename:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3"><a href="file:///C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc" class="file"><acronym title="C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc">C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc</acronym></a></td>
+</tr>
+</table>
+</td>
+<td class="column2">
+<table class="DRC_summary_header">
+<tr>
+<td class="DRC_summary_header_col1">Warnings:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">4</td></tr>
+<tr>
+<td class="DRC_summary_header_col1">Rule Violations:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">4</td></tr>
+</table>
+</td>
+</table><a name="ID45QZVNOZHYY2LW1SABKWYS3A2CHPLNS4KYG3Q5O1BGMIWRVZAV1J"><h2>Summary</h2></a><table>
+<tr>
+<th class="column1">Warnings</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDPHHZKCEZE0E2MBLKLZJM0OCZVJ21U0HHMYWJOMJYMDTNUW1YQT5P">Unplated multi-layer pad(s) detected</a></td>
+<td class="column2">4</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">4</td>
+</tr>
+</table><br><table>
+<tr>
+<th class="column1">Rule Violations</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDQKVP2GZTDT0DHAWJ004V34AS4GLG2JHIKZWL4KOSTFIOG2ZBZYFM">Clearance Constraint (Gap=0.152mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDON5KO1YPACF3EULUARRP3YEX4ERII5AWECKKWNGTA01ZSXADPU2J">Clearance Constraint (Gap=0.254mm) (OnLayer('PWR Layer')),(OnLayer('PWR Layer'))</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDEVSSJS2HE0Z5C3LEZUWABYHRIM0HZSW32RED2RGEHCN2UKMVV2ZM">Short-Circuit Constraint (Allowed=No) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDNM1NYHLDXWVGKI0HYT5P52FDKFEATR4SOOHLQFPNRSLS2O1EVDEH">Un-Routed Net Constraint ( (All) )</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDZX4CU2U1CBN1KALA2SRFSSJ13JZOMHJ3RGYQAZMRPIOVBPKPOQYP">Modified Polygon (Allow modified: No), (Allow shelved: No)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDRY2IISQ5FX3BFMBJIQQX4CX3RCTZ10AWLUX5XFJGBG2R2NLCRLWF">Width Constraint (Min=0.254mm) (Max=10mm) (Preferred=0.254mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDSFXWLLBTD5AUCMOBVNLM2ROR5FXYNVITFFLBFVJE3VWYJUDJKA5F">Routing Layers(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDLFN0PFF0BQU0KO0OJNYTVQBE3CWC001C31NYJDMZ0GO0YC2OQF4P">Routing Via (MinHoleWidth=0.3mm) (MaxHoleWidth=100mm) (PreferredHoleWidth=0.3mm) (MinWidth=0.604mm) (MaxWidth=1.27mm) (PreferedWidth=0.604mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDETDU0XCWH1XCBAWZHH3UGGFNCFOOAVHZRFMGQNLOXPJAK3DQETFN">Differential Pairs Uncoupled Length using the Gap Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm)  and Width Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDVP5K4KXOKRS2ESYUWLMYVAPLPPOVE4VFHFY53IK54A1NNWPOLECO">SMD Neck-Down Constraint (Percent=100%) (Disabled)(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDGTO3VAV4CQAQPP1HK5DQDDA4KEFYZ3D4ZMZ5CML54SF3O2QHYY0D">Power Plane Connect Rule(Relief Connect )(Expansion=0.508mm) (Conductor Width=0.254mm) (Air Gap=0.254mm) (Entries=4) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDILAX5VIW53RZC4QX1LNONX0BC0MSCU4HBBJFPC4UWZQF2QHS0GM">Minimum Annular Ring (Minimum=0.152mm) (All)</a></td>
+<td class="column2">4</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDHPHXR2ADWFSRIYBU02ZLTL2ACOQPV3SCTEZFX5F22PGV45OXS0">Hole Size Constraint (Min=0.3mm) (Max=10mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID0Q1OQORLRLRMBRGVOIPONOLYHKQQHGDSDPLUO5DDSI2NY1FZ2PQD">Pads and Vias to follow the Drill pairs settings</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDMIC043UDDARLEQDSRXF2ZQGLDOFTQBSJDU3U2PF4MFAWKDMUPGZG">Hole To Hole Clearance (Gap=0.254mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDSEJ3JGQXK5QPJ0BQAHFIR5ON3BOKSSRM3UVCGKG5SZXC3R13TT2L">Minimum Solder Mask Sliver (Gap=0.152mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDEUIX3C5UK3YCEHXOZWHYLKMPGI3UDWYNEKKHVNP4K4CTCUGPOCLN">Silk To Solder Mask (Clearance=0.15mm) (IsPad),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDNOT5B15TL5JDNGKOKIKKI2ATTV5RQGJKBG5QNRHMZ1NG0BW0HP">Silk to Silk (Clearance=0.254mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDTQFDQV1XNICIEVBSYV05NG4PFZ310TDU4CUCBLKHQEGRIVTVMBC">Net Antennae (Tolerance=0mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDBONHCYQA3ZVMKAUNITQST32Z2BS1VFMEXW30FRIG3523OK1NUMJI">Component Clearance Constraint ( Horizontal Gap = 0.254mm, Vertical Gap = 0.254mm ) (All),(All) </a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDMXF0Y0MWS350RH2R2VTTB2YNNYGOW3WNIS5DJFHMKLJYYEJUFDO">Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">4</td>
+</tr>
+</table><br><a name="IDVCLGJ34SCF5WJK4TXIKY4OKFYELS1PAMFYRUZ0FVQH5WSAMP5LII"><h2>Warnings</h2></a><a name="IDPHHZKCEZE0E2MBLKLZJM0OCZVJ21U0HHMYWJOMJYMDTNUW1YQT5P"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="warning">Unplated multi-layer pad(s) detected</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7898.882mil|Location2.X=8210.22mil|Location1.Y=8305.317mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7898.882mil|Location2.X=8210.22mil|Location1.Y=8305.317mil|Location2.Y=8616.655mil|Absolute=True">Pad MP103-1(15mm,74mm) on Multi-Layer</acronym></a> on <a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True">Net GND</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7898.882mil|Location2.X=8210.22mil|Location1.Y=5313.19mil|Location2.Y=5624.529mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7898.882mil|Location2.X=8210.22mil|Location1.Y=5313.19mil|Location2.Y=5624.529mil|Absolute=True">Pad MP102-1(15mm,-2mm) on Multi-Layer</acronym></a> on <a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True">Net GND</acronym></a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10654.787mil|Location2.X=10966.126mil|Location1.Y=5313.19mil|Location2.Y=5624.529mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10654.787mil|Location2.X=10966.126mil|Location1.Y=5313.19mil|Location2.Y=5624.529mil|Absolute=True">Pad MP101-1(85mm,-2mm) on Multi-Layer</acronym></a> on <a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True">Net GND</acronym></a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10654.787mil|Location2.X=10966.126mil|Location1.Y=8305.317mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10654.787mil|Location2.X=10966.126mil|Location1.Y=8305.317mil|Location2.Y=8616.655mil|Absolute=True">Pad MP100-1(85mm,74mm) on Multi-Layer</acronym></a> on <a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7487.5mil|Location2.X=11382.5mil|Location1.Y=5313.19mil|Location2.Y=8616.655mil|Absolute=True">Net GND</acronym></a></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDILAX5VIW53RZC4QX1LNONX0BC0MSCU4HBBJFPC4UWZQF2QHS0GM"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Minimum Annular Ring (Minimum=0.152mm) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10807.957mil|Location2.X=10812.957mil|Location1.Y=8458.486mil|Location2.Y=8463.486mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10807.957mil|Location2.X=10812.957mil|Location1.Y=8458.486mil|Location2.Y=8463.486mil|Absolute=True">Minimum Annular Ring: (No Ring) Pad MP100-1(85mm,74mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10807.957mil|Location2.X=10812.957mil|Location1.Y=5466.36mil|Location2.Y=5471.36mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=10807.957mil|Location2.X=10812.957mil|Location1.Y=5466.36mil|Location2.Y=5471.36mil|Absolute=True">Minimum Annular Ring: (No Ring) Pad MP101-1(85mm,-2mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8052.051mil|Location2.X=8057.051mil|Location1.Y=5466.36mil|Location2.Y=5471.36mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8052.051mil|Location2.X=8057.051mil|Location1.Y=5466.36mil|Location2.Y=5471.36mil|Absolute=True">Minimum Annular Ring: (No Ring) Pad MP102-1(15mm,-2mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8052.051mil|Location2.X=8057.051mil|Location1.Y=8458.486mil|Location2.Y=8463.486mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\simon\Desktop\UNI\7pusmetis\Semestro projektas\FusionVision\FusionVisionPCB\CameraBoard.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=8052.051mil|Location2.X=8057.051mil|Location1.Y=8458.486mil|Location2.Y=8463.486mil|Absolute=True">Minimum Annular Ring: (No Ring) Pad MP103-1(15mm,74mm) on Multi-Layer (Annular Ring missing on Mid Layer 1)</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br></body>
+</html>
