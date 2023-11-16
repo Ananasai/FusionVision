@@ -65,6 +65,8 @@ void Error_Handler(void);
 #define IR_LED_PWR_GPIO_Port GPIOC
 #define ADC_LIGHT_SENSOR_Pin GPIO_PIN_0
 #define ADC_LIGHT_SENSOR_GPIO_Port GPIOA
+#define ADC_CURRENT_Pin GPIO_PIN_3
+#define ADC_CURRENT_GPIO_Port GPIOA
 #define OV_PWDN_Pin GPIO_PIN_5
 #define OV_PWDN_GPIO_Port GPIOA
 #define LD1_Pin GPIO_PIN_0

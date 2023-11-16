@@ -21,6 +21,8 @@ static const osThreadAttr_t button_APP_thread_attribute = {
 		.priority = osPriorityNormal
 };
 
+//TODO: Make buttons into one look up table
+
 static osThreadId_t button_APP_thread_id = NULL;
 static osEventFlagsId_t button_event_flags_id = NULL;
 
@@ -46,15 +48,19 @@ void Button_APP_Thread(void *argument){
 		flags = osEventFlagsWait(button_event_flags_id, BUTTON_EVENT_FLAG_ALL, osFlagsWaitAny, osWaitForever);
 		switch(flags){
 			case BUTTON_EVENT_FLAG_BTN_1: {
+				debug("Pressed button 1\r\n");
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_2: {
+				debug("Pressed button 2\r\n");
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_3: {
+				debug("Pressed button 3\r\n");
 				break;
 			}
 			default: {
+				error("Invalid button pressed\r\n");
 				break;
 			}
 		}
@@ -64,12 +70,12 @@ void Button_APP_Thread(void *argument){
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   /* EXTI line interrupt detected */
   if (GPIO_Pin == BTN_1_Pin) {
-
+	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_1);
   }
   else if(GPIO_Pin == BTN_2_Pin){
-
+	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_2);
   }
   else if (GPIO_Pin == BTN_3_Pin){
-
+	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_3);
   }
 }
