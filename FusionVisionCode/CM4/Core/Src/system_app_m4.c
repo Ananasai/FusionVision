@@ -12,4 +12,8 @@ bool System_APP_M4_Start(void){
 	if(led_APP_Start() == false){
 		return false;
 	}
+	if(Button_APP_Start() == false){
+		return false;
+	}
+	return true;
 }
