@@ -27,7 +27,7 @@ const static osThreadAttr_t lughting_thread_attribute = {
 static osTimerId_t lighting_timer_id = NULL;
 static osThreadId_t lighting_thread_id = NULL;
 static osEventFlagsId_t lighting_event_flags_id = NULL;
-static uint16_t curr_adc_value = 0x00;
+//static uint16_t curr_adc_value = 0x00;
 
 static void Lighting_app_timer(void *argument);
 static void Lighting_app_thread(void *argument);
@@ -79,7 +79,7 @@ static void Lighting_app_thread(void *argument){
 	}
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){ //TODO: NOW WORKS ONLY WITH ONE ADC, MAKE INTO SEPERATRE FILE
-	curr_adc_value = HAL_ADC_GetValue(&hadc1);
-	osEventFlagsSet(lighting_event_flags_id, LIGHTING_EVENT_FLAGS_ADC_READY);
-}
+//void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){ //TODO: NOW WORKS ONLY WITH ONE ADC, MAKE INTO SEPERATRE FILE
+//	curr_adc_value = HAL_ADC_GetValue(&hadc1);
+//	osEventFlagsSet(lighting_event_flags_id, LIGHTING_EVENT_FLAGS_ADC_READY);
+//}
