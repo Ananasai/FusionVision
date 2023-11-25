@@ -11,19 +11,34 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <main.h>
+#include <cmsis_os2.h>
 
 #define __DEBUG_FILE_NAME__ "DEBUG_API"
 #define MAX_LOG_MESSAGE_LEN 300
 #define UART_TIMEOUT 100
 
-extern UART_HandleTypeDef huart3; //TODO: check if works
+extern UART_HandleTypeDef huart3;
 
 static char send_buffer[MAX_LOG_MESSAGE_LEN] = {0};
 static uint32_t current_copy_index = 0;
-//TODO: ADD MUTEX
+
+static osMutexId_t debug_mutex = NULL;
+static const osMutexAttr_t debug_mutex_attr = {
+		.name = "DEBUG MUTEX",
+		.attr_bits = osMutexPrioInherit
+};
+
+bool Debug_API_Start(void){
+	debug_mutex = osMutexNew(&debug_mutex_attr);
+	return debug_mutex == NULL;
+}
+
 void DEBUG_API_LOG (char *message, char *info_string, char *error_string, ...) {
     if ((message == NULL) || (info_string == NULL)) {
         return;
+    }
+    if(osMutexAcquire(debug_mutex, osWaitForever) != osOK){
+    	return;
     }
     current_copy_index = 0;
     memcpy(send_buffer + current_copy_index, info_string, strnlen(info_string, MAX_LOG_MESSAGE_LEN));
@@ -37,5 +52,6 @@ void DEBUG_API_LOG (char *message, char *info_string, char *error_string, ...) {
     size_t buffer_length = vsnprintf(send_buffer + current_copy_index, MAX_LOG_MESSAGE_LEN - current_copy_index - 1, message, argptr) + current_copy_index;
     va_end(argptr);
     HAL_UART_Transmit(&huart3, (uint8_t *)send_buffer, buffer_length, UART_TIMEOUT);
+    osMutexRelease(debug_mutex);
 }
 

@@ -39,7 +39,7 @@ bool Lighting_APP_Start(void){
 		return false;
 	}
 	lighting_timer_id = osTimerNew(&Lighting_app_timer, osTimerPeriodic, NULL, &lighting_timer_attribute);
-	if(lighting_thread_id == NULL){
+	if(lighting_timer_id == NULL){
 		error("Creating lighting timer\r\n");
 		return false;
 	}
@@ -56,10 +56,9 @@ bool Lighting_APP_Start(void){
 }
 
 
-static void Lighting_app_timer(void *argument){
+void Lighting_app_timer(void *argument){
 	/* Do ADC start here*/
 	HAL_ADC_Start_IT (&hadc1);
-
 }
 
 static void Lighting_app_thread(void *argument){

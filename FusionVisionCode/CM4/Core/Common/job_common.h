@@ -10,7 +10,7 @@
 
 typedef enum eQueueEnum_t {
 	eQueueFirst = 0,
-	eQueueLighting,
+	eQueueLighting = eQueueFirst,
 	eQueueLast
 }eQueueEnum_t;
 

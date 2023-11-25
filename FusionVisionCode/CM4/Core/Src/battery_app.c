@@ -31,6 +31,6 @@ bool Battery_APP_Start(void){
 
 static void Battery_APP_Thread(void *arguemnt){
 	while(true){
-
+		osDelay(osWaitForever);
 	}
 }

@@ -21,7 +21,8 @@ typedef struct sQueue_t {
 }sQueue_t;
 
 static sQueue_t queue_lut[eQueueLast] = {
-		QUEUE_DESC(eQueueLighting, "LIGHTING", 10)
+		//QUEUE_DESC(eQueueLighting, "LIGHTING", 10)
+		[eQueueLighting] = {(sString_t){"LIGHTING", sizeof("LIGHTING")}, NULL, 10}
 };
 
 bool Job_API_AddNew(eQueueEnum_t queue, sJob_t job_in){
@@ -32,7 +33,7 @@ bool Job_API_AddNew(eQueueEnum_t queue, sJob_t job_in){
 		return false;
 	}
 	if(osMessageQueuePut(queue_lut[queue].id, &job_in, 0, 0) != osOK){
-		error("Failed adding to queue %s", queue_lut[queue].name);
+		error("Failed adding to queue %s\r\n", queue_lut[queue].name.string);
 		return false;
 	}
 	return true;
@@ -46,7 +47,7 @@ bool Job_API_WaitNew(eQueueEnum_t queue, sJob_t *job_out){
 		return false;
 	}
 	if(osMessageQueueGet(queue_lut[queue].id, (void *)job_out, 0, osWaitForever) != osOK){
-		error("Failed waiting for queue %s", queue_lut[queue].name);
+		error("Failed waiting for queue %s\r\n", queue_lut[queue].name.string);
 		return false;
 	}
 	return true;
@@ -61,7 +62,7 @@ bool Job_API_CreateQueue(eQueueEnum_t queue){
 	}
 	queue_lut[queue].id = osMessageQueueNew(queue_lut[queue].length, sizeof(sJob_t), NULL);
 	if(queue_lut[queue].id == NULL){
-		error("Creating queue of %s", queue_lut[queue].name);
+		error("Creating queue of %s\r\n", *queue_lut[queue].name.string);
 		return false;
 	}
 	return true;
