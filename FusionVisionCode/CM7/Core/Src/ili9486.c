@@ -8,6 +8,7 @@
 #include "lcd.h"
 #include "bmp.h"
 #include "ili9486.h"
+#include <cmsis_os2.h>
 
 /* Lcd */
 LCD_DrvTypeDef   ili9486_drv =
@@ -258,13 +259,13 @@ void ili9486_Init(void)
       //LCD_IO_Init();
     Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
   }
-  HAL_Delay(10);
+  osDelay(10);
   LCD_IO_WriteCmd8(ILI9486_SWRESET);
-  HAL_Delay(100);
+  osDelay(100);
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_RGB_INTERFACE, (uint8_t *)"\x00", 1); // RGB mode off (0xB0)
   LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  HAL_Delay(10);
+  osDelay(10);
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // interface format (0x3A)
 
@@ -286,9 +287,9 @@ void ili9486_Init(void)
   LCD_IO_WriteCmd8(ILI9486_NORON);     // Normal display on (0x13)
   LCD_IO_WriteCmd8(ILI9486_INVOFF);    // Display inversion off (0x20)
   LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  HAL_Delay(200);
+  osDelay(200);
   LCD_IO_WriteCmd8(ILI9486_DISPON);    // Display on (0x29)
-  HAL_Delay(10);
+  osDelay(10);
 }
 
 //-----------------------------------------------------------------------------

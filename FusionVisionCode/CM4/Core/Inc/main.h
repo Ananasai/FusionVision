@@ -69,8 +69,6 @@ void Error_Handler(void);
 #define ADC_CURRENT_GPIO_Port GPIOA
 #define OV_PWDN_Pin GPIO_PIN_5
 #define OV_PWDN_GPIO_Port GPIOA
-#define LD1_Pin GPIO_PIN_0
-#define LD1_GPIO_Port GPIOB
 #define BTN_3_Pin GPIO_PIN_15
 #define BTN_3_GPIO_Port GPIOF
 #define LEPTON_VSYNC_Pin GPIO_PIN_13
