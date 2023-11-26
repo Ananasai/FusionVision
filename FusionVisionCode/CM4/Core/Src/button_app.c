@@ -14,7 +14,7 @@
 #define BUTTON_EVENT_FLAG_BTN_1 0x01
 #define BUTTON_EVENT_FLAG_BTN_2 0x02
 #define BUTTON_EVENT_FLAG_BTN_3 0x04
-#define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 || BUTTON_EVENT_FLAG_BTN_2 || BUTTON_EVENT_FLAG_BTN_1)
+#define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 | BUTTON_EVENT_FLAG_BTN_2 | BUTTON_EVENT_FLAG_BTN_3)
 
 static const osThreadAttr_t button_APP_thread_attribute = {
 		.name = "button APP",
@@ -68,7 +68,8 @@ void Button_APP_Thread(void *argument){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  /* EXTI line interrupt detected */
+  NVIC_DisableIRQ(EXTI0_IRQn);
+  NVIC_DisableIRQ(EXTI15_10_IRQn);
   if (GPIO_Pin == BTN_1_Pin) {
 	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_1);
   }
@@ -78,4 +79,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   else if (GPIO_Pin == BTN_3_Pin){
 	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_3);
   }
+  NVIC_EnableIRQ(EXTI0_IRQn);
+  NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
