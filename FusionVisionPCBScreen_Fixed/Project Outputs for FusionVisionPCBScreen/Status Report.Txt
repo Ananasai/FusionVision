@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [FusionVisionPCBScreen.PrjPcb]
+   Generated File[ScreenBoard.TXT]
+   Generated File[ScreenBoard.LDP]
+   Generated File[ScreenBoard.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 10:07:22 PM On 11/27/2023

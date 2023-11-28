@@ -1,5 +1,3 @@
-#include <main.h>
-
 /* Orientation
    - 0: 240x320 portrait 0'
    - 1: 320x240 landscape 90'
@@ -14,6 +12,18 @@
 */
 #define  ILI9486_COLORMODE        0
 
+/* Analog touchscreen
+   - 0: touchscreen disabled
+   - 1: touchscreen enabled
+*/
+#define  ILI9486_TOUCH            0
+
+/* Touchscreen calibration data for 4 orientations */
+#define  TS_CINDEX_0        {3385020, 333702, -667424, 1243070964, -458484, -13002, 1806391572}
+#define  TS_CINDEX_1        {3385020, -458484, -13002, 1806391572, -333702, 667424, -163249584}
+#define  TS_CINDEX_2        {3385020, -333702, 667424, -163249584, 458484, 13002, -184966992}
+#define  TS_CINDEX_3        {3385020, 458484, 13002, -184966992, 333702, -667424, 1243070964}
+
 /* For multi-threaded or interrupt use, Lcd and Touchscreen simultaneous use can cause confusion (since it uses common I/O resources)
    If enabled, the Lcd functions wait until the touchscreen functions are run. The touchscreen query is not executed when Lcd is busy.
    - 0: multi-threaded protection disabled
@@ -25,26 +35,3 @@
 // ILI9486 physic resolution (in 0 orientation)
 #define  ILI9486_LCD_PIXEL_WIDTH  320
 #define  ILI9486_LCD_PIXEL_HEIGHT 480
-
-void     ili9486_Init(void);
-uint16_t ili9486_ReadID(void);
-void     ili9486_DisplayOn(void);
-void     ili9486_DisplayOff(void);
-void     ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos);
-void     ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
-uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos);
-void     ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
-void     ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-void     ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-void     ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode);
-uint16_t ili9486_GetLcdPixelWidth(void);
-uint16_t ili9486_GetLcdPixelHeight(void);
-void     ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
-void     ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
-void     ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
-void     ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix);
-
-/* Touchscreen */
-void     ili9486_ts_Init(uint16_t DeviceAddr);
-uint8_t  ili9486_ts_DetectTouch(uint16_t DeviceAddr);
-void     ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y);

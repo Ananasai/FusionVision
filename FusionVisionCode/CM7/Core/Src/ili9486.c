@@ -8,9 +8,31 @@
 #include "lcd.h"
 #include "bmp.h"
 #include "ili9486.h"
-#include <cmsis_os2.h>
-
+#include "CMSIS_os2.h"
 /* Lcd */
+void     ili9486_Init(void);
+uint16_t ili9486_ReadID(void);
+void     ili9486_DisplayOn(void);
+void     ili9486_DisplayOff(void);
+void     ili9486_SetCursor(uint16_t Xpos, uint16_t Ypos);
+void     ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code);
+uint16_t ili9486_ReadPixel(uint16_t Xpos, uint16_t Ypos);
+void     ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+void     ili9486_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ili9486_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ili9486_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t RGBCode);
+uint16_t ili9486_GetLcdPixelWidth(void);
+uint16_t ili9486_GetLcdPixelHeight(void);
+void     ili9486_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
+void     ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
+void     ili9486_ReadRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData);
+void     ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix);
+
+/* Touchscreen */
+void     ili9486_ts_Init(uint16_t DeviceAddr);
+uint8_t  ili9486_ts_DetectTouch(uint16_t DeviceAddr);
+void     ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y);
+
 LCD_DrvTypeDef   ili9486_drv =
 {
   ili9486_Init,
@@ -142,8 +164,15 @@ LCD_DrvTypeDef  *lcd_drv = &ili9486_drv;
 #define ILI9486_IO_INITIALIZED     0x02
 static  uint8_t   Is_ili9486_Initialized = 0;
 
+#if      ILI9486_MULTITASK_MUTEX == 1 && ILI9486_TOUCH == 1
+volatile uint8_t io_lcd_busy = 0;
+volatile uint8_t io_ts_busy = 0;
+#define  ILI9486_LCDMUTEX_PUSH()    while(io_ts_busy); io_lcd_busy++;
+#define  ILI9486_LCDMUTEX_POP()     io_lcd_busy--
+#else
 #define  ILI9486_LCDMUTEX_PUSH()
 #define  ILI9486_LCDMUTEX_POP()
+#endif
 
 //-----------------------------------------------------------------------------
 /* Link functions for LCD IO peripheral */
@@ -252,13 +281,13 @@ uint16_t ili9486_ReadID(void)
   */
 void ili9486_Init(void)
 {
-  if((Is_ili9486_Initialized & ILI9486_LCD_INITIALIZED) == 0)
-  {
-    Is_ili9486_Initialized |= ILI9486_LCD_INITIALIZED;
-    if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
+  //if((Is_ili9486_Initialized & ILI9486_LCD_INITIALIZED) == 0)
+  //{
+    //Is_ili9486_Initialized |= ILI9486_LCD_INITIALIZED;
+    //if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
       //LCD_IO_Init();
-    Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
-  }
+    //Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
+  //}
   osDelay(10);
   LCD_IO_WriteCmd8(ILI9486_SWRESET);
   osDelay(100);
@@ -269,8 +298,7 @@ void ili9486_Init(void)
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // interface format (0x3A)
 
-  LCD_IO_WriteCmd8(ILI9486_MADCTL);
-  LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
+  LCD_IO_WriteCmd8(ILI9486_MADCTL); LCD_IO_WriteData8(ILI9486_MAD_DATA_RIGHT_THEN_DOWN);
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_PWCTR3, (uint8_t *)"\x44", 1); // 0xC2
   LCD_IO_WriteCmd8MultipleData8(ILI9486_VMCTR1, (uint8_t *)"\x00\x00\x00\x00", 4); // 0xC5
@@ -356,7 +384,6 @@ void ili9486_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint
   ILI9486_LCDMUTEX_PUSH();
   LCD_IO_WriteCmd8(ILI9486_CASET); LCD_IO_WriteData16_to_2x8(Xpos); LCD_IO_WriteData16_to_2x8(Xpos + Width - 1);
   LCD_IO_WriteCmd8(ILI9486_PASET); LCD_IO_WriteData16_to_2x8(Ypos); LCD_IO_WriteData16_to_2x8(Ypos + Height - 1);
-  LCD_IO_WriteCmd8(0x2C);
   ILI9486_LCDMUTEX_POP();
 }
 
@@ -457,7 +484,6 @@ void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
 {
   ili9486_SetDisplayWindow(Xpos, Ypos, Xsize, Ysize);
   ILI9486_LCDMUTEX_PUSH();
-  //LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize * Ysize);
   LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize * Ysize);
   ILI9486_LCDMUTEX_POP();
 }
@@ -555,3 +581,119 @@ void ili9486_Scroll(int16_t Scroll, uint16_t TopFix, uint16_t BottonFix)
   }
   ILI9486_LCDMUTEX_POP();
 }
+
+//=============================================================================
+#if ILI9486_TOUCH == 1
+
+#include "ts.h"
+
+#define TS_MULTITASK_MUTEX    ILI9486_MULTITASK_MUTEX
+#define TOUCH_FILTER          8
+#define TOUCH_MAXREPEAT       8
+
+#define ABS(N)   (((N)<0) ? (-(N)) : (N))
+
+TS_DrvTypeDef   ili9486_ts_drv =
+{
+  ili9486_ts_Init,
+  0,
+  0,
+  0,
+  ili9486_ts_DetectTouch,
+  ili9486_ts_GetXY,
+  0,
+  0,
+  0,
+  0,
+};
+
+TS_DrvTypeDef  *ts_drv = &ili9486_ts_drv;
+
+#if (ILI9486_ORIENTATION == 0)
+int32_t  ts_cindex[] = TS_CINDEX_0;
+#elif (ILI9486_ORIENTATION == 1)
+int32_t  ts_cindex[] = TS_CINDEX_1;
+#elif (ILI9486_ORIENTATION == 2)
+int32_t  ts_cindex[] = TS_CINDEX_2;
+#elif (ILI9486_ORIENTATION == 3)
+int32_t  ts_cindex[] = TS_CINDEX_3;
+#endif
+
+uint16_t tx, ty;
+
+/* Link function for Touchscreen */
+uint8_t   TS_IO_DetectToch(void);
+uint16_t  TS_IO_GetX(void);
+uint16_t  TS_IO_GetY(void);
+uint16_t  TS_IO_GetZ1(void);
+uint16_t  TS_IO_GetZ2(void);
+
+//-----------------------------------------------------------------------------
+void ili9486_ts_Init(uint16_t DeviceAddr)
+{
+  if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
+    LCD_IO_Init();
+  Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
+}
+
+//-----------------------------------------------------------------------------
+uint8_t ili9486_ts_DetectTouch(uint16_t DeviceAddr)
+{
+  static uint8_t ret = 0;
+  int32_t x1, x2, y1, y2, i;
+
+  #if TS_MULTITASK_MUTEX == 1
+  io_ts_busy = 1;
+
+  if(io_lcd_busy)
+  {
+    io_ts_busy = 0;
+    return ret;
+  }
+  #endif
+
+  ret = 0;
+  if(TS_IO_DetectToch())
+  {
+    x1 = TS_IO_GetX();
+    y1 = TS_IO_GetY();
+    i = TOUCH_MAXREPEAT;
+    while(i--)
+    {
+      x2 = TS_IO_GetX();
+      y2 = TS_IO_GetY();
+      if((ABS(x1 - x2) < TOUCH_FILTER) && (ABS(y1 - y2) < TOUCH_FILTER))
+      {
+        x1 = (x1 + x2) >> 1;
+        y1 = (y1 + y2) >> 1;
+        i = 0;
+        if(TS_IO_DetectToch())
+        {
+          tx = x1;
+          ty = y1;
+          ret = 1;
+        }
+      }
+      else
+      {
+        x1 = x2;
+        y1 = y2;
+      }
+    }
+  }
+
+  #if TS_MULTITASK_MUTEX == 1
+  io_ts_busy = 0;
+  #endif
+
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
+void ili9486_ts_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
+{
+  *X = tx,
+  *Y = ty;
+}
+
+#endif /* #if ILI9486_TOUCH == 1 */
