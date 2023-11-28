@@ -23,8 +23,8 @@
 
 //-----------------------------------------------------------------------------
 // ILI9486 physic resolution (in 0 orientation)
-#define  ILI9486_LCD_PIXEL_WIDTH  320
-#define  ILI9486_LCD_PIXEL_HEIGHT 480
+#define  ILI9486_LCD_PIXEL_WIDTH  100
+#define  ILI9486_LCD_PIXEL_HEIGHT 100
 
 void     ili9486_Init(void);
 uint16_t ili9486_ReadID(void);

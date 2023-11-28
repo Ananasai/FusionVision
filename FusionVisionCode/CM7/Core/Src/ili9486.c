@@ -256,7 +256,7 @@ void ili9486_Init(void)
   {
     Is_ili9486_Initialized |= ILI9486_LCD_INITIALIZED;
     if((Is_ili9486_Initialized & ILI9486_IO_INITIALIZED) == 0)
-      //LCD_IO_Init();
+      LCD_IO_Init();
     Is_ili9486_Initialized |= ILI9486_IO_INITIALIZED;
   }
   osDelay(10);
