@@ -20,7 +20,7 @@ const unsigned char OV2640_480x360[][2]=
   {0x2e, 0xdf},  /* Reserved                              */
   {0xff, 0x01},  /* Device control register list Table 13 */
   {0x3c, 0x32},  /* Reserved                              */
-  {0x11, 0x00},  /* Clock Rate Control                    */
+  {0x11, 0x80},  /* Clock Rate Control                    */
   {0x09, 0x02},  /* Common control 2                      */
   {0x04, 0x28},  /* Mirror                                */
   {0x13, 0xe5},  /* Common control 8                      */
@@ -55,7 +55,7 @@ const unsigned char OV2640_480x360[][2]=
   {0x3d, 0x34},  /* Reserved                              */
   {0x5a, 0x57},  /* Reserved                              */
   {0x12, 0x00},  /* Common control 7                      */
-  {0x11, 0x00},  /* Clock Rate Control                   2*/
+  {0x11, 0x80},  /* Clock Rate Control                   2*/
   {0x17, 0x11},  /* Horiz window start MSB 8bits          */
   {0x18, 0x75},  /* Horiz window end MSB 8bits            */
   {0x19, 0x01},  /* Vert window line start MSB 8bits      */
@@ -250,7 +250,7 @@ const unsigned char OV2640_480x360[][2]=
   {0x5a, 0x78}, //x asis norima rezoliucija pastumta per du bitus i desine
   {0x5b, 0x50}, //y asis norima rezoliucija pastumta per du bitus i desine
   {0x5c, 0x00},
-  {0xd3, 0x08},
+  {0xd3, 0x00},
   {0xe0, 0x00},
 };
 
