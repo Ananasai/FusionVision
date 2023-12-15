@@ -5,7 +5,6 @@
  *      Author: simon
  */
 #include "system_app_m7.h"
-#include "ili9486.h"
 
 bool System_APP_M7_Start(void){
 
