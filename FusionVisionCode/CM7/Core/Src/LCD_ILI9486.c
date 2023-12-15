@@ -9,7 +9,6 @@
 #include <string.h>
 #include "main.h"
 #include "LCD_ILI9486.h"
-#include "CMSIS_os2.h"
 
 static  uint16_t  yStart, yEnd;
 #define RD(a)                 __REVSH(a)
@@ -229,13 +228,13 @@ void ili9486_DisplayOff(void)
 
 void ili9486_Init(void)
 {
-  osDelay(10);
+  HAL_Delay(10);
   LCD_IO_WriteCmd8(ILI9486_SWRESET);
-  osDelay(100);
+  HAL_Delay(100);
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_RGB_INTERFACE, (uint8_t *)"\x00", 1); // RGB mode off (0xB0)
   LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  osDelay(10);
+  HAL_Delay(10);
 
   LCD_IO_WriteCmd8MultipleData8(ILI9486_PIXFMT, (uint8_t *)"\x55", 1); // interface format (0x3A)
 
@@ -256,9 +255,9 @@ void ili9486_Init(void)
   LCD_IO_WriteCmd8(ILI9486_NORON);     // Normal display on (0x13)
   LCD_IO_WriteCmd8(ILI9486_INVOFF);    // Display inversion off (0x20)
   LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
-  osDelay(200);
+  HAL_Delay(200);
   LCD_IO_WriteCmd8(ILI9486_DISPON);    // Display on (0x29)
-  osDelay(10);
+  HAL_Delay(10);
 }
 
 void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)

@@ -6,7 +6,6 @@
  */
 
 #include "main.h"
-#include "cmsis_os2.h"
 
 extern I2C_HandleTypeDef hi2c4;
 
@@ -711,21 +710,21 @@ void ov2640_Init(uint16_t DeviceAddr)
   uint32_t index;
 
   HAL_GPIO_WritePin(OV_PWDN_GPIO_Port, OV_PWDN_Pin, GPIO_PIN_RESET);
-  osDelay(10);
+  HAL_Delay(10);
   HAL_GPIO_WritePin(OV_RST_GPIO_Port, OV_RST_Pin, GPIO_PIN_RESET);
-  osDelay(10);
+  HAL_Delay(10);
   HAL_GPIO_WritePin(OV_RST_GPIO_Port, OV_RST_Pin, GPIO_PIN_SET);
-  osDelay(10);
+  HAL_Delay(10);
   /* Prepare the camera to be configured */
   CAMERA_IO_Write(DeviceAddr, OV2640_DSP_RA_DLMT, 0x01);
-  osDelay(10);
+  HAL_Delay(10);
   CAMERA_IO_Write(DeviceAddr, OV2640_SENSOR_COM7, 0x80);
-  osDelay(20);
+  HAL_Delay(20);
 
   for(index=0; index<(sizeof(OV2640_480x360)/2); index++)
   {
     CAMERA_IO_Write(DeviceAddr, OV2640_480x360[index][0], OV2640_480x360[index][1]);
-    osDelay(1);
+    HAL_Delay(1);
   }
 }
 
