@@ -9,7 +9,12 @@
 #define INC_SYSTEM_APP_M7_H_
 
 #include <stdbool.h>
+#include "main.h"
+#include "stm32h7xx_hal_dcmi.h"
 
 bool System_APP_M7_Start(void);
+bool System_APP_M7_Run(void);
+
+extern DCMI_HandleTypeDef hdcmi;
 
 #endif /* INC_SYSTEM_APP_M7_H_ */
