@@ -8,6 +8,9 @@
 #include "Camera_OV2640.h"
 #include "LCD_ILI9486.h"
 #include "ui_element_driver.h"
+#include "debug_api.h"
+
+#define __DEBUG_FILE_NAME__ "M7"
 
 uint16_t image_buffer[480*320] = {0};
 
@@ -26,6 +29,8 @@ bool System_APP_M7_Start(void){
 	//UI_DRIVER_DrawCharacter(80, 100, image_buffer, '1');
 	UI_DRIVER_DrawString(100, 20, image_buffer, "Labas", 5);
 	HAL_Delay(1000);
+
+	debug("Drawn\r\n");
 	return true;
 }
 

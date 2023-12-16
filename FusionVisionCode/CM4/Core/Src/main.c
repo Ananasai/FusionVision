@@ -159,6 +159,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+  Debug_API_Start(huart3);
   if(System_APP_M4_Start() == false){
 	  Error_Handler();
   }
