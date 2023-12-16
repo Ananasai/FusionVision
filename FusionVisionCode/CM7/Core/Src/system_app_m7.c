@@ -7,7 +7,7 @@
 #include "system_app_m7.h"
 #include "Camera_OV2640.h"
 #include "LCD_ILI9486.h"
-#include "ui_element_driver.h"
+#include "ui_app.h"
 #include "debug_api.h"
 
 #define __DEBUG_FILE_NAME__ "M7"
@@ -23,14 +23,12 @@ bool System_APP_M7_Start(void){
 	HAL_Delay(10);
 #include "string.h"
 	memset(image_buffer, 0x00, 320*480*2);
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
+	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	HAL_Delay(1000); //Bbz kam bet nx reikia ig
-	//UI_DRIVER_DrawCharacter(100, 100, image_buffer, '1');
-	//UI_DRIVER_DrawCharacter(80, 100, image_buffer, '1');
-	UI_DRIVER_DrawString(100, 20, image_buffer, "Labas", 5);
-	HAL_Delay(1000);
-
+	UI_APP_DrawAll(image_buffer);
 	debug("Drawn\r\n");
+	UI_APP_Printout(image_buffer);
+	HAL_Delay(1000);
 	return true;
 }
 

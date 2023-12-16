@@ -28,13 +28,15 @@ bool Debug_API_Start(UART_HandleTypeDef huart){
 }
 
 void DEBUG_API_LOG (char *message, char *info_string, char *error_string, ...) {
-    if ((message == NULL) || (info_string == NULL)) {
+    if (message == NULL) {
         return;
     }
     Sync_API_WaitSemaphore(eSemaphoreUart);
     current_copy_index = 0;
-    memcpy(send_buffer + current_copy_index, info_string, strnlen(info_string, MAX_LOG_MESSAGE_LEN));
-    current_copy_index += strnlen(info_string, MAX_LOG_MESSAGE_LEN);
+    if(info_string != NULL){
+		memcpy(send_buffer + current_copy_index, info_string, strnlen(info_string, MAX_LOG_MESSAGE_LEN));
+		current_copy_index += strnlen(info_string, MAX_LOG_MESSAGE_LEN);
+    }
     if (error_string != NULL) {
         memcpy(send_buffer + current_copy_index, error_string, strnlen(error_string, MAX_LOG_MESSAGE_LEN - current_copy_index));
         current_copy_index += strnlen(error_string, MAX_LOG_MESSAGE_LEN - current_copy_index);
