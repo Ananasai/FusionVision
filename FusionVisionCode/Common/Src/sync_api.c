@@ -2,16 +2,29 @@
 #include "main.h"
 #include <stm32h7xx_hal_hsem.h>
 
-void Sync_API_WaitSemaphore(eSemaphore_t sem){
-	while(HAL_HSEM_FastTake(1) != HAL_OK){
+#ifdef CORE_CM7
+#define PROCESS_ID 0
+#else
+#define PROCESS_ID 1
+#endif
+
+bool Sync_API_WaitSemaphore(eSemaphore_t sem){
+	while(HAL_HSEM_Take(sem, PROCESS_ID) != HAL_OK){
 
 	}
+	return true;
 }
 
-void Sync_API_TakeSemaphore(eSemaphore_t sem){
-
+bool Sync_API_TakeSemaphore(eSemaphore_t sem){
+	return HAL_HSEM_Take(sem, PROCESS_ID) == HAL_OK ? true : false;
 }
 
-void Sync_API_ReleaseSemaphore(eSemaphore_t sem){
-	HAL_HSEM_Release(1, 0);
+bool Sync_API_ReleaseSemaphore(eSemaphore_t sem){
+	HAL_HSEM_Release(sem, PROCESS_ID);
+	return true;
+}
+
+bool Sync_API_ReleaseAll(void){
+	HAL_HSEM_ReleaseAll(0xFFFF, PROCESS_ID);
+	return true;
 }
