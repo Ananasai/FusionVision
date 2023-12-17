@@ -191,6 +191,7 @@ Mcu.UserName=STM32H755ZITx
 MxCube.Version=6.10.0
 MxDb.Version=DB.6.0.100
 NVIC1.BusFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
+NVIC1.DCMI_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC1.DMA1_Stream7_IRQn=true\:0\:0\:false\:false\:true\:false\:true\:true
 NVIC1.DebugMonitor_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC1.ForceEnableDMAVector=true

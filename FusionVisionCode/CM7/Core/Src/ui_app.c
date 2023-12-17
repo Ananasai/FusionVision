@@ -40,10 +40,10 @@ char time_text_buffer[20] = {0};
 static const char* Time_getter(void) {
 	RTC_TimeTypeDef time;
 	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
-	/
+	/* Dummy read to */
 	RTC_DateTypeDef date;
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
-	snprintf(time_text_buffer, 20, "%d:%d:%d", time.Hours, time.Minutes, time.Seconds);
+	snprintf(time_text_buffer, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
     return time_text_buffer;
 }
 
@@ -54,8 +54,8 @@ static const GetterFunc function_lut[eUiElementLast] = {
 };
 
 static const sUiElement_t UI_Elements[] = {
-		{.x = 100, .y = 20, .source_type = eUiElementText, .source = (uint32_t *)&tekstas},
-		{.x = 200, .y = 290, .source_type = eUiElementTime, .source = (uint32_t *)&tekstas}
+	{.x = 100, .y = 20, .source_type = eUiElementText, .source = (uint32_t *)&tekstas},
+	{.x = 128, .y = 290, .source_type = eUiElementTime, .source = (uint32_t *)&tekstas}
 };
 
 bool UI_APP_DrawAll(uint16_t *image_buffer){
