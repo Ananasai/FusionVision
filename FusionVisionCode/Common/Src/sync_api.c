@@ -24,7 +24,12 @@ bool Sync_API_ReleaseSemaphore(eSemaphore_t sem){
 	return true;
 }
 
-bool Sync_API_ReleaseAll(void){
+bool Sync_API_ReleaseSemaphoreAll(void){
 	HAL_HSEM_ReleaseAll(0xFFFF, PROCESS_ID);
+	return true;
+}
+
+bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem){
+	HAL_HSEM_ActivateNotification(sem); //TODO: MASK
 	return true;
 }

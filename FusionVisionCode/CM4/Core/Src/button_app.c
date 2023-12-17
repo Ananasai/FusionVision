@@ -49,6 +49,9 @@ void Button_APP_Thread(void *argument){
 		switch(flags){
 			case BUTTON_EVENT_FLAG_BTN_1: {
 				debug("Pressed button 1\r\n");
+#include "sync_api.h"
+				Sync_API_TakeSemaphore(eSemaphoreButton);
+				Sync_API_ReleaseSemaphore(eSemaphoreButton);
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_2: {
