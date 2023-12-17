@@ -15,7 +15,7 @@
 #define COMPUTE_HEIGHT 300
 
 #define PIXEL(image, x, y) *(image + (y) * SCREEN_WIDTH + (x))
-#define PIXEL_GRAY(image, x, y) (*(image + (y) * SCREEN_WIDTH + (x)) & 0x001F)
+#define PIXEL_GRAY(image, x, y) (*(image + (y) * SCREEN_WIDTH + (x)))
 
 uint8_t gray_scale[480*320] = {0};
 
@@ -43,8 +43,8 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 			int16_t green = ((pixel & 0x07E0)>>5);
 			int16_t blue = (pixel & 0x001F);
 			uint8_t grayscale = (0.2126 * red) + (0.7152 * green / 2.0) + (0.0722 * blue);
-			PIXEL(image_buffer, x, y) = (grayscale<<11)+(grayscale<<6)+grayscale;
-			//PIXEL(gray_scale, x, y) = grayscale;
+			//PIXEL(image_buffer, x, y) = (grayscale<<11)+(grayscale<<6)+grayscale;
+			PIXEL(gray_scale, x, y) = grayscale;
 		}
 	}
 	/* https://homepages.inf.ed.ac.uk/rbf/HIPR2/sobel.htm
@@ -55,9 +55,9 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	for(uint16_t y = 1; y < COMPUTE_HEIGHT-1; y++){
 		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x++){
 			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));
-			if(sum > 254){
+			if(sum > 6){
 				//PIXEL(image_buffer, x, y) = 0xFFFF;
-				//*(image_buffer + (y) * 480 + (x)) = 0xFAFA;
+				*(image_buffer + (y) * 480 + (x)) = 0xFAFA;
 			}
 
 		}
