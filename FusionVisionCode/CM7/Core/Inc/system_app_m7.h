@@ -12,9 +12,10 @@
 #include "main.h"
 #include "stm32h7xx_hal_dcmi.h"
 
+extern RTC_HandleTypeDef hrtc;
+extern DCMI_HandleTypeDef hdcmi;
+
 bool System_APP_M7_Start(void);
 bool System_APP_M7_Run(void);
-
-extern DCMI_HandleTypeDef hdcmi;
 
 #endif /* INC_SYSTEM_APP_M7_H_ */

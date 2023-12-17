@@ -154,8 +154,7 @@ Error_Handler();
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  System_APP_M7_Run();
-	  HAL_Delay(1);
+	System_APP_M7_Run();
 
     /* USER CODE END WHILE */
 

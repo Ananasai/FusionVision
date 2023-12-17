@@ -10,6 +10,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "main.h"
+
+extern RTC_HandleTypeDef hrtc;
 
 bool UI_APP_DrawAll(uint16_t *image_buffer);
 bool UI_APP_Printout(uint16_t *image_buffer);

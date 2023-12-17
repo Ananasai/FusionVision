@@ -29,19 +29,20 @@ typedef struct sUiElement_t {
 static const char tekstas[] = "Lab";
 
 // Define the signature for the functions
-typedef char* (*GetterFunc)(void);
+typedef const char* (*GetterFunc)(void);
 
 // Define some example functions
-char* Text_getter(void) {
+static const char* Text_getter(void) {
     return tekstas;
 }
 
-extern RTC_HandleTypeDef hrtc;
-
 char time_text_buffer[20] = {0};
-char* Time_getter(void) {
+static const char* Time_getter(void) {
 	RTC_TimeTypeDef time;
 	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+	/
+	RTC_DateTypeDef date;
+	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text_buffer, 20, "%d:%d:%d", time.Hours, time.Minutes, time.Seconds);
     return time_text_buffer;
 }
@@ -60,7 +61,7 @@ static const sUiElement_t UI_Elements[] = {
 bool UI_APP_DrawAll(uint16_t *image_buffer){
 	for(uint8_t i = 0; i < ARRAY_LENGTH(UI_Elements); i++){
 		//UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, (char *)UI_Elements[i].source, strlen((char *)UI_Elements[i].source));
-		char *text = function_lut[UI_Elements[i].source_type]();
+		const char *text = function_lut[UI_Elements[i].source_type]();
 		UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, text, strlen(text));
 	}
 	return true;

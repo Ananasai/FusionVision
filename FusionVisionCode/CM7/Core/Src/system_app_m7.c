@@ -37,6 +37,9 @@ bool System_APP_M7_Start(void){
 bool System_APP_M7_Run(void){ //TODO: remove
 	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
 	//HAL_Delay(10);
+	HAL_Delay(10);
+	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
+	//HAL_DCMI_Resume(&hdcmi);
 	UI_APP_DrawAll(image_buffer);
 	ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 
