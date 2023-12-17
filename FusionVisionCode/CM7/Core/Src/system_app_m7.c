@@ -71,14 +71,6 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		HAL_Delay(10);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 	}
-	HAL_Delay(1000);
-#include "shared_param_api.h"
-	volatile uint32_t in = 68;
-	Shared_param_API_Write(eSharedParamEdgeThreshold, (volatile uint32_t *)&in, sizeof(in));
-
-	volatile uint32_t out = 0;
-	Shared_param_API_Read(eSharedParamEdgeThreshold, (volatile void *)&out);
-	debug("Param: %d\r\n", out);
 	return true;
 }
 

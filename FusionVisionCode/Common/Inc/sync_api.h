@@ -14,6 +14,7 @@ typedef enum eSemaphore_t {
 	eSemaphoreFirst = 0,
 	eSemaphoreCore = eSemaphoreFirst, //DEFAULT FOR STARTING CORES DO NOT CHANGE
 	eSemaphoreUart,
+	eSemaphoreSharedMem,
 	eSemaphoreButton,
 	eSemaphoreLast
 }eSemaphore_t;

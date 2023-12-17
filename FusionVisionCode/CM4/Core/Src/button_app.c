@@ -17,8 +17,8 @@
 #define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 | BUTTON_EVENT_FLAG_BTN_2 | BUTTON_EVENT_FLAG_BTN_3)
 
 static const osThreadAttr_t button_APP_thread_attribute = {
-		.name = "button APP",
-		.priority = osPriorityNormal
+	.name = "button APP",
+	.priority = osPriorityNormal
 };
 
 //TODO: Make buttons into one look up table
@@ -49,15 +49,6 @@ void Button_APP_Thread(void *argument){
 		switch(flags){
 			case BUTTON_EVENT_FLAG_BTN_1: {
 				debug("Pressed button 1\r\n");
-#include "shared_param_api.h"
-				volatile uint32_t out = 0;
-				Shared_param_API_Read(eSharedParamEdgeThreshold, &out);
-				debug("Read %d\r\n", out);
-				uint32_t parametras = 69;
-				bool corr = Shared_param_API_Write(eSharedParamEdgeThreshold, &parametras, sizeof(parametras));
-				debug("Written %s\r\n", corr ? "yes" : "no");
-				Shared_param_API_Read(eSharedParamEdgeThreshold, (volatile void *)&out);
-				debug("Read %d\r\n", out);
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_2: {
