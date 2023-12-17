@@ -89,7 +89,6 @@ int main(void)
   /* USER CODE END 1 */
 /* USER CODE BEGIN Boot_Mode_Sequence_0 */
   int32_t timeout;
-  Sync_API_ReleaseSemaphoreAll();
 /* USER CODE END Boot_Mode_Sequence_0 */
 
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
@@ -116,6 +115,9 @@ int main(void)
 /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
 /* USER CODE BEGIN Boot_Mode_Sequence_2 */
+  if(System_APP_M7_PreInit() == false){ //TODO: is this the best place?
+	  Error_Handler();
+  }
 /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
 HSEM notification */
 /*HW semaphore Clock enable*/
@@ -146,11 +148,11 @@ Error_Handler();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   MX_USART3_UART_Init();
-#include "debug_api.h" //TODO: FIX
-  Debug_API_Start(huart3);
   //HAL_NVIC_SetPriority(CM4_SEV_IRQn, 0, 0);
   //HAL_NVIC_EnableIRQ(CM4_SEV_IRQn);
-  System_APP_M7_Start();
+  if(System_APP_M7_Start() == false){
+	  return false;
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */

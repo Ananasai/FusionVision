@@ -10,7 +10,7 @@
 #include <main.h>
 #include <cmsis_os2.h>
 
-#define __DEBUG_FILE_NAME__ "BTN_APP"
+#define __DEBUG_FILE_NAME__ "BTN"
 #define BUTTON_EVENT_FLAG_BTN_1 0x01
 #define BUTTON_EVENT_FLAG_BTN_2 0x02
 #define BUTTON_EVENT_FLAG_BTN_3 0x04
@@ -49,9 +49,15 @@ void Button_APP_Thread(void *argument){
 		switch(flags){
 			case BUTTON_EVENT_FLAG_BTN_1: {
 				debug("Pressed button 1\r\n");
-#include "sync_api.h"
-				Sync_API_TakeSemaphore(eSemaphoreButton);
-				Sync_API_ReleaseSemaphore(eSemaphoreButton);
+#include "shared_param_api.h"
+				volatile uint32_t out = 0;
+				Shared_param_API_Read(eSharedParamEdgeThreshold, &out);
+				debug("Read %d\r\n", out);
+				uint32_t parametras = 69;
+				bool corr = Shared_param_API_Write(eSharedParamEdgeThreshold, &parametras, sizeof(parametras));
+				debug("Written %s\r\n", corr ? "yes" : "no");
+				Shared_param_API_Read(eSharedParamEdgeThreshold, (volatile void *)&out);
+				debug("Read %d\r\n", out);
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_2: {

@@ -33,3 +33,4 @@ bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem){
 	HAL_HSEM_ActivateNotification(sem); //TODO: MASK
 	return true;
 }
+
