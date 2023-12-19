@@ -7,6 +7,7 @@
 
 #include "button_app.h"
 #include "debug_api.h"
+#include "shared_param_api.h"
 #include <main.h>
 #include <cmsis_os2.h>
 
@@ -15,6 +16,7 @@
 #define BUTTON_EVENT_FLAG_BTN_2 0x02
 #define BUTTON_EVENT_FLAG_BTN_3 0x04
 #define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 | BUTTON_EVENT_FLAG_BTN_2 | BUTTON_EVENT_FLAG_BTN_3)
+#define DOUBLE_CLICK_TIMEOUT_MS 100
 
 static const osThreadAttr_t button_APP_thread_attribute = {
 	.name = "button APP",
@@ -25,6 +27,11 @@ static const osThreadAttr_t button_APP_thread_attribute = {
 
 static osThreadId_t button_APP_thread_id = NULL;
 static osEventFlagsId_t button_event_flags_id = NULL;
+
+static uint32_t lst_btn_1_click = 0;
+static uint32_t lst_btn_2_click = 0;
+static uint32_t lst_btn_3_click = 0;
+static uint32_t curr_time = 0;
 
 void Button_APP_Thread(void *argument);
 
@@ -49,14 +56,38 @@ void Button_APP_Thread(void *argument){
 		switch(flags){
 			case BUTTON_EVENT_FLAG_BTN_1: {
 				debug("Pressed button 1\r\n");
+				if(curr_time - lst_btn_1_click < DOUBLE_CLICK_TIMEOUT_MS){
+					debug("Doubleclick 1\r\n");
+				}
+				lst_btn_1_click = curr_time;
+				uint32_t curr_param = 0;
+				Shared_param_API_Read(eSharedParamEdgeThreshold, &curr_param);
+				if(curr_param > 0){
+					curr_param--;
+					Shared_param_API_Write(eSharedParamEdgeThreshold, &curr_param, 4);
+				}
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_2: {
 				debug("Pressed button 2\r\n");
+				if(curr_time - lst_btn_2_click < DOUBLE_CLICK_TIMEOUT_MS){
+					debug("Doubleclick 2\r\n");
+				}
+				lst_btn_2_click = curr_time;
 				break;
 			}
 			case BUTTON_EVENT_FLAG_BTN_3: {
 				debug("Pressed button 3\r\n");
+				if(curr_time - lst_btn_3_click < DOUBLE_CLICK_TIMEOUT_MS){
+					debug("Doubleclick 3\r\n");
+				}
+				lst_btn_3_click = curr_time;
+				uint32_t curr_param = 0;
+				Shared_param_API_Read(eSharedParamEdgeThreshold, &curr_param);
+				if(curr_param < 3){
+					curr_param++;
+					Shared_param_API_Write(eSharedParamEdgeThreshold, &curr_param, 4);
+				}
 				break;
 			}
 			default: {
@@ -70,6 +101,7 @@ void Button_APP_Thread(void *argument){
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   NVIC_DisableIRQ(EXTI0_IRQn);
   NVIC_DisableIRQ(EXTI15_10_IRQn);
+  curr_time = HAL_GetTick();
   if (GPIO_Pin == BTN_1_Pin) {
 	  osEventFlagsSet(button_event_flags_id, BUTTON_EVENT_FLAG_BTN_1);
   }

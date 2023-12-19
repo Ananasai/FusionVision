@@ -12,7 +12,9 @@ typedef struct sSharedParam_t{
 }sSharedParam_t;
 
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
-	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", 4)
+	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", 4),
+	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", 4),
+	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", 4)
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
@@ -36,8 +38,7 @@ bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){
 	if(param >= eSharedParamLast){
 		return false;
 	}
-	Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out);
-	return true;
+	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out);
 }
 
 bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, size_t length){
@@ -47,6 +48,5 @@ bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, siz
 	if(length > shared_param_lut[param].size){
 		return false;
 	}
-	Shared_mem_API_Write(shared_param_address_lut[param], in, length);
-	return true;
+	return Shared_mem_API_Write(shared_param_address_lut[param], in, length);
 }

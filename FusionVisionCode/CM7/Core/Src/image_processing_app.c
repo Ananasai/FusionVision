@@ -51,7 +51,6 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	 * https://en.wikipedia.org/wiki/Prewitt_operator or
 	 * https://en.wikipedia.org/wiki/Sobel_operator
 	 * for edge detection */
-
 	for(uint16_t y = 1; y < COMPUTE_HEIGHT-1; y++){
 		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x++){
 			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));

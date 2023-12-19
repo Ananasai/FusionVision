@@ -44,7 +44,7 @@ bool System_APP_M7_Start(void){
 	ov2640_Init(0x60);
 	HAL_Delay(10);
 
-	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
+	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
 	//HAL_Delay(1000); //Bbz kam bet nx reikia ig
 	//UI_APP_DrawAll(image_buffer);
@@ -62,10 +62,8 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	//HAL_DCMI_Resume(&hdcmi);
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
-#include "sync_api.h"
-	Sync_API_ActivateSemaphoreIrq(eSemaphoreButton); //TODO: MOVE
 		frame_event_flag = false;
-		IMG_PROCESSING_APP_Compute(image_buffer);
+		//IMG_PROCESSING_APP_Compute(image_buffer);
 		HAL_Delay(10);
 		UI_APP_DrawAll(image_buffer);
 		HAL_Delay(10);
