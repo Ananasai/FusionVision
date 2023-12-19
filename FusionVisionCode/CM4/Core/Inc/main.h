@@ -67,8 +67,6 @@ void Error_Handler(void);
 #define ADC_LIGHT_SENSOR_GPIO_Port GPIOA
 #define ADC_CURRENT_Pin GPIO_PIN_3
 #define ADC_CURRENT_GPIO_Port GPIOA
-#define OV_PWDN_Pin GPIO_PIN_5
-#define OV_PWDN_GPIO_Port GPIOA
 #define BTN_3_Pin GPIO_PIN_15
 #define BTN_3_GPIO_Port GPIOF
 #define LEPTON_VSYNC_Pin GPIO_PIN_13
@@ -85,8 +83,6 @@ void Error_Handler(void);
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
-#define OV_RST_Pin GPIO_PIN_15
-#define OV_RST_GPIO_Port GPIOA
 #define COMPASS_INTB_Pin GPIO_PIN_3
 #define COMPASS_INTB_GPIO_Port GPIOD
 #define COMPASS_INTA_Pin GPIO_PIN_6

@@ -12,8 +12,9 @@
 #include "adc_app.h"
 #include "debug_api.h"
 #include "job_api.h"
+#include "shared_param_api.h"
 #include <stdbool.h>
-#include <string_common.h>
+#include "string_common.h"
 
 #define __DEBUG_FILE_NAME__ "SYS"
 #define APP_DESC(app_enum, name, init) [app_enum] = {(sString_t){.string = name, .length = sizeof(name)}, init}
@@ -44,8 +45,9 @@ static const sAppDesc_t const_app_lut[eAppLast] = {
 
 /* RTOS CMSIS V2 documentation: https://www.keil.com/pack/doc/CMSIS/RTOS2/html/rtos_api2.html */
 bool System_APP_M4_Start(void){
-	Debug_API_Start();
+	//Debug_API_Start();
 	debug("Init starting\r\n");
+	Shared_param_API_Init();
 	Job_API_InitAll();
 	for(eAppEnum_t app = eAppFirst; app < eAppLast; app++){
 		/* Execute initialise function of every app*/
