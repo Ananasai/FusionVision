@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "system_app_m4.h"
+#include "debug_api.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

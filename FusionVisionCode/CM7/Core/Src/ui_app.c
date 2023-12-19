@@ -76,9 +76,19 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	uint16_t panel_y = 200;
 	volatile uint32_t selected = 0;
 	Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &selected);
-	for(size_t i = 0; i < curr_panel.label_amount; i++){
-		UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, curr_panel.labels[i].content, curr_panel.labels[i].length, i == selected);
-		//UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, curr_panel.labels[i].content, curr_panel.labels[i].length);
+	uint32_t selectable_i = 0;
+	for(size_t i = 0; i < curr_panel.children_amount; i++){
+		switch(curr_panel.children[i].type){
+			case(eUiElementTypeLabel): {
+				sUiLabel_t label = (sUiLabel_t)(*curr_panel.children[i].element.label); //TODO: DONT COPy
+				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length);
+			} break;
+			case (eUiElementTypeButton): {
+				sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);
+				UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, selectable_i == selected);
+				selectable_i++;
+			}break;
+		}
 		panel_y -= 50;
 	}
 
