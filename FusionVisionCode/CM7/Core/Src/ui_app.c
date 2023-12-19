@@ -75,7 +75,7 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	uint16_t panel_x = 100;
 	uint16_t panel_y = 200;
 	volatile uint32_t selected = 0;
-	Shared_param_API_Read(eSharedParamEdgeThreshold, &selected);
+	Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &selected);
 	for(size_t i = 0; i < curr_panel.label_amount; i++){
 		UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, curr_panel.labels[i].content, curr_panel.labels[i].length, i == selected);
 		//UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, curr_panel.labels[i].content, curr_panel.labels[i].length);
