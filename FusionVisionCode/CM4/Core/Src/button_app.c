@@ -19,6 +19,8 @@
 #define DOUBLE_CLICK_TIMEOUT_MS 200
 #define LONG_CLICK_TIMEOUT_MS 500
 
+#define EMPTY_BTN_STATE {.last_press_time = 0, .click_active = false, .high = false}
+
 typedef enum eButton_t {
 	eButtonFirst = 0,
 	eButtonUp = eButtonFirst,
@@ -31,7 +33,7 @@ typedef enum eButtonPress_t {
 	eButtonPressFirst = 0,
 	eButtonPressSingle = eButtonPressFirst,
 	eButtonPressDouble,
-	eButtonPressLong, //TODO: detect long click
+	eButtonPressLong,
 	eButtonPressLast
 }eButtonPress_t;
 
@@ -41,21 +43,24 @@ typedef struct sButtonDesc_t {
 	uint16_t pin;
 	uint32_t flag; //TODO: remove flags? maybe a queue better?
 	Button_Callback callback;
+}sButtonDesc_t;
+
+typedef struct sButtonState_t {
 	uint32_t last_press_time;
 	bool click_active;
 	bool high;
-}sButtonDesc_t;
+}sButtonState_t;
 
 void Button_UP_Callback(eButtonPress_t press);
 void Button_OK_Callback(eButtonPress_t press);
 void Button_DOWN_Callback(eButtonPress_t press);
 
-//TODO: could make const
-static sButtonDesc_t button_lut[eButtonLast] = {
-	[eButtonUp] = {.pin = BTN_1_Pin, .flag = BUTTON_EVENT_FLAG_BTN_1, .callback = &Button_UP_Callback, .last_press_time = 0, .click_active = false, .high = false},
-	[eButtonOk] = {.pin = BTN_2_Pin, .flag = BUTTON_EVENT_FLAG_BTN_2, .callback = &Button_OK_Callback, .last_press_time = 0, .click_active = false, .high = false},
-	[eButtonDown] = {.pin = BTN_3_Pin, .flag = BUTTON_EVENT_FLAG_BTN_3, .callback = &Button_DOWN_Callback, .last_press_time = 0, .click_active = false, .high = false}
+static const sButtonDesc_t button_desc_lut[eButtonLast] = {
+	[eButtonUp] = {.pin = BTN_1_Pin, .flag = BUTTON_EVENT_FLAG_BTN_1, .callback = &Button_UP_Callback},
+	[eButtonOk] = {.pin = BTN_2_Pin, .flag = BUTTON_EVENT_FLAG_BTN_2, .callback = &Button_OK_Callback},
+	[eButtonDown] = {.pin = BTN_3_Pin, .flag = BUTTON_EVENT_FLAG_BTN_3, .callback = &Button_DOWN_Callback}
 };
+static sButtonState_t button_state_lut[eButtonLast] = {0};
 
 static const osThreadAttr_t button_APP_thread_attribute = {
 	.name = "button APP",
@@ -92,6 +97,7 @@ bool Button_APP_Start(void){
 		error("Starting button timer\r\n");
 		return false;
 	}
+	debug("AAAAAAAAAAAAAAAAAAAAAAAAA\r\n"); //TODO: needed for middle button to work?? something with memory
 	return true;
 }
 
@@ -99,28 +105,30 @@ void Button_APP_Thread(void *argument){
 	uint32_t flags = 0x00;
 	while(true){
 		flags = osEventFlagsWait(button_event_flags_id, BUTTON_EVENT_FLAG_ALL, osFlagsWaitAny, osWaitForever);
+
 		for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
-			  if((flags & button_lut[btn].flag) != 0x00){
+			  if((flags & button_desc_lut[btn].flag) != 0x00){
+
 				  uint32_t curr_time = HAL_GetTick();
-				  button_lut[btn].high = !button_lut[btn].high;
+				  button_state_lut[btn].high = !button_state_lut[btn].high;
 				  /* Falling btn edge */
-				  if(button_lut[btn].high == false){
+				  if(button_state_lut[btn].high == false){
 					  /* Is if long click */
-					  if(curr_time - button_lut[btn].last_press_time >= LONG_CLICK_TIMEOUT_MS){
-						  button_lut[btn].click_active = false;
+					  if(curr_time - button_state_lut[btn].last_press_time >= LONG_CLICK_TIMEOUT_MS){
+						  button_state_lut[btn].click_active = false;
 						  debug("Long click\r\n");
-						  (*button_lut[btn].callback)(eButtonPressLong);
+						  (*button_desc_lut[btn].callback)(eButtonPressLong);
 					  }
 				  }else{ /* Rising btn edge */
 					  /* Check if double click */
-					  if(curr_time - button_lut[btn].last_press_time <= DOUBLE_CLICK_TIMEOUT_MS){
-						  button_lut[btn].click_active = false;
-						  button_lut[btn].last_press_time = curr_time;
+					  if(curr_time - button_state_lut[btn].last_press_time <= DOUBLE_CLICK_TIMEOUT_MS){
+						  button_state_lut[btn].click_active = false;
+						  button_state_lut[btn].last_press_time = curr_time;
 						  debug("Double click\r\n");
-						  (*button_lut[btn].callback)(eButtonPressDouble);
-					  }else{ /* Record time for single double/signel click tracking */
-						  button_lut[btn].click_active = true;
-						  button_lut[btn].last_press_time = curr_time;
+						  (*button_desc_lut[btn].callback)(eButtonPressDouble);
+					  }else{ /* Record time for single double/signal click tracking */
+						  button_state_lut[btn].click_active = true;
+						  button_state_lut[btn].last_press_time = curr_time;
 					  }
 				  }
 			  }
@@ -133,11 +141,11 @@ static void Button_Timer(void *argument){
 	uint32_t curr_time = HAL_GetTick();
 	for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
 		/* If waiting for double click ant button low level */
-		if(button_lut[btn].click_active && !button_lut[btn].high){
-			if(curr_time - button_lut[btn].last_press_time >= DOUBLE_CLICK_TIMEOUT_MS+10){
-				button_lut[btn].click_active = false;
+		if(button_state_lut[btn].click_active && !button_state_lut[btn].high){
+			if(curr_time - button_state_lut[btn].last_press_time >= DOUBLE_CLICK_TIMEOUT_MS+10){
+				button_state_lut[btn].click_active = false;
 				debug("Single click\r\n");
-				(*button_lut[btn].callback)(eButtonPressSingle);
+				(*button_desc_lut[btn].callback)(eButtonPressSingle);
 			}
 		}
 	}
@@ -165,8 +173,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   NVIC_DisableIRQ(EXTI0_IRQn);
   NVIC_DisableIRQ(EXTI15_10_IRQn);
   for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
-	  if(GPIO_Pin == button_lut[btn].pin){
-		  osEventFlagsSet(button_event_flags_id, button_lut[btn].flag);
+	  if(GPIO_Pin == button_desc_lut[btn].pin){
+		  osEventFlagsSet(button_event_flags_id, button_desc_lut[btn].flag);
 	  }
   }
   NVIC_EnableIRQ(EXTI0_IRQn);
