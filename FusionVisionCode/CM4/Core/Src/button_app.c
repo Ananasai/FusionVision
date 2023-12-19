@@ -153,20 +153,21 @@ static void Button_Timer(void *argument){
 
 void Button_UP_Callback(eButtonPress_t press){
 	//debug("Pressed button UP\r\n");
-	if(current_active_panel_index < 2){
-		current_active_panel_index++;
-		Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index, 4);
-	}
+	if(current_active_panel_index > 0){
+			current_active_panel_index--;
+			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index, 4);
+		}
+
 }
 void Button_OK_Callback(eButtonPress_t press){
 	//debug("Pressed button OK\r\n");
 }
 void Button_DOWN_Callback(eButtonPress_t press){
 	//debug("Pressed button DOWN\r\n");
-	if(current_active_panel_index > 0){
-		current_active_panel_index--;
-		Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index, 4);
-	}
+	if(current_active_panel_index < 2){
+			current_active_panel_index;
+			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index, 4);
+		}
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
