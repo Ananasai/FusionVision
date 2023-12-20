@@ -54,7 +54,7 @@ const unsigned char OV2640_480x360[][2]=
   {0x3d, 0x34},  /* Reserved                              */
   {0x5a, 0x57},  /* Reserved                              */
   {0x12, 0x00},  /* Common control 7                      */
-  {0x11, 0x8A},  /* Clock Rate Control CHANGE THIS FOR FPS*/
+  {0x11, 0x80},  /* Clock Rate Control CHANGE THIS FOR FPS*/ /* Leave 0x8 as it is*/
   {0x17, 0x11},  /* Horiz window start MSB 8bits          */
   {0x18, 0x75},  /* Horiz window end MSB 8bits            */
   {0x19, 0x01},  /* Vert window line start MSB 8bits      */
