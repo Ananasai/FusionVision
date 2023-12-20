@@ -6,6 +6,7 @@
  */
 
 #include "image_processing_app.h"
+#include "shared_param_api.h"
 #include <stdlib.h>
 
 #define SCREEN_WIDTH 480
@@ -17,7 +18,7 @@
 #define PIXEL(image, x, y) *(image + (y) * SCREEN_WIDTH + (x))
 #define PIXEL_GRAY(image, x, y) (*(image + (y) * SCREEN_WIDTH + (x)))
 
-uint8_t gray_scale[480*320] = {0};
+static uint8_t gray_scale[480*320] = {0};
 
 static int16_t Conv_Gx(uint8_t *image_buffer, uint16_t x, uint16_t y){
 	int16_t conv = PIXEL_GRAY(image_buffer, x-1, y-1) + 2*PIXEL_GRAY(image_buffer, x, y-1) + PIXEL_GRAY(image_buffer, x+1, y-1)
@@ -35,6 +36,8 @@ static int16_t Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
 }
 
 bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
+	uint32_t edge_threshold = 0;
+	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
 	/* To grayscale https://stackoverflow.com/questions/58449462/rgb565-to-grayscale */
 	for(uint16_t y = 0; y < COMPUTE_HEIGHT; y++){
 		for(uint16_t x = 0; x < COMPUTE_WIDTH; x++){
@@ -54,7 +57,7 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	for(uint16_t y = 1; y < COMPUTE_HEIGHT-1; y++){
 		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x++){
 			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));
-			if(sum > 10){
+			if(sum > edge_threshold){
 				//PIXEL(image_buffer, x, y) = 0xFFFF;
 				*(image_buffer + (y) * 480 + (x)) = 0xFAFA;
 			}

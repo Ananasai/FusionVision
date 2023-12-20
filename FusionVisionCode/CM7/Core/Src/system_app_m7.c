@@ -53,9 +53,7 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		HAL_DCMI_Suspend(&hdcmi);
 		frame_event_flag = false;
 		IMG_PROCESSING_APP_Compute(image_buffer);
-		HAL_Delay(10);
 		UI_APP_DrawAll(image_buffer);
-		HAL_Delay(10);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 		HAL_DCMI_Resume(&hdcmi);
 	}

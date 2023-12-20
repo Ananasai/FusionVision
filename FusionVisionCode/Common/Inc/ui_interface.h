@@ -47,5 +47,6 @@ typedef struct sUiPanel_t {
 }sUiPanel_t;
 
 bool UI_Interface_GetCurrentPanel(uint32_t panel_id, sUiPanel_t *out);
+bool UI_Interface_ButtonPressed(uint32_t panel_id, uint32_t button_id);
 
 #endif /* INC_UI_INTERFACE_H_ */

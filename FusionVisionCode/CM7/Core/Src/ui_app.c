@@ -83,11 +83,11 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 		switch(curr_panel.children[i].type){
 			case(eUiElementTypeLabel): {
 				sUiLabel_t label = (sUiLabel_t)(*curr_panel.children[i].element.label); //TODO: DONT COPy
-				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length, eFont16x29);
+				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length, eFont11x18);
 			} break;
 			case (eUiElementTypeButton): {
 				sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);
-				UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont16x29, selectable_i == selected);
+				UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, selectable_i == selected);
 				selectable_i++;
 			}break;
 			default: {
