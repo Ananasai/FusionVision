@@ -62,9 +62,10 @@ static const sUiElement_t UI_Elements[] = {
 
 bool UI_APP_DrawAll(uint16_t *image_buffer){
 	for(uint8_t i = 0; i < ARRAY_LENGTH(UI_Elements); i++){
+		HAL_Delay(1); //TODO: MAGIC
 		//UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, (char *)UI_Elements[i].source, strlen((char *)UI_Elements[i].source));
 		const char *text = function_lut[UI_Elements[i].source_type]();
-		UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, text, strlen(text));
+		UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, text, strlen(text), eFont11x18);
 	}
 	/* Draw menu if active */
 	//TODO: make if active
@@ -78,20 +79,23 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &selected);
 	uint32_t selectable_i = 0;
 	for(size_t i = 0; i < curr_panel.children_amount; i++){
+		HAL_Delay(1); //TODO: MAGIC
 		switch(curr_panel.children[i].type){
 			case(eUiElementTypeLabel): {
 				sUiLabel_t label = (sUiLabel_t)(*curr_panel.children[i].element.label); //TODO: DONT COPy
-				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length);
+				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length, eFont16x29);
 			} break;
 			case (eUiElementTypeButton): {
 				sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);
-				UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, selectable_i == selected);
+				UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont16x29, selectable_i == selected);
 				selectable_i++;
+			}break;
+			default: {
+				/* Should not happen */
 			}break;
 		}
 		panel_y -= 50;
 	}
-
 	return true;
 }
 

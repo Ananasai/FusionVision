@@ -153,7 +153,7 @@ static void Button_Timer(void *argument){
 
 void Button_UP_Callback(eButtonPress_t press){
 	//debug("Pressed button UP\r\n");
-	if(current_active_panel_index > 1){
+	if(current_active_panel_index > 0){
 		current_active_panel_index--;
 		Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index, 4);
 	}

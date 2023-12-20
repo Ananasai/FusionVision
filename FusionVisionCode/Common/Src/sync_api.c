@@ -9,6 +9,9 @@
 #endif
 
 bool Sync_API_WaitSemaphore(eSemaphore_t sem){
+	//while(HAL_HSEM_IsSemTaken(sem) == 1){ //TODO: not working
+
+	//}
 	while(HAL_HSEM_Take(sem, PROCESS_ID) != HAL_OK){
 
 	}

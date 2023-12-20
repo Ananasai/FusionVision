@@ -35,7 +35,7 @@ bool System_APP_M7_PreInit(void){
 
 bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
-	//HAL_NVIC_SetPriority(HSEM1_IRQn, 0, 0);
+	//HAL_NVIC_SetPriority(HSEM1_IRQn, 0, 0); //Maybe for hsem irq?
 	//HAL_NVIC_EnableIRQ(HSEM1_IRQn);
 	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
 	HAL_Delay(10);
@@ -43,33 +43,20 @@ bool System_APP_M7_Start(void){
 	HAL_Delay(10);
 	ov2640_Init(0x60);
 	HAL_Delay(10);
-
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
-	//HAL_Delay(1000); //Bbz kam bet nx reikia ig
-	//UI_APP_DrawAll(image_buffer);
-	debug("Drawn\r\n");
-	//UI_APP_Printout(image_buffer);
-	HAL_Delay(100);
 	return true;
 }
 
 bool System_APP_M7_Run(void){ //TODO: remove
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
-	//HAL_Delay(10);
-	//HAL_Delay(10);
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
-	//HAL_DCMI_Resume(&hdcmi);
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
 		HAL_DCMI_Suspend(&hdcmi);
 		frame_event_flag = false;
-		//IMG_PROCESSING_APP_Compute(image_buffer);
+		IMG_PROCESSING_APP_Compute(image_buffer);
 		HAL_Delay(10);
 		UI_APP_DrawAll(image_buffer);
 		HAL_Delay(10);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)image_buffer, 480*320/2);
 		HAL_DCMI_Resume(&hdcmi);
 	}
 	return true;
