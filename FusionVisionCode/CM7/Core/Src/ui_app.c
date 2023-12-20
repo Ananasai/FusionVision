@@ -28,52 +28,18 @@ typedef struct sUiElement_t {
 	uint32_t *source;
 }sUiElement_t;
 
-static const char tekstas[] = "Lab";
-
-// Define the signature for the functions
-typedef const char* (*GetterFunc)(void);
-
-// Define some example functions
-static const char* Text_getter(void) {
-    return tekstas;
-}
-
-char time_text_buffer[20] = {0};
-static const char* Time_getter(void) {
-	RTC_TimeTypeDef time;
-	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
-	/* Dummy read to */
-	RTC_DateTypeDef date;
-	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
-	snprintf(time_text_buffer, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-    return time_text_buffer;
-}
-
-// Create an array of function pointers
-static const GetterFunc function_lut[eUiElementLast] = {
-    [eUiElementText] = Text_getter,
-    [eUiElementTime] = Time_getter,
-};
-
-static const sUiElement_t UI_Elements[] = {
-	{.x = 100, .y = 20, .source_type = eUiElementText, .source = (uint32_t *)&tekstas},
-	{.x = 128, .y = 290, .source_type = eUiElementTime, .source = (uint32_t *)&tekstas}
-};
-
 bool UI_APP_DrawAll(uint16_t *image_buffer){
-	for(uint8_t i = 0; i < ARRAY_LENGTH(UI_Elements); i++){
-		HAL_Delay(1); //TODO: MAGIC
-		//UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, (char *)UI_Elements[i].source, strlen((char *)UI_Elements[i].source));
-		const char *text = function_lut[UI_Elements[i].source_type]();
-		UI_DRIVER_DrawString(UI_Elements[i].x, UI_Elements[i].y, image_buffer, text, strlen(text), eFont11x18);
-	}
-	/* Draw menu if active */
-	//TODO: make if active
+	UI_Interface_UpdateLabels(hrtc);
 	sUiPanel_t curr_panel;
+	UI_Interface_GetConstantPanel(&curr_panel);
+	for(size_t i = 0; i < curr_panel.children_amount; i++){
+		UI_DRIVER_DrawString(curr_panel.children[i].x, curr_panel.children[i].y, image_buffer, curr_panel.children[i].element.label->content, strlen(curr_panel.children[i].element.label->content), eFont11x18);
+	}
+	//TODO: make if active
+	/* Draw menu if active */
 	if(UI_Interface_GetCurrentPanel(0, &curr_panel) == false){
 		return false;
 	}
-	UI_Interface_UpdateLabels();
 	uint16_t panel_x = 100;
 	uint16_t panel_y = 200;
 	volatile uint32_t selected = 0;

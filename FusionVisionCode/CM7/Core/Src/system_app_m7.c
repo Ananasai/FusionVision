@@ -52,7 +52,7 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	if(frame_event_flag){
 		HAL_DCMI_Suspend(&hdcmi);
 		frame_event_flag = false;
-		IMG_PROCESSING_APP_Compute(image_buffer);
+		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll(image_buffer);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 		HAL_DCMI_Resume(&hdcmi);
