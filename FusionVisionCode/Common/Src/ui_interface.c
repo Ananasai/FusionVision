@@ -1,5 +1,8 @@
 #include "ui_interface.h"
+#include "shared_param_api.h"
 #include <string.h>
+#include <stdio.h>
+
 #ifdef CORE_CM7
 #else
 #include "button_app.h"
@@ -12,13 +15,15 @@
 #define BUTTON(_name, _callback) {.type = eUiElementTypeButton, .element.button = &(sUiButton_t){.content = _name, .length = strlen(_name), .callback = _callback}}
 #endif
 
-#define LABEL(_name) {.type = eUiElementTypeLabel, .element.label = &(sUiLabel_t){.content = _name, .length = strlen(_name)}}
+#define LABEL(_name) {.type = eUiElementTypeLabel, .element.label = &(sUiLabel_t){.content = _name}}
+
+static char edge_text[20] = "DEFAULT";
 
 static const sUiPanel_t main_menu = {
     .children = (sUiElementType_t[]) {
     	LABEL("Menu"),
     	BUTTON("Up", &Button_APP_EdgeThresholdUpPressed),
-		LABEL("Edge"),
+		LABEL(edge_text),
 		BUTTON("Dwn", &Button_APP_EdgeThresholdDownPressed)
     },
     .children_amount = 4,
@@ -53,4 +58,11 @@ bool UI_Interface_ButtonPressed(uint32_t panel_id, uint32_t button_id){
 	}
 	return false;
 #endif
+}
+
+bool UI_Interface_UpdateLabels(void){
+	uint32_t edge_threshold = 0;
+	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
+	snprintf(edge_text, 20, "Edge: %lu", edge_threshold);
+	return true;
 }

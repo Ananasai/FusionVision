@@ -98,7 +98,7 @@ bool Button_APP_Start(void){
 		error("Starting button timer\r\n");
 		return false;
 	}
-	debug("AAAAAAAAAAAAAAAAAAAAAAAAA\r\n"); //TODO: needed for middle button to work?? something with memory
+	debug("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\r\n"); //TODO: needed for middle button to work?? something with memory
 	return true;
 }
 
@@ -108,7 +108,6 @@ void Button_APP_Thread(void *argument){
 		flags = osEventFlagsWait(button_event_flags_id, BUTTON_EVENT_FLAG_ALL, osFlagsWaitAny, osWaitForever);
 		for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
 			  if((flags & button_desc_lut[btn].flag) != 0x00){
-
 				  uint32_t curr_time = HAL_GetTick();
 				  button_state_lut[btn].high = !button_state_lut[btn].high;
 				  /* Falling btn edge */

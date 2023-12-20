@@ -73,6 +73,7 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	if(UI_Interface_GetCurrentPanel(0, &curr_panel) == false){
 		return false;
 	}
+	UI_Interface_UpdateLabels();
 	uint16_t panel_x = 100;
 	uint16_t panel_y = 200;
 	volatile uint32_t selected = 0;
@@ -83,7 +84,7 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 		switch(curr_panel.children[i].type){
 			case(eUiElementTypeLabel): {
 				sUiLabel_t label = (sUiLabel_t)(*curr_panel.children[i].element.label); //TODO: DONT COPy
-				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, label.length, eFont11x18);
+				UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, strlen(label.content), eFont11x18);
 			} break;
 			case (eUiElementTypeButton): {
 				sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);

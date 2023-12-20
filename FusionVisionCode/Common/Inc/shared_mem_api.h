@@ -13,7 +13,7 @@
 #include <stddef.h>
 
 //https://github.com/MaJerle/stm32h7-dual-core-inter-cpu-async-communication/blob/main/projects/nucleo_stm32h745_q_aync_comm/Common/Inc/common.h
-#define SHARED_MEM_START 0x30040000
+#define SHARED_MEM_START 0x38000000
 #define SHARED_MEM_LEN 0x0000FFFF
 
 
