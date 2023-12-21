@@ -20,11 +20,15 @@ bool UI_DRIVER_DrawCharacter(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buf
 	uint8_t curr_font_width = font_lut[font].width;
 	for(uint8_t y = 0; y < curr_font_height; y++){
 		for(uint8_t i = 0; i < curr_font_width; i++){
+			uint32_t pixel_loc = i + loc_x + SCREEN_WIDTH*y + SCREEN_WIDTH * loc_y;
+			if(pixel_loc >= (SCREEN_WIDTH * SCREEN_HEIGHT)){
+				continue;
+			}
 			uint16_t new_colour = 0x0000; //TODO: remove cus is a magic variable to not crash
 			if(((*(curr_font_table + (((character - 32 + 1) * curr_font_height) - 1 - y)) >> (i + 16 - curr_font_width)) & 0x01) == 0x01){
-				*(image_buffer + SCREEN_WIDTH*y+i + SCREEN_WIDTH * loc_y + loc_x) = invert ? UI_COLOUR_INVERTED : UI_COLOUR;
+				*(image_buffer + pixel_loc) = invert ? UI_COLOUR_INVERTED : UI_COLOUR;
 			}else if(invert){
-				*(image_buffer + SCREEN_WIDTH*y+i + SCREEN_WIDTH * loc_y + loc_x) = UI_COLOUR;
+				*(image_buffer + pixel_loc) = UI_COLOUR;
 			}
 			//*(image_buffer + SCREEN_WIDTH*y+i + SCREEN_WIDTH * loc_y + loc_x) = new_colour;
 		}

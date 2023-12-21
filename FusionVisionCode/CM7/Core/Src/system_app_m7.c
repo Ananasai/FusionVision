@@ -50,7 +50,6 @@ bool System_APP_M7_Start(void){
 bool System_APP_M7_Run(void){ //TODO: remove
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
-		HAL_DCMI_Suspend(&hdcmi);
 		frame_event_flag = false;
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll(image_buffer);
@@ -60,10 +59,13 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	return true;
 }
 
+/* End of frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
+	HAL_DCMI_Suspend(hdcmi);
 	frame_event_flag = true;
 }
 
+/* HSEM released IRQ */
 void HAL_HSEM_FreeCallback(uint32_t SemMask){ //TODO: MASK
 	HAL_HSEM_ActivateNotification(SemMask);
 }
