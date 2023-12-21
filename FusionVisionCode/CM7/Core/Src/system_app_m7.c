@@ -19,6 +19,7 @@
 uint16_t image_buffer[480*320] = {0};
 
 bool frame_event_flag = false;
+bool frame_half_event_flag = false;
 
 /* Executed before M4 is launched */
 bool System_APP_M7_PreInit(void){
@@ -56,8 +57,15 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 		HAL_DCMI_Resume(&hdcmi);
 	}
+	if(frame_half_event_flag) {
+		frame_half_event_flag = false;
+		IMG_PROCESSING_APP_Compute(image_buffer);
+		//UI_APP_DrawAll(image_buffer);
+	}
 	return true;
 }
+
+
 
 /* End of frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
@@ -65,7 +73,14 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 	frame_event_flag = true;
 }
 
+/* End of frame conversion IRQ */
+void HAL_DCMI_HalfFrameEventCallback(void){
+	frame_half_event_flag = true;
+}
+
 /* HSEM released IRQ */
 void HAL_HSEM_FreeCallback(uint32_t SemMask){ //TODO: MASK
 	HAL_HSEM_ActivateNotification(SemMask);
 }
+
+
