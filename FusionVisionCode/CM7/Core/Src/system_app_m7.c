@@ -37,8 +37,6 @@ bool System_APP_M7_PreInit(void){
 bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
-	//HAL_NVIC_SetPriority(HSEM1_IRQn, 0, 0); //Maybe for hsem irq?
-	//HAL_NVIC_EnableIRQ(HSEM1_IRQn);
 	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
 	HAL_Delay(10);
 	ili9486_Init();
@@ -53,7 +51,7 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
 		frame_event_flag = false;
-		//IMG_PROCESSING_APP_Compute(image_buffer);
+		IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		ili9486_SetDisplayWindow(0, 0, 100, 100);
 		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 100*100);

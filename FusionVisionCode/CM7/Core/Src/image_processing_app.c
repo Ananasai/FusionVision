@@ -16,6 +16,8 @@
 #define COMPUTE_WIDTH 400
 #define COMPUTE_HEIGHT 300
 
+#define EDGE_COLOUR 0xFAFA
+
 #define PIXEL(image, x, y) *(image + (y) * SCREEN_WIDTH + (x))
 #define PIXEL_GRAY(image, x, y) (*(image + (y) * SCREEN_WIDTH + (x)))
 
@@ -24,7 +26,6 @@ static uint8_t gray_scale[480*320] = {0};
 static int16_t Conv_Gx(uint8_t *image_buffer, uint16_t x, uint16_t y){
 	int16_t conv = PIXEL_GRAY(image_buffer, x-1, y-1) + 2*PIXEL_GRAY(image_buffer, x, y-1) + PIXEL_GRAY(image_buffer, x+1, y-1)
 			+ -PIXEL_GRAY(image_buffer, x-1, y+1) + -2*PIXEL_GRAY(image_buffer, x, y+1) + -PIXEL_GRAY(image_buffer, x+1, y+1);
-
 	return conv;
 }
 
@@ -44,10 +45,11 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	for(uint16_t y = 0; y < COMPUTE_HEIGHT; y++){
 		for(uint16_t x = 0; x < COMPUTE_WIDTH; x++){
 			int16_t pixel = PIXEL(image_buffer, x, y);
-			int16_t red = ((pixel & 0xF800)>>11);
-			int16_t green = ((pixel & 0x07E0)>>5);
-			int16_t blue = (pixel & 0x001F);
-			uint8_t grayscale = (0.2126 * red) + (0.7152 * green / 2.0) + (0.0722 * blue);
+			int8_t red = ((pixel & 0xF800)>>11);
+			int8_t green = ((pixel & 0x07E0)>>5);
+			int8_t blue = (pixel & 0x001F);
+			//uint8_t grayscale = (0.2126 * red) + (0.7152 * green / 2.0) + (0.0722 * blue);
+			uint8_t grayscale = (red >> 2) + (green >> 2) + (blue >> 4); //TODO: play around with this
 			//PIXEL(image_buffer, x, y) = (grayscale<<11)+(grayscale<<6)+grayscale;
 			PIXEL(gray_scale, x, y) = grayscale;
 		}
@@ -61,7 +63,7 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));
 			if(sum > edge_threshold){
 				//PIXEL(image_buffer, x, y) = 0xFFFF;
-				*(image_buffer + (y) * 480 + (x)) = 0xFAFA;
+				*(image_buffer + (y) * 480 + (x)) = EDGE_COLOUR;
 			}
 
 		}

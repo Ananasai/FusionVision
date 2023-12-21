@@ -149,8 +149,6 @@ Error_Handler();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   MX_USART3_UART_Init();
-  //HAL_NVIC_SetPriority(CM4_SEV_IRQn, 0, 0);
-  //HAL_NVIC_EnableIRQ(CM4_SEV_IRQn);
   if(System_APP_M7_Start() == false){
 	  return false;
   }
