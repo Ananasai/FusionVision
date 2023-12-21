@@ -7,6 +7,7 @@
 
 #include "image_processing_app.h"
 #include "shared_param_api.h"
+#include <arm_math.h>
 #include <stdlib.h>
 
 #define SCREEN_WIDTH 480
@@ -34,7 +35,7 @@ static int16_t Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
 
 	return conv;
 }
-
+/* ARM DSP LIB https://community.st.com/t5/stm32-mcus/configuring-dsp-libraries-on-stm32cubeide/ta-p/49637 */
 bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	uint32_t edge_threshold = 0;
 	//TODO: dont read on every frame
