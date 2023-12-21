@@ -12,7 +12,7 @@
 
 static  uint16_t  yStart, yEnd;
 #define RD(a)                 __REVSH(a)
-#define LCD_ADDR_DATA         (LCD_ADDR_BASE + (1 << (LCD_REGSELECT_BIT + 2)) - 2)
+
 #define  LCD_IO_WriteData16_to_2x8(dt)    {LCD_IO_WriteData8((dt) >> 8); LCD_IO_WriteData8(dt); }
 
 #define ILI9486_NOP            0x00

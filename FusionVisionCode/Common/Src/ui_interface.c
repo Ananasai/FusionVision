@@ -79,7 +79,7 @@ bool UI_Interface_ButtonPressed(uint32_t panel_id, uint32_t button_id){
 	return false;
 #endif
 }
-
+#ifdef CORE_CM7
 bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){
 	uint32_t edge_threshold = 0;
 	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
@@ -92,3 +92,4 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
 	return true;
 }
+#endif

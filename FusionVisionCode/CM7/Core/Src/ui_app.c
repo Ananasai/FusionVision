@@ -9,6 +9,7 @@
 #include "debug_api.h"
 #include "ui_interface.h"
 #include "shared_param_api.h"
+#include "sync_api.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -29,9 +30,22 @@ typedef struct sUiElement_t {
 	uint32_t *source;
 }sUiElement_t;
 
-uint32_t last_ui_update_time = 0;
+static void UI_Updated(void);
 
-bool UI_APP_DrawAll(uint16_t *image_buffer){
+static uint16_t *image_buffer;
+static uint32_t curr_active_ui_button = 0;
+static uint32_t last_ui_update_time = 0;
+static bool last_ui_update_flag = true;
+
+bool UI_APP_Init(uint16_t *new_image_buffer){
+	if(new_image_buffer == NULL){
+		return false;
+	}
+	image_buffer = new_image_buffer;
+	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated); //TODO: CHANGE TO OTHER SEMAPHGORE
+}
+
+bool UI_APP_DrawAll(void){
 	UI_Interface_UpdateLabels(hrtc);
 	sUiPanel_t curr_panel;
 	UI_Interface_GetConstantPanel(&curr_panel);
@@ -40,15 +54,17 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	}
 	uint32_t curr_time = HAL_GetTick();
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
-		//TODO: make if active
 		/* Draw menu if active */
 		if(UI_Interface_GetCurrentPanel(0, &curr_panel) == false){
 			return false;
 		}
+		/* Get new variables if UI changed */
+		if(last_ui_update_flag){
+			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
+			last_ui_update_flag = false;
+		}
 		uint16_t panel_x = 100;
 		uint16_t panel_y = 200;
-		volatile uint32_t selected = 0;
-		Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &selected);
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel.children_amount; i++){
 			HAL_Delay(1); //TODO: MAGIC
@@ -59,7 +75,7 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 				} break;
 				case (eUiElementTypeButton): {
 					sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);
-					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, selectable_i == selected);
+					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, selectable_i == curr_active_ui_button);
 					selectable_i++;
 				}break;
 				default: {
@@ -72,7 +88,7 @@ bool UI_APP_DrawAll(uint16_t *image_buffer){
 	return true;
 }
 
-bool UI_APP_Printout(uint16_t *image_buffer){
+bool UI_APP_Printout(void){
 	for(uint16_t y = 0; y < 320; y++){
 		for(uint16_t x = 0; x < 480; x++){
 			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * 480));
@@ -83,5 +99,11 @@ bool UI_APP_Printout(uint16_t *image_buffer){
 		DEBUG_API_LOG("\r\n", NULL, NULL);
 	}
 	return true;
+}
+
+/* Ui update event on semaphore release, record time*/
+static void UI_Updated(void){
+	last_ui_update_time = HAL_GetTick();
+	last_ui_update_flag = true;
 }
 

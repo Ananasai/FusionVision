@@ -1,5 +1,6 @@
 #include "shared_param_api.h"
 #include "shared_mem_api.h"
+#include "sync_api.h"
 #include <string.h>
 
 #define NEW_PARAM(_enum, _name, _size) [_enum] = {.name = _name, .size = _size}
@@ -48,5 +49,12 @@ bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, siz
 	if(length > shared_param_lut[param].size){
 		return false;
 	}
-	return Shared_mem_API_Write(shared_param_address_lut[param], in, length);
+	if(Shared_mem_API_Write(shared_param_address_lut[param], in, length) == false){
+		return false;
+	}
+	//TODO: move out of here into callbacks or smth
+	if((param == eSharedParamActiveUiButtonIndex) || (param == eSharedParamActiveUiPanelIndex)){
+	Sync_API_TakeSemaphore(eSemaphoreUiUpdate);
+	Sync_API_ReleaseSemaphore(eSemaphoreUiUpdate);
+	}
 }

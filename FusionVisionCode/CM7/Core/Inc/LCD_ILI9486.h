@@ -31,6 +31,7 @@
 
 #define LCD_ADDR_BASE     0xC8000000
 #define LCD_REGSELECT_BIT 8
+#define LCD_ADDR_DATA         (LCD_ADDR_BASE + (1 << (LCD_REGSELECT_BIT + 2)) - 2)
 
 //LCD general commands
 void     ili9486_Init(void);

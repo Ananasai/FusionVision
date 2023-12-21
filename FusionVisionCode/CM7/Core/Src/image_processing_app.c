@@ -37,6 +37,7 @@ static int16_t Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
 
 bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	uint32_t edge_threshold = 0;
+	//TODO: dont read on every frame
 	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
 	/* To grayscale https://stackoverflow.com/questions/58449462/rgb565-to-grayscale */
 	for(uint16_t y = 0; y < COMPUTE_HEIGHT; y++){
