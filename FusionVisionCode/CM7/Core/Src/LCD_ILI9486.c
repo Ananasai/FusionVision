@@ -116,7 +116,7 @@ static  uint16_t  yStart, yEnd;
 // LCD write commands
 void LCD_IO_WriteCmd8(uint8_t Cmd)
 {
-  *(uint8_t *)LCD_ADDR_BASE = Cmd;
+  *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
 }
 
 //-----------------------------------------------------------------------------

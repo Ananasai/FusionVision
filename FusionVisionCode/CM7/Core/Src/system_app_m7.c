@@ -51,12 +51,13 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
 		frame_event_flag = false;
-		IMG_PROCESSING_APP_Compute(image_buffer);
+		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
-		ili9486_SetDisplayWindow(0, 0, 100, 100);
-		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 100*100);
-		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		HAL_DCMI_Resume(&hdcmi);
+		ili9486_SetDisplayWindow(0, 0, 480, 320);
+		LCD_IO_WriteCmd8(0x2C);
+		HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
+		//ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		//HAL_DCMI_Resume(&hdcmi);
 	}
 	if(frame_half_event_flag) {
 		frame_half_event_flag = false;
