@@ -17,6 +17,7 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamEdgeThreshold = eSharedParamFirst,
 	eSharedParamActiveUiPanelIndex,
 	eSharedParamActiveUiButtonIndex,
+	eSharedParamScreenState,
 	eSharedParamLast
 }eSharedParamEnum_t;
 

@@ -36,6 +36,13 @@ typedef enum eUiElementType_t {
 	eUiElementTypeLast
 }eUiElementType_t;
 
+typedef enum ePanel_t {
+	ePanelFirst = 0,
+	ePanelMainMenu = ePanelFirst,
+	ePanelEdge,
+	ePanelLast
+}ePanel_t;
+
 typedef struct sUiLabel_t {
 	char *content;
 	size_t length;
@@ -69,8 +76,8 @@ typedef struct sUiPanel_t {
 	UI_PanelButton_Callback_t btn_callback;
 }sUiPanel_t;
 
-bool UI_Interface_GetCurrentPanel(sUiPanel_t *out);
-bool UI_Interface_GetConstantPanel(sUiPanel_t *out);
+bool UI_Interface_GetCurrentPanel(sUiPanel_t **out);
+bool UI_Interface_GetConstantPanel(sUiPanel_t **out);
 
 void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press);
 

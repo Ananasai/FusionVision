@@ -15,7 +15,8 @@ typedef struct sSharedParam_t{
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", 4),
 	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", 4),
-	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", 4)
+	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", 4),
+	NEW_PARAM(eSharedParamScreenState, "Screen state", 4)
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
