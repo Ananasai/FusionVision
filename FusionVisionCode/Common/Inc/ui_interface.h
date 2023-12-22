@@ -76,8 +76,8 @@ typedef struct sUiPanel_t {
 	UI_PanelButton_Callback_t btn_callback;
 }sUiPanel_t;
 
-bool UI_Interface_GetCurrentPanel(sUiPanel_t **out);
-bool UI_Interface_GetConstantPanel(sUiPanel_t **out);
+bool UI_Interface_GetCurrentPanel(const sUiPanel_t **out);
+bool UI_Interface_GetConstantPanel(const sUiPanel_t **out);
 
 void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press);
 

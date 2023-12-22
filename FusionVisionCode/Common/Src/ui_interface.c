@@ -46,7 +46,7 @@ static const sUiPanel_t edge_threshold_menu = {
 
 static char time_text[20] = "66.66.66";
 
-static const sUiPanel_t constant = {
+static const sUiPanel_t constant_menu = {
 	.x = 128,
 	.y = 290,
 	.children = (sUiElementType_t[]) {
@@ -65,9 +65,9 @@ static const sUiPanel_t *panel_lut[ePanelLast] = {
 static uint32_t current_active_button_index = 0;
 static uint32_t current_active_panel_index = 0;
 static uint32_t edge_threshold = 0;
-static sUiPanel_t *current_panel = &main_menu;
+static const sUiPanel_t *current_panel = &main_menu;
 
-bool UI_Interface_GetCurrentPanel(sUiPanel_t **out){
+bool UI_Interface_GetCurrentPanel(const sUiPanel_t **out){
 #ifdef CORE_CM7
 	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 	current_panel = panel_lut[current_active_panel_index];
@@ -78,8 +78,8 @@ bool UI_Interface_GetCurrentPanel(sUiPanel_t **out){
 #endif
 }
 
-bool UI_Interface_GetConstantPanel(sUiPanel_t **out){
-	*out = &constant;
+bool UI_Interface_GetConstantPanel(const sUiPanel_t **out){
+	*out = &constant_menu;
 	return true;
 }
 

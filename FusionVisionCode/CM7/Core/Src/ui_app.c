@@ -47,7 +47,7 @@ bool UI_APP_Init(uint16_t *new_image_buffer){
 
 bool UI_APP_DrawAll(void){
 	UI_Interface_UpdateLabels(hrtc);
-	sUiPanel_t *curr_panel;
+	const sUiPanel_t *curr_panel;
 	UI_Interface_GetConstantPanel(&curr_panel);
 	for(size_t i = 0; i < curr_panel->children_amount; i++){
 		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, curr_panel->children[i].element.label->content, strlen(curr_panel->children[i].element.label->content), eFont11x18);
