@@ -13,6 +13,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef enum eButtonType_t {
+	eButtonFirst = 0,
+	eButtonUp = eButtonFirst,
+	eButtonOk,
+	eButtonDown,
+	eButtonLast
+}eButtonType_t;
+
+typedef enum eButtonPress_t {
+	eButtonPressFirst = 0,
+	eButtonPressSingle = eButtonPressFirst,
+	eButtonPressDouble,
+	eButtonPressLong,
+	eButtonPressLast
+}eButtonPress_t;
+
 typedef enum eUiElementType_t {
 	eUiElementTypeFirst = 0,
 	eUiElementTypeLabel = eUiElementTypeFirst,
@@ -25,7 +41,8 @@ typedef struct sUiLabel_t {
 	size_t length;
 }sUiLabel_t;
 
-typedef void (*UI_Button_Callback_t)();
+typedef void (*UI_Button_Callback_t)(eButtonPress_t);
+typedef void (*UI_PanelButton_Callback_t)(eButtonType_t, eButtonPress_t);
 
 typedef struct sUiButton_t {
 	char *content;
@@ -49,11 +66,14 @@ typedef struct sUiPanel_t {
 	sUiElementType_t *children;
 	size_t children_amount;
 	size_t selectable;
+	UI_PanelButton_Callback_t btn_callback;
 }sUiPanel_t;
 
-bool UI_Interface_GetCurrentPanel(uint32_t panel_id, sUiPanel_t *out);
+bool UI_Interface_GetCurrentPanel(sUiPanel_t *out);
 bool UI_Interface_GetConstantPanel(sUiPanel_t *out);
-bool UI_Interface_ButtonPressed(uint32_t panel_id, uint32_t button_id);
+
+void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press);
+
 #ifdef CORE_CM7
 bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc);
 #endif

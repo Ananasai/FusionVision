@@ -55,7 +55,7 @@ bool UI_APP_DrawAll(void){
 	uint32_t curr_time = HAL_GetTick();
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
 		/* Draw menu if active */
-		if(UI_Interface_GetCurrentPanel(0, &curr_panel) == false){
+		if(UI_Interface_GetCurrentPanel(&curr_panel) == false){
 			return false;
 		}
 		/* Get new variables if UI changed */

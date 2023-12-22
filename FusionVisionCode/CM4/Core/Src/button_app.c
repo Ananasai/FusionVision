@@ -22,23 +22,9 @@
 
 #define EMPTY_BTN_STATE {.last_press_time = 0, .click_active = false, .high = false}
 
-typedef enum eButton_t {
-	eButtonFirst = 0,
-	eButtonUp = eButtonFirst,
-	eButtonOk,
-	eButtonDown,
-	eButtonLast
-}eButton_t;
 
-typedef enum eButtonPress_t {
-	eButtonPressFirst = 0,
-	eButtonPressSingle = eButtonPressFirst,
-	eButtonPressDouble,
-	eButtonPressLong,
-	eButtonPressLast
-}eButtonPress_t;
 
-typedef void (*Button_Callback)(eButtonPress_t press);
+typedef void (*Button_Callback)(eButtonType_t, eButtonPress_t);
 
 typedef struct sButtonDesc_t {
 	uint16_t pin;
@@ -52,14 +38,10 @@ typedef struct sButtonState_t {
 	bool high;
 }sButtonState_t;
 
-void Button_UP_Callback(eButtonPress_t press);
-void Button_OK_Callback(eButtonPress_t press);
-void Button_DOWN_Callback(eButtonPress_t press);
-
 static const sButtonDesc_t button_desc_lut[eButtonLast] = {
-	[eButtonUp] = {.pin = BTN_1_Pin, .flag = BUTTON_EVENT_FLAG_BTN_1, .callback = &Button_UP_Callback},
-	[eButtonOk] = {.pin = BTN_2_Pin, .flag = BUTTON_EVENT_FLAG_BTN_2, .callback = &Button_OK_Callback},
-	[eButtonDown] = {.pin = BTN_3_Pin, .flag = BUTTON_EVENT_FLAG_BTN_3, .callback = &Button_DOWN_Callback}
+	[eButtonUp] = {.pin = BTN_1_Pin, .flag = BUTTON_EVENT_FLAG_BTN_1, .callback = &UI_Interface_ButtonPressed},
+	[eButtonOk] = {.pin = BTN_2_Pin, .flag = BUTTON_EVENT_FLAG_BTN_2, .callback = &UI_Interface_ButtonPressed},
+	[eButtonDown] = {.pin = BTN_3_Pin, .flag = BUTTON_EVENT_FLAG_BTN_3, .callback = &UI_Interface_ButtonPressed}
 };
 static sButtonState_t button_state_lut[eButtonLast] = {0};
 
@@ -71,9 +53,6 @@ static const osThreadAttr_t button_APP_thread_attribute = {
 static osThreadId_t button_APP_thread_id = NULL;
 static osEventFlagsId_t button_event_flags_id = NULL;
 static osTimerId_t button_click_timer = NULL;
-
-static uint32_t current_active_panel_index = 0;
-static uint32_t current_active_button_index = 0;
 
 static void Button_APP_Thread(void *argument);
 static void Button_Timer(void *argument);
@@ -106,7 +85,7 @@ void Button_APP_Thread(void *argument){
 	uint32_t flags = 0x00;
 	while(true){
 		flags = osEventFlagsWait(button_event_flags_id, BUTTON_EVENT_FLAG_ALL, osFlagsWaitAny, osWaitForever);
-		for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
+		for(eButtonType_t btn = eButtonFirst; btn < eButtonLast; btn++){
 			  if((flags & button_desc_lut[btn].flag) != 0x00){
 				  uint32_t curr_time = HAL_GetTick();
 				  button_state_lut[btn].high = !button_state_lut[btn].high;
@@ -116,7 +95,7 @@ void Button_APP_Thread(void *argument){
 					  if(curr_time - button_state_lut[btn].last_press_time >= LONG_CLICK_TIMEOUT_MS){
 						  button_state_lut[btn].click_active = false;
 						  debug("Long click\r\n");
-						  (*button_desc_lut[btn].callback)(eButtonPressLong);
+						  (*button_desc_lut[btn].callback)(btn, eButtonPressLong);
 					  }
 				  }else{ /* Rising btn edge */
 					  /* Check if double click */
@@ -124,7 +103,7 @@ void Button_APP_Thread(void *argument){
 						  button_state_lut[btn].click_active = false;
 						  button_state_lut[btn].last_press_time = curr_time;
 						  debug("Double click\r\n");
-						  (*button_desc_lut[btn].callback)(eButtonPressDouble);
+						  (*button_desc_lut[btn].callback)(btn, eButtonPressDouble);
 					  }else{ /* Record time for single double/signal click tracking */
 						  button_state_lut[btn].click_active = true;
 						  button_state_lut[btn].last_press_time = curr_time;
@@ -138,55 +117,22 @@ void Button_APP_Thread(void *argument){
 /* Timer for single click timeout  */
 static void Button_Timer(void *argument){
 	uint32_t curr_time = HAL_GetTick();
-	for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
+	for(eButtonType_t btn = eButtonFirst; btn < eButtonLast; btn++){
 		/* If waiting for double click ant button low level */
 		if(button_state_lut[btn].click_active && !button_state_lut[btn].high){
 			if(curr_time - button_state_lut[btn].last_press_time >= DOUBLE_CLICK_TIMEOUT_MS+10){
 				button_state_lut[btn].click_active = false;
 				debug("Single click\r\n");
-				(*button_desc_lut[btn].callback)(eButtonPressSingle);
+				(*button_desc_lut[btn].callback)(btn, eButtonPressSingle);
 			}
 		}
 	}
 }
 
-void Button_UP_Callback(eButtonPress_t press){
-	//debug("Pressed button UP\r\n");
-	if(current_active_button_index > 0){
-		current_active_button_index--;
-		Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index, 4);
-	}
-
-}
-void Button_OK_Callback(eButtonPress_t press){
-	//debug("Pressed button OK\r\n");
-	UI_Interface_ButtonPressed(current_active_panel_index, current_active_button_index);
-}
-void Button_DOWN_Callback(eButtonPress_t press){
-	//debug("Pressed button DOWN\r\n");
-	sUiPanel_t panel;
-	UI_Interface_GetCurrentPanel(current_active_panel_index, &panel);
-	if(current_active_button_index < panel.selectable - 1){
-		current_active_button_index++;
-		Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index, 4);
-	}
-}
-
-uint32_t edge_threshold = 0;
-void Button_APP_EdgeThresholdUpPressed(void){
-	edge_threshold++;
-	Shared_param_API_Write(eSharedParamEdgeThreshold, &edge_threshold, 4);
-}
-
-void Button_APP_EdgeThresholdDownPressed(void){
-	edge_threshold--;
-	Shared_param_API_Write(eSharedParamEdgeThreshold, &edge_threshold, 4);
-}
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   NVIC_DisableIRQ(EXTI0_IRQn);
   NVIC_DisableIRQ(EXTI15_10_IRQn);
-  for(eButton_t btn = eButtonFirst; btn < eButtonLast; btn++){
+  for(eButtonType_t btn = eButtonFirst; btn < eButtonLast; btn++){
 	  if(GPIO_Pin == button_desc_lut[btn].pin){
 		  osEventFlagsSet(button_event_flags_id, button_desc_lut[btn].flag);
 	  }

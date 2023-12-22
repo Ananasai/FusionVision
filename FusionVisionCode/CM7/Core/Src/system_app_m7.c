@@ -64,7 +64,7 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	}
 	if(frame_half_event_flag) {
 		frame_half_event_flag = false;
-		//IMG_PROCESSING_APP_Compute(image_buffer);
+		IMG_PROCESSING_APP_Compute(image_buffer);
 		//UI_APP_DrawAll(image_buffer);
 	}
 	return true;
