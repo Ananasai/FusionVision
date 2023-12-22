@@ -12,6 +12,7 @@
 #include "debug_api.h"
 #include "sync_api.h"
 #include "shared_param_api.h"
+#include "diagnostics_app.h"
 #include <string.h>
 
 #define __DEBUG_FILE_NAME__ "M7"
@@ -43,6 +44,7 @@ bool System_APP_M7_Start(void){
 	HAL_Delay(10);
 	ov2640_Init(0x60);
 	HAL_Delay(10);
+	Diagnostics_APP_FrameStart();
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
@@ -55,9 +57,10 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		UI_APP_DrawAll();
 		ili9486_SetDisplayWindow(0, 0, 480, 320);
 		LCD_IO_WriteCmd8(0x2C);
-		HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
-		//ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		//HAL_DCMI_Resume(&hdcmi);
+		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
+		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		Diagnostics_APP_FrameEnd();
+		HAL_DCMI_Resume(&hdcmi);
 	}
 	if(frame_half_event_flag) {
 		frame_half_event_flag = false;
