@@ -18,6 +18,14 @@ typedef enum eFont_t {
 	eFontLast
 }eFont_t;
 
+typedef enum eAlignment_t {
+	eAlignmentFirst = 0,
+	eAlignmentLeft = eAlignmentFirst,
+	eAlignmentCenter,
+	eAlignmentRight,
+	eAlignemntLast
+}eAlignment_t;
+
 typedef struct sFontDesc_t {
 	uint8_t width;
 	uint8_t height;

@@ -50,7 +50,7 @@ bool UI_APP_DrawAll(void){
 	const sUiPanel_t *curr_panel;
 	UI_Interface_GetConstantPanel(&curr_panel);
 	for(size_t i = 0; i < curr_panel->children_amount; i++){
-		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, curr_panel->children[i].element.label->content, strlen(curr_panel->children[i].element.label->content), eFont11x18);
+		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, curr_panel->children[i].element.label->content, strlen(curr_panel->children[i].element.label->content), eFont11x18, eAlignmentCenter, false);
 	}
 	uint32_t curr_time = HAL_GetTick();
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
@@ -71,11 +71,11 @@ bool UI_APP_DrawAll(void){
 			switch(curr_panel->children[i].type){
 				case(eUiElementTypeLabel): {
 					sUiLabel_t label = (sUiLabel_t)(*curr_panel->children[i].element.label); //TODO: DONT COPy
-					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, strlen(label.content), eFont11x18);
+					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, strlen(label.content), eFont11x18, eAlignmentCenter, false);
 				} break;
 				case (eUiElementTypeButton): {
 					sUiButton_t button = (sUiButton_t)(*curr_panel->children[i].element.button);
-					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, selectable_i == curr_active_ui_button);
+					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, eAlignmentCenter, selectable_i == curr_active_ui_button);
 					selectable_i++;
 				}break;
 				default: {

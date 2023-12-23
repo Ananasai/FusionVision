@@ -36,25 +36,26 @@ bool UI_DRIVER_DrawCharacter(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buf
 	return true;
 }
 
-bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font){
+bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, eAlignment_t alignment, bool invert){
 	uint8_t curr_font_width = font_lut[font].width;
 	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
 		return false;
 	}
+	if(alignment == eAlignmentCenter) {
+		loc_x += (length * curr_font_width) >> 1;
+	}
 	for(size_t i = 0; i < length; i++){
-		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), font, false);
+		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), font, invert);
 	}
 	return true;
 }
 
-bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, bool selected){
+bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, eAlignment_t alignment, bool selected){
 	uint8_t curr_font_width = font_lut[font].width;
 	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
 		return false;
 	}
-	for(size_t i = 0; i < length; i++){
-		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), font, selected);
-	}
+	UI_DRIVER_DrawString(loc_x, loc_y, image_buffer, text, length, font, alignment, selected);
 	return true;
 }
 

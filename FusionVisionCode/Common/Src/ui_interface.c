@@ -91,14 +91,10 @@ static uint32_t screen_state = eScreenStateFirst;
 static const sUiPanel_t *current_panel = &main_menu;
 
 bool UI_Interface_GetCurrentPanel(const sUiPanel_t **out){
-#ifdef CORE_CM7
 	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 	current_panel = panel_lut[current_active_panel_index];
-	*out = current_panel; //TODO: dont copy
+	*out = current_panel;
 	return true;
-#else
-	return false;
-#endif
 }
 
 bool UI_Interface_GetConstantPanel(const sUiPanel_t **out){
