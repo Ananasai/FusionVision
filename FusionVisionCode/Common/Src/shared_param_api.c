@@ -55,7 +55,7 @@ bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, siz
 	}
 	/* INdicate to M7 that new visual configuration written */
 	if((param == eSharedParamActiveUiButtonIndex) || (param == eSharedParamActiveUiPanelIndex)
-			|| (param == eSharedParamEdgeThreshold)){
+			|| (param == eSharedParamEdgeThreshold) || (param == eSharedParamScreenState)){
 		Sync_API_TakeSemaphore(eSemaphoreUiUpdate);
 		Sync_API_ReleaseSemaphore(eSemaphoreUiUpdate);
 	}

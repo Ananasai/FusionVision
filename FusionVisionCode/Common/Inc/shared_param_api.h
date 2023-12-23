@@ -21,6 +21,13 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamLast
 }eSharedParamEnum_t;
 
+typedef enum eScreenState_t {
+	eScreenStateFirst = 0,
+	eScreenStatePassthrough = eScreenStateFirst,
+	eScreenStateProcessed,
+	eScreenStateLast
+}eScreenState_t;
+
 bool Shared_param_API_Init(void);
 bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out);
 bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, size_t length);

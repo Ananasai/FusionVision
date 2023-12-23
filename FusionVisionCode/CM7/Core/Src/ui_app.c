@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define UI_UPDATE_TIMEOUT 2000
+#define UI_UPDATE_TIMEOUT 4000
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
 typedef enum eUiElementSourceType_t {
@@ -63,7 +63,7 @@ bool UI_APP_DrawAll(void){
 			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
 			last_ui_update_flag = false;
 		}
-		uint16_t panel_x = 100;
+		uint16_t panel_x = 130;
 		uint16_t panel_y = 200;
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel->children_amount; i++){

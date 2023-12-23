@@ -40,6 +40,7 @@ typedef enum ePanel_t {
 	ePanelFirst = 0,
 	ePanelMainMenu = ePanelFirst,
 	ePanelEdge,
+	ePanelScreenState,
 	ePanelLast
 }ePanel_t;
 
