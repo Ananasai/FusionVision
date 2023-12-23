@@ -47,10 +47,10 @@ static const sUiPanel_t main_menu = {
     	LABEL("Menu", 4,  0, 0, eFont11x18, eAlignmentCenter),
     	NAV_BUTTON("Edge", 4, 0, 0, eFont11x18, eAlignmentCenter, ePanelEdge),
 		NAV_BUTTON("Screen", 6, 0, 0, eFont11x18, eAlignmentCenter, ePanelScreenState),
-		//BUTTON("Optim", 12, 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_ScreenStateButtonPressed),
+		NAV_BUTTON("Optim", 5, 0, 0, eFont11x18, eAlignmentCenter, ePanelScreenOptim),
     },
-    .children_amount = 3,
-	.selectable = 2,
+    .children_amount = 4,
+	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
@@ -85,14 +85,14 @@ static const sUiPanel_t screen_optim_menu = {
 	.y = 175,
 	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-		LABEL("Screen:", 7, 0, 0, eFont11x18, eAlignmentCenter),
-		LABEL(screen_state_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("Optim:", 6, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL(screen_optim_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
     },
     .children_amount = 2,
 	.selectable = 0,
 	.btn_callback = &UI_ParamChangeButtonCallback
 };
-
+/* Constant visible menu with RTC and TM */
 static const sUiPanel_t constant_menu = {
 	.x = 50,
 	.y = 175,
@@ -119,6 +119,8 @@ static const char *screen_state_text_lut[eScreenStateLast] = {
 
 static const char *screen_optim_text_lut[eScreenOptimLast] = {
 	[eScreenOptimNone] = "None",
+	[eScreenOptimInterlacedProcessing] = "Interlaced 1",
+	[eScreenOptimInterlacedAll] = "Interlaced 2",
 };
 
 static uint32_t current_active_button_index = 0;
@@ -297,5 +299,4 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify i
 	return true;
 }
 #endif
-
 

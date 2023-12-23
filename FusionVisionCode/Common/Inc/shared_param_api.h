@@ -32,6 +32,8 @@ typedef enum eScreenState_t {
 typedef enum eScreenOptim_t {
 	eScreenOptimFirst = 0,
 	eScreenOptimNone = eScreenOptimFirst,
+	eScreenOptimInterlacedProcessing,
+	eScreenOptimInterlacedAll,
 	eScreenOptimLast
 }eScreenOptim_t;
 
