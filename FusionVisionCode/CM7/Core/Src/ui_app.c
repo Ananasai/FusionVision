@@ -50,7 +50,7 @@ bool UI_APP_DrawAll(void){
 	const sUiPanel_t *curr_panel;
 	UI_Interface_GetConstantPanel(&curr_panel);
 	for(size_t i = 0; i < curr_panel->children_amount; i++){
-		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, curr_panel->children[i].element.label->content, strlen(curr_panel->children[i].element.label->content), *curr_panel->children[i].param, false);
+		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, *curr_panel->children[i].element.label->string, *curr_panel->children[i].param, false);
 	}
 	uint32_t curr_time = HAL_GetTick();
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
@@ -63,26 +63,26 @@ bool UI_APP_DrawAll(void){
 			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
 			last_ui_update_flag = false;
 		}
-		uint16_t panel_x = 130;
-		uint16_t panel_y = 200;
+		uint16_t panel_x = curr_panel->x;
+		uint16_t panel_y = curr_panel->y;
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel->children_amount; i++){
 			HAL_Delay(1); //TODO: MAGIC
 			switch(curr_panel->children[i].type){
 				case(eUiElementTypeLabel): {
 					sUiLabel_t label = (sUiLabel_t)(*curr_panel->children[i].element.label); //TODO: DONT COPy
-					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, strlen(label.content), *curr_panel->children[i].param, false);
+					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, *label.string, *curr_panel->children[i].param, false);
 				} break;
 				case (eUiElementTypeButton): {
 					sUiButton_t button = (sUiButton_t)(*curr_panel->children[i].element.button);
-					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, *curr_panel->children[i].param, selectable_i == curr_active_ui_button);
+					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, *button.string, *curr_panel->children[i].param, selectable_i == curr_active_ui_button);
 					selectable_i++;
 				}break;
 				default: {
 					/* Should not happen */
 				}break;
 			}
-			panel_y -= 50;
+			panel_y -= curr_panel->spacing_y;
 		}
 	}
 	return true;

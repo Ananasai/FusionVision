@@ -10,6 +10,7 @@
 
 #include "main.h"
 #include "fonts.h"
+#include "string_common.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -46,16 +47,14 @@ typedef enum ePanel_t {
 }ePanel_t;
 
 typedef struct sUiLabel_t {
-	char *content;
-	size_t length;
+	const sString_t *string;
 }sUiLabel_t;
 
 typedef void (*UI_Button_Callback_t)(eButtonPress_t);
 typedef void (*UI_PanelButton_Callback_t)(eButtonType_t, eButtonPress_t);
 
 typedef struct sUiButton_t {
-	char *content;
-	size_t length;
+	const sString_t *string;
 	UI_Button_Callback_t callback;
 }sUiButton_t;
 
@@ -63,16 +62,17 @@ typedef struct sUiElementType_t {
 	eUiElementType_t type;
 	uint16_t x;
 	uint16_t y;
-	sTextParam_t *param;
+	const sTextParam_t *param;
 	union {
-		sUiLabel_t *label;
-		sUiButton_t *button;
+		const sUiLabel_t *label;
+		const sUiButton_t *button;
 	} element;
 }sUiElementType_t;
 
 typedef struct sUiPanel_t {
 	uint16_t x;
 	uint16_t y;
+	uint16_t spacing_y;
 	sUiElementType_t *children;
 	size_t children_amount;
 	size_t selectable;

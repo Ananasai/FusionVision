@@ -11,26 +11,28 @@
 
 #define __DEBUG_FILE_NAME__ "UI"
 /* Todo: find a better way instead of this shit below */
-#define BUTTON(_name, _x, _y, _font, _align, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.content = _name, .length = strlen(_name), .callback = _callback}}
+#define BUTTON(_name, _length, _x, _y, _font, _align, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = _length}, .callback = _callback}}
 
-#define LABEL(_name, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.content = _name}}
+#define LABEL(_name, _length, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.string = &(sString_t){.text = _name, .length = _length}}}
 
 static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_EdgeButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_ScreenStateButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_Interface_EdgeButtonPressed(eButtonPress_t press);
 static void UI_Interface_ScreenStateButtonPressed(eButtonPress_t press);
-//
+
 static char edge_text[20] = "DEFAULT";
 static char screen_state_text[20] = "DEFAULT";
-//eFont11x18, eAlignmentCenter
+static char time_text[20] = "66.66.66";
+
 static const sUiPanel_t main_menu = {
-	.x = 100,
-	.y = 200,
+	.x = 50,
+	.y = 175,
+	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-    	LABEL("Menu", 0, 0, eFont11x18, eAlignmentCenter),
-    	BUTTON("Edge", 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_EdgeButtonPressed),
-		BUTTON("Screen", 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_ScreenStateButtonPressed),
+    	LABEL("Menu", 4,  0, 0, eFont11x18, eAlignmentCenter),
+    	BUTTON("Edge", 4, 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_EdgeButtonPressed),
+		BUTTON("Screen", 6, 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_ScreenStateButtonPressed),
 		//BUTTON("NONE", 0, 0, &UI_Interface_EdgeButtonPressed),
     },
     .children_amount = 3,
@@ -39,35 +41,38 @@ static const sUiPanel_t main_menu = {
 };
 
 static const sUiPanel_t edge_threshold_menu = {
-	.x = 100,
-	.y = 200,
+	.x = 50,
+	.y = 175,
+	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-		LABEL(edge_text, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("Threshold:", 9, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL(edge_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
     },
-    .children_amount = 1,
-	.selectable = 1,
+    .children_amount = 2,
+	.selectable = 0,
 	.btn_callback = &UI_EdgeButtonCallback
 };
 
 static const sUiPanel_t screen_state_menu = {
-	.x = 100,
-	.y = 200,
+	.x = 50,
+	.y = 175,
+	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-		LABEL(screen_state_text, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("Screen:", 7, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL(screen_state_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
     },
-    .children_amount = 1,
-	.selectable = 1,
+    .children_amount = 2,
+	.selectable = 0,
 	.btn_callback = &UI_ScreenStateButtonCallback
 };
 
-static char time_text[20] = "66.66.66";
-
 static const sUiPanel_t constant_menu = {
-	.x = 128,
-	.y = 290,
+	.x = 50,
+	.y = 175,
+	.spacing_y = 40,
 	.children = (sUiElementType_t[]) {
-		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
-		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter)
+		LABEL(time_text, 8, 128, 290, eFont11x18, eAlignmentCenter),
+		LABEL("Group A tm", 10, 120, 1, eFont11x18, eAlignmentCenter)
 	},
 	.children_amount = 2,
 	.selectable = 0
@@ -239,7 +244,7 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){
 	/* Edge threshold */
 	uint32_t edge_threshold = 0;
 	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
-	snprintf(edge_text, 20, "Edge: %lu", edge_threshold);
+	snprintf(edge_text, 20, "%lu", edge_threshold);
 	/* RTC */
 	RTC_TimeTypeDef time;
 	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
@@ -250,7 +255,7 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){
 	uint32_t screen_state = 0;
 	Shared_param_API_Read(eSharedParamScreenState, &screen_state);
 	if(screen_state >= eScreenStateLast){
-		error("Screen: %ld", screen_state);
+		error("%ld", screen_state);
 		return false;
 	}
 	snprintf(screen_state_text, 20, "%s", screen_state_text_lut[screen_state]);

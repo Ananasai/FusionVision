@@ -6,6 +6,7 @@
  */
 
 #include "ui_element_driver.h"
+#include <string.h>
 
 #define UI_COLOUR 0xFFFF
 #define UI_COLOUR_INVERTED 0x0000
@@ -36,26 +37,25 @@ bool UI_DRIVER_DrawCharacter(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buf
 	return true;
 }
 
-bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, sTextParam_t text_param, bool invert){
+bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, sString_t string, sTextParam_t text_param, bool invert){
 	uint8_t curr_font_width = font_lut[text_param.font].width;
-	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
+	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT)){ //TODO: || (loc_x < length * curr_font_width)
 		return false;
 	}
 	if(text_param.alignment == eAlignmentCenter) { //TODO: right and left alignment
-		loc_x += (length * curr_font_width) >> 1;
+		loc_x += (strlen(string.text) * curr_font_width) >> 1;
 	}
-	for(size_t i = 0; i < length; i++){
-		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), text_param.font, invert);
+	for(size_t i = 0; i < strlen(string.text); i++){ //TODO: string.length
+		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(string.text + i), text_param.font, invert);
 	}
 	return true;
 }
 
-bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, sTextParam_t text_param, bool selected){
-	uint8_t curr_font_width = font_lut[text_param.font].width;
-	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
+bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, sString_t string, sTextParam_t text_param, bool selected){
+	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT)){
 		return false;
 	}
-	UI_DRIVER_DrawString(loc_x, loc_y, image_buffer, text, length, text_param, selected);
+	UI_DRIVER_DrawString(loc_x, loc_y, image_buffer, string, text_param, selected);
 	return true;
 }
 
