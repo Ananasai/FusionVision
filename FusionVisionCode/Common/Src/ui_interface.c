@@ -125,7 +125,7 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 				if(main_menu.children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
 						/* Found required button */
-						sUiButton_t *button = main_menu.children[i].element.button;
+						const sUiButton_t *button = main_menu.children[i].element.button;
 						if(button->callback == NULL){
 							break;
 						}
@@ -229,6 +229,9 @@ static void UI_ScreenStateButtonCallback(eButtonType_t btn, eButtonPress_t press
 		case eButtonDown: {
 			if(screen_state > eScreenStateFirst){
 				screen_state--;
+			}
+			else{
+				screen_state = eScreenStateLast - 1;
 			}
 			Shared_param_API_Write(eSharedParamScreenState, &screen_state, 4);
 			break;

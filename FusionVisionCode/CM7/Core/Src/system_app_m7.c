@@ -17,10 +17,11 @@
 
 #define __DEBUG_FILE_NAME__ "M7"
 
-uint16_t image_buffer[480*320] = {0};
+static uint16_t image_buffer[480*320] = {0};
 
-bool frame_event_flag = false;
-bool frame_half_event_flag = false;
+static bool frame_event_flag = false;
+static bool frame_half_event_flag = false;
+static uint32_t line_scanned_amount = 0;
 
 /* Executed before M4 is launched */
 bool System_APP_M7_PreInit(void){
@@ -62,12 +63,15 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		Diagnostics_APP_FrameEnd();
 		HAL_DCMI_Resume(&hdcmi);
 	}
+	if(line_scanned_amount > 3){
+
+	}
 	if(frame_half_event_flag) {
 		frame_half_event_flag = false;
 		uint32_t screen_state = 0;
 		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
 		if(screen_state == eScreenStateProcessed){
-			//IMG_PROCESSING_APP_Compute(image_buffer);
+			IMG_PROCESSING_APP_Compute(image_buffer);
 		}
 		//UI_APP_DrawAll(image_buffer);
 	}
@@ -79,8 +83,14 @@ bool System_APP_M7_Run(void){ //TODO: remove
 /* End of frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 	HAL_DCMI_Suspend(hdcmi);
+	line_scanned_amount = 0;
 	frame_event_flag = true;
 }
+
+//TODO: doesn't work
+//void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
+//	line_scanned_amount++;
+//}
 
 /* End of frame conversion IRQ */
 void HAL_DCMI_HalfFrameEventCallback(void){

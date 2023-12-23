@@ -3,20 +3,22 @@
 #include "sync_api.h"
 #include <string.h>
 
-#define NEW_PARAM(_enum, _name, _size) [_enum] = {.name = _name, .size = _size}
+#define NEW_PARAM(_enum, _name, _size, _default) [_enum] = {.name = _name, .size = _size, .default_val = _default}
 
 #define ARR_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 typedef struct sSharedParam_t{
 	char *name;
 	size_t size; //BYTES
+	uint32_t default_val;
 }sSharedParam_t;
 
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
-	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", 4),
-	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", 4),
-	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", 4),
-	NEW_PARAM(eSharedParamScreenState, "Screen state", 4)
+	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", sizeof(uint32_t), 5),
+	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0),
+	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", sizeof(uint32_t), 0),
+	NEW_PARAM(eSharedParamScreenState, "Screen state", sizeof(uint32_t), 0),
+	NEW_PARAM(eSharedParamScreenOptim, "Screen optimisation", sizeof(uint32_t), 0)
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
@@ -30,8 +32,12 @@ bool Shared_param_API_Init(void){
 		if(last_address >= SHARED_MEM_START + SHARED_MEM_LEN){
 			return false;
 		}
-		/* Clear buffer */ //TODO: move to mem api //TODO: DOUBLE CLEARING ON power on
-		memset((void *)shared_param_address_lut[param], 0, shared_param_lut[param].size);
+		//TODO: change for non uint32_t type
+		uint32_t default_value = shared_param_lut[param].default_val;
+		*((volatile uint32_t*)shared_param_address_lut[param]) = default_value;
+		//Shared_param_API_Write(param, &default_value, shared_param_lut[param].size);
+		/* Clear buffer */
+		//memset((void *)shared_param_address_lut[param], 0, shared_param_lut[param].size);
 	}
 	return true;
 }
@@ -53,9 +59,8 @@ bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, siz
 	if(Shared_mem_API_Write(shared_param_address_lut[param], in, length) == false){
 		return false;
 	}
-	/* INdicate to M7 that new visual configuration written */
-	if((param == eSharedParamActiveUiButtonIndex) || (param == eSharedParamActiveUiPanelIndex)
-			|| (param == eSharedParamEdgeThreshold) || (param == eSharedParamScreenState)){
+	/* Indicate to M7 that new visual configuration written */
+	if(param > eSharedParamFirst){
 		Sync_API_TakeSemaphore(eSemaphoreUiUpdate);
 		Sync_API_ReleaseSemaphore(eSemaphoreUiUpdate);
 	}

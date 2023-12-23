@@ -18,6 +18,7 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamActiveUiPanelIndex,
 	eSharedParamActiveUiButtonIndex,
 	eSharedParamScreenState,
+	eSharedParamScreenOptim,
 	eSharedParamLast
 }eSharedParamEnum_t;
 
@@ -27,6 +28,12 @@ typedef enum eScreenState_t {
 	eScreenStateProcessed,
 	eScreenStateLast
 }eScreenState_t;
+
+typedef enum eScreenOptim_t {
+	eScreenOptimFirst = 0,
+	eScreenOptimNone = eScreenOptimFirst,
+	eScreenOptimLast
+}eScreenOptim_t;
 
 bool Shared_param_API_Init(void);
 bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out);
