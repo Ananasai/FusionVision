@@ -9,6 +9,7 @@
 #define INC_UI_INTERFACE_H_
 
 #include "main.h"
+#include "fonts.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -62,6 +63,7 @@ typedef struct sUiElementType_t {
 	eUiElementType_t type;
 	uint16_t x;
 	uint16_t y;
+	sTextParam_t *param;
 	union {
 		sUiLabel_t *label;
 		sUiButton_t *button;

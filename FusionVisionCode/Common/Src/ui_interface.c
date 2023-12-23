@@ -11,26 +11,26 @@
 
 #define __DEBUG_FILE_NAME__ "UI"
 /* Todo: find a better way instead of this shit below */
-#define BUTTON(_name, _x, _y, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .element.button = &(sUiButton_t){.content = _name, .length = strlen(_name), .callback = _callback}}
+#define BUTTON(_name, _x, _y, _font, _align, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.content = _name, .length = strlen(_name), .callback = _callback}}
 
-#define LABEL(_name, _x, _y) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .element.label = &(sUiLabel_t){.content = _name}}
+#define LABEL(_name, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.content = _name}}
 
 static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_EdgeButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_ScreenStateButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_Interface_EdgeButtonPressed(eButtonPress_t press);
 static void UI_Interface_ScreenStateButtonPressed(eButtonPress_t press);
-
+//
 static char edge_text[20] = "DEFAULT";
 static char screen_state_text[20] = "DEFAULT";
-
+//eFont11x18, eAlignmentCenter
 static const sUiPanel_t main_menu = {
 	.x = 100,
 	.y = 200,
     .children = (sUiElementType_t[]) {
-    	LABEL("Menu", 0, 0),
-    	BUTTON("Edge", 0, 0, &UI_Interface_EdgeButtonPressed),
-		BUTTON("Screen", 0, 0, &UI_Interface_ScreenStateButtonPressed),
+    	LABEL("Menu", 0, 0, eFont11x18, eAlignmentCenter),
+    	BUTTON("Edge", 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_EdgeButtonPressed),
+		BUTTON("Screen", 0, 0, eFont11x18, eAlignmentCenter, &UI_Interface_ScreenStateButtonPressed),
 		//BUTTON("NONE", 0, 0, &UI_Interface_EdgeButtonPressed),
     },
     .children_amount = 3,
@@ -42,7 +42,7 @@ static const sUiPanel_t edge_threshold_menu = {
 	.x = 100,
 	.y = 200,
     .children = (sUiElementType_t[]) {
-		LABEL(edge_text, 0, 0),
+		LABEL(edge_text, 0, 0, eFont11x18, eAlignmentCenter),
     },
     .children_amount = 1,
 	.selectable = 1,
@@ -53,7 +53,7 @@ static const sUiPanel_t screen_state_menu = {
 	.x = 100,
 	.y = 200,
     .children = (sUiElementType_t[]) {
-		LABEL(screen_state_text, 0, 0),
+		LABEL(screen_state_text, 0, 0, eFont11x18, eAlignmentCenter),
     },
     .children_amount = 1,
 	.selectable = 1,
@@ -66,8 +66,8 @@ static const sUiPanel_t constant_menu = {
 	.x = 128,
 	.y = 290,
 	.children = (sUiElementType_t[]) {
-		LABEL(time_text, 128, 290),
-		LABEL("Group A tm", 120, 1)
+		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
+		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter)
 	},
 	.children_amount = 2,
 	.selectable = 0

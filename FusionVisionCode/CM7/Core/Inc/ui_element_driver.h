@@ -14,8 +14,8 @@
 #include "fonts.h"
 
 bool UI_DRIVER_DrawCharacter(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, char character, eFont_t font, bool invert);
-bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, eAlignment_t alignment, bool invert);
-bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, eAlignment_t alignment, bool selected);
+bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, sTextParam_t text_param, bool invert);
+bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, sTextParam_t text_param, bool selected);
 
 
 #endif /* INC_UI_ELEMENT_DRIVER_H_ */

@@ -26,6 +26,11 @@ typedef enum eAlignment_t {
 	eAlignemntLast
 }eAlignment_t;
 
+typedef struct sTextParam_t {
+	eFont_t font;
+	eAlignment_t alignment;
+}sTextParam_t;
+
 typedef struct sFontDesc_t {
 	uint8_t width;
 	uint8_t height;
