@@ -78,6 +78,11 @@ bool UI_APP_DrawAll(void){
 					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, *button.string, *curr_panel->children[i].param, selectable_i == curr_active_ui_button);
 					selectable_i++;
 				}break;
+				case (eUiElementTypeNavButton): {
+					sUiNavButton_t button = (sUiNavButton_t)(*curr_panel->children[i].element.nav_button);
+					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, *button.string, *curr_panel->children[i].param, selectable_i == curr_active_ui_button);
+					selectable_i++;
+				}break;
 				default: {
 					/* Should not happen */
 				}break;

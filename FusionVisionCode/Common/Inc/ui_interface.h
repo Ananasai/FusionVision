@@ -35,6 +35,7 @@ typedef enum eUiElementType_t {
 	eUiElementTypeFirst = 0,
 	eUiElementTypeLabel = eUiElementTypeFirst,
 	eUiElementTypeButton,
+	eUiElementTypeNavButton,
 	eUiElementTypeLast
 }eUiElementType_t;
 
@@ -43,6 +44,7 @@ typedef enum ePanel_t {
 	ePanelMainMenu = ePanelFirst,
 	ePanelEdge,
 	ePanelScreenState,
+	ePanelScreenOptim,
 	ePanelLast
 }ePanel_t;
 
@@ -58,6 +60,11 @@ typedef struct sUiButton_t {
 	UI_Button_Callback_t callback;
 }sUiButton_t;
 
+typedef struct sUiNavButton_t {
+	const sString_t *string;
+	ePanel_t target;
+}sUiNavButton_t;
+
 typedef struct sUiElementType_t {
 	eUiElementType_t type;
 	uint16_t x;
@@ -66,6 +73,7 @@ typedef struct sUiElementType_t {
 	union {
 		const sUiLabel_t *label;
 		const sUiButton_t *button;
+		const sUiNavButton_t *nav_button;
 	} element;
 }sUiElementType_t;
 
