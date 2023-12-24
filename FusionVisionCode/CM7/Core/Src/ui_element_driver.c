@@ -71,5 +71,3 @@ bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer
 	UI_DRIVER_DrawString(loc_x, loc_y, image_buffer, string, text_param, selected);
 	return true;
 }
-
-

@@ -40,9 +40,28 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	uint32_t edge_threshold = 0;
 	//TODO: dont read on every frame
 	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
+	/* Optimisation level for interlacing */
+	eScreenOptim_t optim_level = eScreenOptimFirst;
+	Shared_param_API_Read(eSharedParamScreenOptim, &optim_level);
+	uint8_t loop_increase = 1;
+	static uint8_t line_start = 0;
+	switch(optim_level){
+		case eScreenOptimNone: {
+			line_start = 0;
+			loop_increase = 1;
+		}break;
+		case eScreenOptimInterlacedAll:
+		case eScreenOptimInterlacedProcessing:{
+			loop_increase = 2;
+			line_start = 1 ? line_start == 0 : 0;
+		}break;
+		default:{
+			return false;
+		}break;
+	}
 	/* To grayscale https://stackoverflow.com/questions/58449462/rgb565-to-grayscale */
-	for(uint16_t y = 0; y < COMPUTE_HEIGHT; y += 2){
-		for(uint16_t x = 0; x < COMPUTE_WIDTH; x += 2){
+	for(uint16_t y = line_start; y < COMPUTE_HEIGHT; y += loop_increase){
+		for(uint16_t x = 0; x < COMPUTE_WIDTH; x += 1){
 			int16_t pixel = PIXEL(image_buffer, x, y);
 			int8_t red = ((pixel & 0xF800)>>11);
 			int8_t green = ((pixel & 0x07E0)>>5);
@@ -57,11 +76,10 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	 * https://en.wikipedia.org/wiki/Prewitt_operator or
 	 * https://en.wikipedia.org/wiki/Sobel_operator
 	 * for edge detection */
-	for(uint16_t y = 1; y < COMPUTE_HEIGHT-1; y += 2){
-		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x += 2){
+	for(uint16_t y = line_start + 2; y < COMPUTE_HEIGHT-1; y += loop_increase){ //TODO: remove +2
+		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x += 1){
 			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));
 			if(sum > edge_threshold){
-				//PIXEL(image_buffer, x, y) = 0xFFFF;
 				*(image_buffer + (y) * 480 + (x)) = EDGE_COLOUR;
 			}
 		}

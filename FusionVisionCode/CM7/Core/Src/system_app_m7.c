@@ -56,10 +56,11 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		frame_event_flag = false;
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
-		ili9486_SetDisplayWindow(0, 0, 480, 320);
-		LCD_IO_WriteCmd8(0x2C);
+		//ili9486_SetDisplayWindow(0, 0, 480, 320);
+		//LCD_IO_WriteCmd8(0x2C);
 		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 320, image_buffer, 0);
 		Diagnostics_APP_FrameEnd();
 		HAL_DCMI_Resume(&hdcmi);
 	}
@@ -77,8 +78,6 @@ bool System_APP_M7_Run(void){ //TODO: remove
 	}
 	return true;
 }
-
-
 
 /* End of frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
