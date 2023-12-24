@@ -45,23 +45,30 @@ bool System_APP_M7_Start(void){
 	HAL_Delay(10);
 	ov2640_Init(0x60);
 	HAL_Delay(10);
-	Diagnostics_APP_FrameStart();
+	Diagnostics_APP_Start();
+	Diagnostics_APP_RecordStart(eDiagEventCamera);
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
 
-bool System_APP_M7_Run(void){ //TODO: remove
+bool System_APP_M7_Run(void){
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
 		frame_event_flag = false;
+		Diagnostics_APP_RecordStart(eDiagEventDisplay);
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
 		//LCD_IO_WriteCmd8(0x2C);
 		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 320, image_buffer, 0);
-		Diagnostics_APP_FrameEnd();
+		Diagnostics_APP_RecordEnd(eDiagEventDisplay);
+		Diagnostics_APP_RecordEnd(eDiagEventFrame);
+		//static uint8_t line_start = 0;
+		//line_start = 1 ? line_start == 0 : 1;
+		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 300, image_buffer, line_start);
+		Diagnostics_APP_RecordStart(eDiagEventFrame);
+		Diagnostics_APP_RecordStart(eDiagEventCamera);
 		HAL_DCMI_Resume(&hdcmi);
 	}
 	if(line_scanned_amount > 3){
@@ -72,7 +79,9 @@ bool System_APP_M7_Run(void){ //TODO: remove
 		uint32_t screen_state = 0;
 		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
 		if(screen_state == eScreenStateProcessed){
+			Diagnostics_APP_RecordStart(eDiagEventProcessing);
 			IMG_PROCESSING_APP_Compute(image_buffer);
+			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
 		//UI_APP_DrawAll(image_buffer);
 	}
@@ -82,8 +91,10 @@ bool System_APP_M7_Run(void){ //TODO: remove
 /* End of frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 	HAL_DCMI_Suspend(hdcmi);
+	Diagnostics_APP_RecordEnd(eDiagEventCamera);
 	line_scanned_amount = 0;
 	frame_event_flag = true;
+
 }
 
 //TODO: doesn't work
