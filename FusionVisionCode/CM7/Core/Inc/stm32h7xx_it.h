@@ -59,7 +59,6 @@ void TIM2_IRQHandler(void);
 void DMA1_Stream7_IRQHandler(void);
 void DMA2_Stream0_IRQHandler(void);
 void DCMI_IRQHandler(void);
-void DMA2D_IRQHandler(void);
 void HSEM1_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 

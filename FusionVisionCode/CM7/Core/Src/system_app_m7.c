@@ -17,7 +17,7 @@
 
 #define __DEBUG_FILE_NAME__ "M7"
 
-static uint16_t image_buffer[480*320+1000] = {0};
+static uint16_t image_buffer[480*320] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
@@ -55,7 +55,7 @@ bool System_APP_M7_Run(void){
 	if(frame_event_flag){
 		frame_event_flag = false;
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
-		HAL_Delay(1);
+		//HAL_Delay(1); //TODO: DELETE WTF IS tHIS
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
@@ -114,6 +114,6 @@ void HAL_DCMI_HalfFrameEventCallback(void){
 	frame_half_event_flag = true;
 }
 
-void HAL_DMA2D_CLUTLoadingCpltCallback(DMA2D_HandleTypeDef *hdma2d){
+//void HAL_DMA2D_CLUTLoadingCpltCallback(DMA2D_HandleTypeDef *hdma2d){
 
-}
+//}
