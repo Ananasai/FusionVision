@@ -17,8 +17,8 @@ static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", sizeof(uint32_t), 5),
 	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0),
 	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", sizeof(uint32_t), 0),
-	NEW_PARAM(eSharedParamScreenState, "Screen state", sizeof(uint32_t), 1),
-	NEW_PARAM(eSharedParamScreenOptim, "Screen optimisation", sizeof(uint32_t), 1)
+	NEW_PARAM(eSharedParamScreenState, "Screen state", sizeof(uint32_t), eScreenStatePassthrough),
+	NEW_PARAM(eSharedParamScreenOptim, "Screen optimisation", sizeof(uint32_t), eScreenOptimNone)
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };

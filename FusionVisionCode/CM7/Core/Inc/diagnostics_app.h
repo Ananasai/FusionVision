@@ -19,7 +19,7 @@ typedef enum eDiagEvent_t {
 	eDiagEventLast
 }eDiagEvent_t;
 
-extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
 
 void Diagnostics_APP_Start(void);
 void Diagnostics_APP_RecordStart(eDiagEvent_t event);

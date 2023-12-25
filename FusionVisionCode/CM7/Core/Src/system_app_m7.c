@@ -46,6 +46,7 @@ bool System_APP_M7_Start(void){
 	ov2640_Init(0x60);
 	HAL_Delay(10);
 	Diagnostics_APP_Start();
+	Diagnostics_APP_RecordStart(eDiagEventFrame);
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
@@ -59,9 +60,14 @@ bool System_APP_M7_Run(void){
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
-		//LCD_IO_WriteCmd8(0x2C);
-		//HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 479*319*2+22000);
+		//LCD_IO_WriteCmd16(0x2C);
+		//NOTE: DMA LENgth ONLY 16bit
+		//HAL_StatusTypeDef status0 = HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 480*106/2);
+		//HAL_StatusTypeDef status3 = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0, HAL_DMA_FULL_TRANSFER, 100);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		//SCB_CleanDCache_by_Addr((uint32_t*)LCD_ADDR_DATA, 480*320);
+		//HAL_StatusTypeDef status = HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)image_buffer, (uint32_t)LCD_ADDR_DATA, 100, 100);
+		//HAL_StatusTypeDef status2 = HAL_DMA2D_PollForTransfer(&hdma2d, 1000);
 		Diagnostics_APP_RecordEnd(eDiagEventDisplay);
 		Diagnostics_APP_RecordEnd(eDiagEventFrame);
 		//static uint8_t line_start = 0;
@@ -105,4 +111,8 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 /* End of frame conversion IRQ */
 void HAL_DCMI_HalfFrameEventCallback(void){
 	frame_half_event_flag = true;
+}
+
+void HAL_DMA2D_CLUTLoadingCpltCallback(DMA2D_HandleTypeDef *hdma2d){
+
 }

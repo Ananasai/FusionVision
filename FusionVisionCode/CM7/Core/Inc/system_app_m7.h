@@ -16,6 +16,7 @@ extern RTC_HandleTypeDef hrtc;
 extern DCMI_HandleTypeDef hdcmi;
 extern UART_HandleTypeDef huart3;
 extern DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
+extern DMA2D_HandleTypeDef hdma2d;
 
 bool System_APP_M7_PreInit(void);
 bool System_APP_M7_Start(void);
