@@ -12,7 +12,7 @@ typedef struct sSharedParam_t{
 	size_t size; //BYTES
 	uint32_t default_val;
 }sSharedParam_t;
-
+    //TODO: cache resources if they were not modified
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", sizeof(uint32_t), 5),
 	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0),

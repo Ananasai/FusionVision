@@ -41,7 +41,7 @@ void Diagnostics_APP_RecordStart(eDiagEvent_t event) {
 }
 
 void Diagnostics_APP_RecordEnd(eDiagEvent_t event) {
-	diag_event_times[event] = TIM2->CNT - diag_event_start[event];
+	diag_event_times[event] += TIM2->CNT - diag_event_start[event];
 	/* If last event - increase frame counter and printout info */
 	if(event == eDiagEventFrame){
 		curr_frame++;
@@ -50,6 +50,7 @@ void Diagnostics_APP_RecordEnd(eDiagEvent_t event) {
 			for(eDiagEvent_t evt = eDiagEventFirst; evt < eDiagEventLast; evt++){
 				float new_time = diag_event_times[evt] / MAX_FRAMES * TICK_TIME / 1000.0f;
 				debug((char *)diag_event_name_format_lut[evt], new_time);
+				diag_event_times[evt] = 0;
 			}
 			curr_frame = 0;
 			TIM2->CNT = 0;

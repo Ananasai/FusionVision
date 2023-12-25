@@ -17,7 +17,7 @@
 
 #define __DEBUG_FILE_NAME__ "M7"
 
-static uint16_t image_buffer[480*320] = {0};
+static uint16_t image_buffer[480*320+1000] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
@@ -31,8 +31,6 @@ bool System_APP_M7_PreInit(void){
 	if(Shared_param_API_Init() == false){
 		return false;
 	}
-	/* Clear image buffer */
-	memset(image_buffer, 0x00, 320*480*2);
 	return true;
 }
 
@@ -57,6 +55,7 @@ bool System_APP_M7_Run(void){
 	if(frame_event_flag){
 		frame_event_flag = false;
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
+		HAL_Delay(1);
 		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
@@ -65,6 +64,7 @@ bool System_APP_M7_Run(void){
 		//HAL_StatusTypeDef status0 = HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 480*106/2);
 		//HAL_StatusTypeDef status3 = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0, HAL_DMA_FULL_TRANSFER, 100);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 300, image_buffer, 0);
 		//SCB_CleanDCache_by_Addr((uint32_t*)LCD_ADDR_DATA, 480*320);
 		//HAL_StatusTypeDef status = HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)image_buffer, (uint32_t)LCD_ADDR_DATA, 100, 100);
 		//HAL_StatusTypeDef status2 = HAL_DMA2D_PollForTransfer(&hdma2d, 1000);
@@ -72,7 +72,7 @@ bool System_APP_M7_Run(void){
 		Diagnostics_APP_RecordEnd(eDiagEventFrame);
 		//static uint8_t line_start = 0;
 		//line_start = 1 ? line_start == 0 : 1;
-		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 300, image_buffer, line_start);
+		//
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
 		HAL_DCMI_Resume(&hdcmi);
@@ -87,6 +87,7 @@ bool System_APP_M7_Run(void){
 		if(screen_state == eScreenStateProcessed){
 			Diagnostics_APP_RecordStart(eDiagEventProcessing);
 			IMG_PROCESSING_APP_Compute(image_buffer);
+			//HAL_Delay(1);
 			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
 		//UI_APP_DrawAll(image_buffer);
