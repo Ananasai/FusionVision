@@ -11,11 +11,13 @@
 typedef enum eQueueEnum_t {
 	eQueueFirst = 0,
 	eQueueLighting = eQueueFirst,
+	eQueuePowerTrack,
 	eQueueLast
 }eQueueEnum_t;
 
 typedef enum eJobEnum_t {
 	eJobFirst = 0,
+	eJobRecAdc, /* Received ADC value */
 	eJobLast
 }eJobEnum_t;
 

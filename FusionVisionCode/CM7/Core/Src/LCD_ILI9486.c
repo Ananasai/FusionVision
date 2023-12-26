@@ -315,10 +315,12 @@ void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
 
 void ili9486_DrawRGBImageInterlaced(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData, uint8_t line_start)
 {
-	static lines = 0 ? lines == 1 : 1;
-	for(uint16_t line = lines; line < 200; line += 2){
-		ili9486_DrawRGBImage(0, line, 480, 1, pData+Xsize*line);
-	}
+	ili9486_DrawRGBImage(0, 0, 480, 160, pData);
+	ili9486_DrawRGBImage(0, 160, 480, 160, pData+480*160);
+	//static lines = 0 ? lines == 1 : 1;
+	//for(uint16_t line = lines; line < 200; line += 2){
+	//	ili9486_DrawRGBImage(0, line, 480, 1, pData+Xsize*line);
+	//}
 	/*
 	for(uint16_t line = 0; line < 254; line += 2){
 		ili9486_SetDisplayWindow(Xpos, line, Xsize, 2);
