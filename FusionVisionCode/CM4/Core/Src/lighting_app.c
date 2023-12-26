@@ -13,6 +13,9 @@
 
 #define __DEBUG_FILE_NAME__ "LIGHT"
 
+#define R2 25000
+#define VIN 5
+
 static void Lighting_app_thread(void *argument);
 static void Lighting_job_recAdc(void *payload);
 
@@ -47,7 +50,9 @@ static void Lighting_app_thread(void *argument){
 	}
 }
 
+/* Formula for photo resistor resistance R1 = (Vin * R2) / Vout - R2*/
 static void Lighting_job_recAdc(void *payload){
 	float *adc_val_v = (float *)payload;
-	debug("Val: %.2f\r\n", *adc_val_v);
+	float R1 = (float)(VIN * R2) / (float)(*adc_va_v) - R2;
+	debug("Photo resistor: %.2f\r\n", *R1);
 }

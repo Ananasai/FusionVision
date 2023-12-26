@@ -78,7 +78,6 @@ static void Adc_APP_Timer(void *arg){
 			}
 			uint16_t adc_value = HAL_ADC_GetValue(&hadc1);
 			HAL_ADC_Stop(&hadc1);
-			//debug("ADC val: %s %d\r\n", adc_channel_lut[channel].name, &adc_value);
 			float *adc_value_v = malloc(sizeof(float));
 			if(adc_value_v == NULL){
 				error("In allocating value\r\n");
