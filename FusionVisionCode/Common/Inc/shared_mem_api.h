@@ -17,7 +17,7 @@
 #define SHARED_MEM_LEN 0x0000FFFF
 
 
-bool Shared_mem_API_Read(uint32_t address, volatile uint32_t *out);
-bool Shared_mem_API_Write(uint32_t address, volatile const uint32_t *data, size_t length);
+bool Shared_mem_API_Read(uint32_t address, volatile void *out, size_t length);
+bool Shared_mem_API_Write(uint32_t address, volatile const void *data, size_t length);
 
 #endif /* INC_SHARED_MEM_API_H_ */

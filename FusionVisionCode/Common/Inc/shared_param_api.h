@@ -39,6 +39,6 @@ typedef enum eScreenOptim_t {
 
 bool Shared_param_API_Init(void);
 bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out);
-bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, size_t length);
+bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in);
 
 #endif /* INC_SHARED_PARAM_API_H_ */

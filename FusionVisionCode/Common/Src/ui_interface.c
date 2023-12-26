@@ -159,7 +159,7 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			else{
 				current_active_button_index--;
 			}
-			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index, 4);
+			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
 			break;
 		}
 		case eButtonOk: {
@@ -202,7 +202,7 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			else{
 				current_active_button_index++;
 			}
-			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index, 4);
+			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
 			break;
 		}
 		default: {
@@ -223,8 +223,8 @@ void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press){
 static void UI_NavButtonPressed(eButtonPress_t press, ePanel_t target){
 	current_active_button_index = 0;
 	current_active_panel_index = target;
-	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index, 4);
-	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index, 4);
+	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
+	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index);
 }
 
 /* Defines what up/down/ok buttons do in parameter change panels */
@@ -243,15 +243,15 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 			}else{
 				(*param.local)++;
 			}
-			Shared_param_API_Write(param.param, param.local, 4); //TODO: ONLY uint32_t supported
+			Shared_param_API_Write(param.param, param.local); //TODO: ONLY uint32_t supported
 			break;
 		}
 		case eButtonOk: {
 			sPanelNavDesc_t last_panel = panel_lut[current_active_panel_index];
 			current_active_button_index = last_panel.parent_btn;
 			current_active_panel_index = last_panel.parent;
-			Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index, 4);
-			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index, 4);
+			Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
+			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
 			break;
 		}
 		case eButtonDown: {
@@ -261,7 +261,7 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 			else{
 				*param.local = param.max - 1;
 			}
-			Shared_param_API_Write(param.param, param.local, 4); //TODO: here too
+			Shared_param_API_Write(param.param, param.local); //TODO: here too
 			break;
 		}
 		default: {

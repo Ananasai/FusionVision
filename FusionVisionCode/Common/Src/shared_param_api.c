@@ -32,12 +32,11 @@ bool Shared_param_API_Init(void){
 		if(last_address >= SHARED_MEM_START + SHARED_MEM_LEN){
 			return false;
 		}
-		//TODO: change for non uint32_t type
+		/* Set all buffer to default value of uint32_t type */
 		uint32_t default_value = shared_param_lut[param].default_val;
-		*((volatile uint32_t*)shared_param_address_lut[param]) = default_value;
-		//Shared_param_API_Write(param, &default_value, shared_param_lut[param].size);
-		/* Clear buffer */
-		//memset((void *)shared_param_address_lut[param], 0, shared_param_lut[param].size);
+		for(uint32_t i = 0; i < shared_param_lut[param].size/4; i++){
+			memcpy((void *)shared_param_address_lut[param], &default_value, 4);
+		}
 	}
 	return true;
 }
@@ -46,17 +45,14 @@ bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){
 	if(param >= eSharedParamLast){
 		return false;
 	}
-	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out);
+	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out, shared_param_lut[param].size);
 }
 
-bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, size_t length){
+bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in){
 	if((param >= eSharedParamLast) || (in == NULL)){
 		return false;
 	}
-	if(length > shared_param_lut[param].size){
-		return false;
-	}
-	if(Shared_mem_API_Write(shared_param_address_lut[param], in, length) == false){
+	if(Shared_mem_API_Write(shared_param_address_lut[param], in, shared_param_lut[param].size) == false){
 		return false;
 	}
 	/* Indicate to M7 that new visual configuration written */
