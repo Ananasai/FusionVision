@@ -12,31 +12,24 @@
 typedef struct sPanelNavDesc_t {
 	const sUiPanel_t *panel;
 	ePanel_t parent;
-	uint32_t parent_btn;
+	uint32_t last_btn;
 }sPanelNavDesc_t;
-
-typedef struct sParamChange_t {
-	uint32_t *local;
-	eSharedParamEnum_t param;
-	uint32_t max;
-	uint32_t min;
-}sParamChange_t;
 
 #define __DEBUG_FILE_NAME__ "UI"
 
-#define BUTTON(_name, _length, _x, _y, _font, _align, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = _length}, .callback = _callback}}
-#define LABEL(_name, _length, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.string = &(sString_t){.text = _name, .length = _length}}}
-#define NAV_BUTTON(_name, _length, _x, _y, _font, _align, _target) {.type = eUiElementTypeNavButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.nav_button = &(sUiNavButton_t){.string = &(sString_t){.text = _name, .length = _length}, .target = _target}}
-
-#define PANEL(_panel, _parent, _parent_btn) {.panel = _panel, .parent = _parent, .parent_btn = _parent_btn}
+#define BUTTON(_name, _x, _y, _font, _align, _callback) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}, .callback = _callback, .argument = NULL}}
+#define NAV_BUTTON(_name, _x, _y, _font, _align, _target) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}, .callback = UI_NavButtonPressed, .argument = &(uint32_t){_target}}}
+#define PARAM_CHANGE_BUTTON(_name, _x, _y, _font, _align, _target) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}, .callback = UI_ParamChangeButtonPressed, .argument = &(eSharedParamEnum_t){_target}}}
+#define LABEL(_name, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}}}
+#define PANEL(_panel, _parent) {.panel = _panel, .parent = _parent, .last_btn = 0}
 
 static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press);
-static void UI_NavButtonPressed(eButtonPress_t press, ePanel_t target);
+static void UI_NavButtonPressed(eButtonPress_t press, const void *argument);
+static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argument);
 
-static char edge_text[20] = "DEFAULT";
-static char screen_state_text[20] = "DEFAULT";
-static char screen_optim_text[20] = "DEFAULT";
+static char current_param_name_text[20] = "DEFAULT";
+static char current_param_value_text[20] = "DEFAULT";
 static char time_text[20] = "66.66.66";
 
 static const sUiPanel_t main_menu = {
@@ -44,96 +37,80 @@ static const sUiPanel_t main_menu = {
 	.y = 175,
 	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-    	LABEL("Menu", 4,  0, 0, eFont11x18, eAlignmentCenter),
-    	NAV_BUTTON("Edge", 4, 0, 0, eFont11x18, eAlignmentCenter, ePanelEdge),
-		NAV_BUTTON("Screen", 6, 0, 0, eFont11x18, eAlignmentCenter, ePanelScreenState),
-		NAV_BUTTON("Optim", 5, 0, 0, eFont11x18, eAlignmentCenter, ePanelScreenOptim),
+    	LABEL("Menu",  0, 0, eFont11x18, eAlignmentCenter),
+    	PARAM_CHANGE_BUTTON("Edge", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamEdgeThreshold),
+		PARAM_CHANGE_BUTTON("State", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenState),
+		PARAM_CHANGE_BUTTON("Optim", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenOptim),
     },
     .children_amount = 4,
 	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
-static const sUiPanel_t edge_threshold_menu = {
+static const sUiPanel_t param_change_default_panel = {
 	.x = 50,
 	.y = 175,
 	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
-		LABEL("Threshold:", 9, 0, 0, eFont11x18, eAlignmentCenter),
-		LABEL(edge_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL(current_param_name_text, 0, 0, eFont11x18, eAlignmentCenter),
+		LABEL(current_param_value_text, 0, 0, eFont11x18, eAlignmentCenter),
     },
     .children_amount = 2,
 	.selectable = 0,
 	.btn_callback = &UI_ParamChangeButtonCallback
 };
 
-static const sUiPanel_t screen_state_menu = {
-	.x = 50,
-	.y = 175,
-	.spacing_y = 40,
-    .children = (sUiElementType_t[]) {
-		LABEL("Screen:", 7, 0, 0, eFont11x18, eAlignmentCenter),
-		LABEL(screen_state_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
-    },
-    .children_amount = 2,
-	.selectable = 0,
-	.btn_callback = &UI_ParamChangeButtonCallback
-};
-
-static const sUiPanel_t screen_optim_menu = {
-	.x = 50,
-	.y = 175,
-	.spacing_y = 40,
-    .children = (sUiElementType_t[]) {
-		LABEL("Optim:", 6, 0, 0, eFont11x18, eAlignmentCenter),
-		LABEL(screen_optim_text, 20, 0, 0, eFont11x18, eAlignmentCenter),
-    },
-    .children_amount = 2,
-	.selectable = 0,
-	.btn_callback = &UI_ParamChangeButtonCallback
-};
 /* Constant visible menu with RTC and TM */
 static const sUiPanel_t constant_menu = {
 	.x = 50,
 	.y = 175,
 	.spacing_y = 40,
 	.children = (sUiElementType_t[]) {
-		LABEL(time_text, 8, 128, 290, eFont11x18, eAlignmentCenter),
-		LABEL("Group A tm", 10, 120, 1, eFont11x18, eAlignmentCenter)
+		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
+		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter)
 	},
 	.children_amount = 2,
 	.selectable = 0
 };
 
-static const sPanelNavDesc_t panel_lut[ePanelLast] = {
-	[ePanelMainMenu] = PANEL(&main_menu, ePanelMainMenu, 0),
-	[ePanelEdge] = PANEL(&edge_threshold_menu, ePanelMainMenu, 0),
-	[ePanelScreenState] = PANEL(&screen_state_menu, ePanelMainMenu, 1),
-	[ePanelScreenOptim] = PANEL(&screen_optim_menu, ePanelMainMenu, 2)
+static sPanelNavDesc_t panel_lut[ePanelLast] = {
+	[ePanelMainMenu] = PANEL(&main_menu, ePanelMainMenu),
+	[ePanelParamChangeDefault] = PANEL(&param_change_default_panel, ePanelMainMenu) //TODO: back button will not work
 };
 
-static const char *screen_state_text_lut[eScreenStateLast] = {
-	[eScreenStatePassthrough] = "Passthrough",
-	[eScreenStateProcessed] = "Processed"
-};
+typedef struct sParamValTextDesc_t {
+	uint32_t count;
+	char *texts[10]; //TODO: could overflow if more than 10
+}sParamValTextDesc_t;
 
-static const char *screen_optim_text_lut[eScreenOptimLast] = {
-	[eScreenOptimNone] = "None",
-	[eScreenOptimInterlacedProcessing] = "Interlaced 1",
-	[eScreenOptimInterlacedAll] = "Interlaced 2",
+static const sParamValTextDesc_t param_value_text[eSharedParamLast] = {
+	[eSharedParamScreenState] = {
+		.count = 2,
+		.texts = {
+			[eScreenStatePassthrough] = "Passthrough",
+			[eScreenStateProcessed] = "Processed"}
+	},
+	[eSharedParamScreenOptim] = {
+			.count = 3,
+		.texts = {
+			[eScreenOptimNone] = "None",
+			[eScreenOptimInterlacedProcessing] = "Interlaced 1",
+			[eScreenOptimInterlacedAll] = "Interlaced 2"}
+	},
+	[eSharedParamEdgeAlgorithm] = {
+		.count = 2,
+		.texts = {
+			[eEdgeAlgorithmSobel] = "Sobel",
+			[eEdgeAlgorithmRoberts] = "Roberts"
+		}
+	},
 };
 
 static uint32_t current_active_button_index = 0;
 static uint32_t current_active_panel_index = 0;
-static uint32_t edge_threshold = 5;
-static uint32_t screen_state = eScreenStateFirst;
-static uint32_t screen_optim = eScreenStateFirst;
 
-static const sParamChange_t param_change_lut[ePanelLast] = { //TODO: several luts could be merged
-	[ePanelEdge] = {.local = &edge_threshold, .param = eSharedParamEdgeThreshold, .max = 999, .min = 0},
-	[ePanelScreenState] = {.local = &screen_state, .param = eSharedParamScreenState, .max = eScreenStateLast, .min = eScreenStateFirst},
-	[ePanelScreenOptim] = {.local = &screen_optim, .param = eSharedParamScreenOptim, .max = eScreenOptimLast, .min = eScreenOptimFirst}
-};
+static uint32_t current_param = eSharedParamFirst;
+static uint32_t current_param_back_btn = 0;
 
 bool UI_Interface_GetCurrentPanel(const sUiPanel_t **out){
 	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
@@ -165,23 +142,18 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 		case eButtonOk: {
 			uint32_t selectable = 0;
 			for(uint32_t i = 0; i < main_menu.children_amount; i++){
-				if((main_menu.children[i].type == eUiElementTypeButton) ||
-						(main_menu.children[i].type == eUiElementTypeNavButton)){
+				if(main_menu.children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
 						/* Found required button */
+						panel_lut[current_active_panel_index].last_btn = selectable;
 						switch(main_menu.children[i].type){
 							case eUiElementTypeButton: {
 								const sUiButton_t *button = main_menu.children[i].element.button;
 								if(button->callback == NULL){
 									break;
 								}
-								(*button->callback)(press);
+								(*button->callback)(press, button->argument);
 							}break;
-							case eUiElementTypeNavButton: {
-								const sUiNavButton_t *button = main_menu.children[i].element.nav_button;
-								UI_NavButtonPressed(press, button->target);
-								break;
-							}
 							default: {
 								break;
 							}
@@ -219,12 +191,24 @@ void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press){
 	(*panel_lut[current_active_panel_index].panel->btn_callback)(btn, press);
 }
 
-/* Defines nav button logic -> opening new panel*/
-static void UI_NavButtonPressed(eButtonPress_t press, ePanel_t target){
+/* Defines nav button logic -> opening new panel */
+static void UI_NavButtonPressed(eButtonPress_t press, const void *argument){
+	ePanel_t *target = (ePanel_t *)argument;
 	current_active_button_index = 0;
-	current_active_panel_index = target;
+	current_active_panel_index = *target;
 	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
-	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_panel_index);
+	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
+}
+
+/* Defines param button logic -> opening param change default panel */
+static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argument){
+	current_param_back_btn = current_active_button_index;
+	eSharedParamEnum_t *new_param = (eSharedParamEnum_t *)argument;
+	current_active_panel_index = ePanelParamChangeDefault;
+	current_param = *new_param;
+	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
+	/* Set current active button to param value to informt M7 core */
+	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_param);
 }
 
 /* Defines what up/down/ok buttons do in parameter change panels */
@@ -232,36 +216,36 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 	if((btn >= eButtonLast) || (press >= eButtonPressLast)){
 		return;
 	}
-	sParamChange_t param = param_change_lut[current_active_panel_index];
-	if(param.local == NULL){
-		return;
-	}
+	uint32_t current_param_val = 0;
+	sSharedParam_t current_param_desc;
+	Shared_param_API_Read(current_param, &current_param_val);
+	Shared_param_API_GetDesc(current_param, &current_param_desc);
 	switch(btn){
 		case eButtonUp: {
-			if(*param.local == param.max - 1){
-				*param.local = param.min;
+			if(current_param_val == current_param_desc.max - 1){
+				current_param_val = current_param_desc.min;
 			}else{
-				(*param.local)++;
+				current_param_val++;
 			}
-			Shared_param_API_Write(param.param, param.local); //TODO: ONLY uint32_t supported
+			Shared_param_API_Write(current_param, &current_param_val); //TODO: ONLY uint32_t supported
 			break;
 		}
 		case eButtonOk: {
 			sPanelNavDesc_t last_panel = panel_lut[current_active_panel_index];
-			current_active_button_index = last_panel.parent_btn;
+			current_active_button_index = panel_lut[last_panel.parent].last_btn;
 			current_active_panel_index = last_panel.parent;
 			Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 			Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
 			break;
 		}
 		case eButtonDown: {
-			if(*param.local > param.min){
-				(*param.local)--;
+			if(current_param_val > current_param_desc.min){
+				current_param_val--;
 			}
 			else{
-				*param.local = param.max - 1;
+				current_param_val = current_param_desc.max - 1;
 			}
-			Shared_param_API_Write(param.param, param.local); //TODO: here too
+			Shared_param_API_Write(current_param, &current_param_val); //TODO: here too
 			break;
 		}
 		default: {
@@ -272,30 +256,29 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 
 #ifdef CORE_CM7
 bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify into loop or lut?
-	/* Edge threshold */
-	uint32_t edge_threshold = 0;
-	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
-	snprintf(edge_text, 20, "%lu", edge_threshold);
+	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
+	/* Current selected value */
+	if(current_active_panel_index == ePanelParamChangeDefault){
+		/* Fill value of param*/
+		Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &current_param);
+		uint32_t current_param_val = 0; //TODO: dont know which parameter is read
+		Shared_param_API_Read(current_param, &current_param_val);
+		if(param_value_text[current_param].count == 0){
+			snprintf(current_param_value_text, 20, "%lu", current_param_val);
+		}else{
+			snprintf(current_param_value_text, 20, "%s", param_value_text[current_param].texts[current_param_val]);
+		}
+		/* Fill name of param */
+		sSharedParam_t current_shared_param_desc;
+		Shared_param_API_GetDesc(current_param, &current_shared_param_desc);
+		snprintf(current_param_name_text, 20, "%s", current_shared_param_desc.name);
+	}
 	/* RTC */
 	RTC_TimeTypeDef time;
 	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 	RTC_DateTypeDef date; /* Need read date for value to update */
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-	/* Screen state */
-	uint32_t screen_state = 0;
-	Shared_param_API_Read(eSharedParamScreenState, &screen_state);
-	if(screen_state >= eScreenStateLast){
-		return false;
-	}
-	snprintf(screen_state_text, 20, "%s", screen_state_text_lut[screen_state]);
-	/* Screen optim */
-	uint32_t screen_optim = 0;
-	Shared_param_API_Read(eSharedParamScreenOptim, &screen_optim);
-	if(screen_optim >= eScreenOptimLast){
-		return false;
-	}
-	snprintf(screen_optim_text, 20, "%s", screen_optim_text_lut[screen_optim]);
 	return true;
 }
 #endif

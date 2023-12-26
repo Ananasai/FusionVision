@@ -35,45 +35,37 @@ typedef enum eUiElementType_t {
 	eUiElementTypeFirst = 0,
 	eUiElementTypeLabel = eUiElementTypeFirst,
 	eUiElementTypeButton,
-	eUiElementTypeNavButton,
 	eUiElementTypeLast
 }eUiElementType_t;
 
 typedef enum ePanel_t {
 	ePanelFirst = 0,
 	ePanelMainMenu = ePanelFirst,
-	ePanelEdge,
-	ePanelScreenState,
-	ePanelScreenOptim,
+	ePanelParamChangeDefault,
 	ePanelLast
 }ePanel_t;
 
-typedef struct sUiLabel_t {
-	const sString_t *string;
-}sUiLabel_t;
-
-typedef void (*UI_Button_Callback_t)(eButtonPress_t);
+typedef void (*UI_Button_Callback_t)(eButtonPress_t, const void *);
 typedef void (*UI_PanelButton_Callback_t)(eButtonType_t, eButtonPress_t);
 
-typedef struct sUiButton_t {
-	const sString_t *string;
-	UI_Button_Callback_t callback;
-}sUiButton_t;
+typedef struct sUiLabel_t {
+	sString_t *string;
+}sUiLabel_t;
 
-typedef struct sUiNavButton_t {
-	const sString_t *string;
-	ePanel_t target;
-}sUiNavButton_t;
+typedef struct sUiButton_t {
+	sString_t *string;
+	UI_Button_Callback_t callback;
+	const void *argument;
+}sUiButton_t;
 
 typedef struct sUiElementType_t {
 	eUiElementType_t type;
 	uint16_t x;
 	uint16_t y;
-	const sTextParam_t *param;
+	sTextParam_t *param;
 	union {
 		const sUiLabel_t *label;
 		const sUiButton_t *button;
-		const sUiNavButton_t *nav_button;
 	} element;
 }sUiElementType_t;
 

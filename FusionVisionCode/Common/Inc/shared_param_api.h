@@ -19,6 +19,7 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamActiveUiButtonIndex,
 	eSharedParamScreenState,
 	eSharedParamScreenOptim,
+	eSharedParamEdgeAlgorithm,
 	eSharedParamLast
 }eSharedParamEnum_t;
 
@@ -37,7 +38,23 @@ typedef enum eScreenOptim_t {
 	eScreenOptimLast
 }eScreenOptim_t;
 
+typedef enum eEdgeAlgorithm_t {
+	eEdgeAlgorithmFirst = 0,
+	eEdgeAlgorithmSobel,
+	eEdgeAlgorithmRoberts,
+	eEdgeAlgorithmLast
+}eEdgeAlgorithm_t;
+
+typedef struct sSharedParam_t{
+	char *name;
+	size_t size; //BYTES
+	uint32_t default_val;
+	uint32_t min;
+	uint32_t max;
+}sSharedParam_t;
+
 bool Shared_param_API_Init(void);
+bool Shared_param_API_GetDesc(eSharedParamEnum_t param, sSharedParam_t *out);
 bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out);
 bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in);
 
