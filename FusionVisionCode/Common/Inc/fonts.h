@@ -37,7 +37,7 @@ typedef struct sFontDesc_t {
 	const uint16_t *table;
 }sFontDesc_t;
 
-extern const uint16_t debug_image_320x240x16[76800];
+extern const uint16_t splash_screen[153600];
 extern const sFontDesc_t font_lut[eFontLast];
 
 #endif /* INC_FONTS_H_ */

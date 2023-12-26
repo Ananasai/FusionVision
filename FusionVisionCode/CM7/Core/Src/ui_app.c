@@ -42,7 +42,7 @@ bool UI_APP_Init(uint16_t *new_image_buffer){
 		return false;
 	}
 	image_buffer = new_image_buffer;
-	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated); //TODO: CHANGE TO OTHER SEMAPHGORE
+	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated);
 }
 
 bool UI_APP_DrawAll(void){

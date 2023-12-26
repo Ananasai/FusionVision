@@ -13,11 +13,12 @@
 #include "sync_api.h"
 #include "shared_param_api.h"
 #include "diagnostics_app.h"
+#include "fonts.h"
 #include <string.h>
 
 #define __DEBUG_FILE_NAME__ "M7"
 
-static uint16_t image_buffer[480*320] = {0};
+static uint16_t image_buffer[480*320+1] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
@@ -37,15 +38,17 @@ bool System_APP_M7_PreInit(void){
 bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
-	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
+	/* Init screen */
 	ili9486_Init();
-	HAL_Delay(10);
+	/* Display splash screen */
+	ili9486_DrawRGBImage(0, 0, 480, 320, (uint16_t *)splash_screen);
+	/* Init camera */
 	ov2640_Init(0x60);
-	HAL_Delay(10);
+	/* Start time tracking */
 	Diagnostics_APP_Start();
 	Diagnostics_APP_RecordStart(eDiagEventFrame);
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
+	/* Start camera conversion */
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
@@ -55,8 +58,6 @@ bool System_APP_M7_Run(void){
 	if(frame_event_flag){
 		frame_event_flag = false;
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
-		//HAL_Delay(1); //TODO: DELETE WTF IS tHIS
-		//IMG_PROCESSING_APP_Compute(image_buffer);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
 		//LCD_IO_WriteCmd16(0x2C);
