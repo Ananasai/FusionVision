@@ -23,16 +23,26 @@
 
 static uint8_t gray_scale[480*320] = {0};
 
-static inline int16_t Conv_Gx(uint8_t *image_buffer, uint16_t x, uint16_t y){
+static inline int16_t Sobel_Conv_Gx(uint8_t *image_buffer, uint16_t x, uint16_t y){
 	int16_t conv = PIXEL_GRAY(image_buffer, x-1, y-1) + 2*PIXEL_GRAY(image_buffer, x, y-1) + PIXEL_GRAY(image_buffer, x+1, y-1)
 			+ -PIXEL_GRAY(image_buffer, x-1, y+1) + -2*PIXEL_GRAY(image_buffer, x, y+1) + -PIXEL_GRAY(image_buffer, x+1, y+1);
 	return conv;
 }
 
-static inline int16_t Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
+static inline int16_t Sobel_Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
 	int16_t conv = PIXEL_GRAY(image_buffer, x-1, y-1) + -PIXEL_GRAY(image_buffer, x+1, y-1)
 			+ 2*PIXEL_GRAY(image_buffer, x-1, y) + -2*PIXEL_GRAY(image_buffer, x+1, y)
 			+ PIXEL_GRAY(image_buffer, x-1, y+1) + -PIXEL_GRAY(image_buffer, x+1, y+1);
+	return conv;
+}
+
+static inline int16_t Roberts_Conv_Gx(uint8_t *image_buffer, uint16_t x, uint16_t y){
+	int16_t conv = PIXEL_GRAY(image_buffer, x, y) - PIXEL_GRAY(image_buffer, x-1, y-1);
+	return conv;
+}
+
+static inline int16_t Roberts_Conv_Gy(uint8_t *image_buffer, uint16_t x, uint16_t y){
+	int16_t conv = PIXEL_GRAY(image_buffer, x-1, y) - PIXEL_GRAY(image_buffer, x, y-1);
 	return conv;
 }
 /* ARM DSP LIB https://community.st.com/t5/stm32-mcus/configuring-dsp-libraries-on-stm32cubeide/ta-p/49637 */
@@ -41,7 +51,10 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	//TODO: dont read on every frame
 	Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
 	/* Optimisation level for interlacing */
-	eScreenOptim_t optim_level = eScreenOptimFirst;
+	uint8_t loop_increase = 1;
+	static uint8_t line_start = 0;
+	/*
+	uint32_t optim_level = eScreenOptimFirst;
 	Shared_param_API_Read(eSharedParamScreenOptim, &optim_level);
 	uint8_t loop_increase = 1;
 	static uint8_t line_start = 0;
@@ -59,6 +72,7 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 			return false;
 		}break;
 	}
+	*/
 	/* To grayscale https://stackoverflow.com/questions/58449462/rgb565-to-grayscale */
 	for(uint16_t y = line_start; y < COMPUTE_HEIGHT; y += loop_increase){
 		for(uint16_t x = 0; x < COMPUTE_WIDTH; x += 1){
@@ -72,13 +86,26 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 			PIXEL(gray_scale, x, y) = grayscale;
 		}
 	}
+
+	/* https://homepages.inf.ed.ac.uk/rbf/HIPR2/roberts.htm
+	 * Roberts cross
+	 */
+	for(uint16_t y = line_start + 2; y < COMPUTE_HEIGHT-1; y += loop_increase){
+		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x += 1){
+			int32_t sum = abs(Roberts_Conv_Gx(gray_scale, x, y)) + abs(Roberts_Conv_Gy(gray_scale, x, y));
+			if(sum > edge_threshold){
+				*(image_buffer + (y) * 480 + (x)) = EDGE_COLOUR;
+			}
+		}
+	}
+	return true;
 	/* https://homepages.inf.ed.ac.uk/rbf/HIPR2/sobel.htm
 	 * https://en.wikipedia.org/wiki/Prewitt_operator or
 	 * https://en.wikipedia.org/wiki/Sobel_operator
-	 * for edge detection */
-	for(uint16_t y = line_start + 2; y < COMPUTE_HEIGHT-1; y += loop_increase){ //TODO: remove +2
+	 * Sobel/Previt operator */
+	for(uint16_t y = line_start + 2; y < COMPUTE_HEIGHT-1; y += loop_increase){
 		for(uint16_t x = 1; x < COMPUTE_WIDTH-1; x += 1){
-			int32_t sum = abs(Conv_Gx(gray_scale, x, y)) + abs(Conv_Gy(gray_scale, x, y));
+			int32_t sum = abs(Sobel_Conv_Gx(gray_scale, x, y)) + abs(Sobel_Conv_Gy(gray_scale, x, y));
 			if(sum > edge_threshold){
 				*(image_buffer + (y) * 480 + (x)) = EDGE_COLOUR;
 			}
