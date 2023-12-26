@@ -8,9 +8,26 @@
 #ifndef INC_JOB_API_H_
 #define INC_JOB_API_H_
 
-#include "job_common.h"
 #include <stdint.h>
 #include <stdbool.h>
+
+typedef enum eQueueEnum_t {
+	eQueueFirst = 0,
+	eQueueLighting = eQueueFirst,
+	eQueuePowerTrack,
+	eQueueLast
+}eQueueEnum_t;
+
+typedef enum eJobEnum_t {
+	eJobFirst = 0,
+	eJobRecAdc, /* Received ADC value */
+	eJobLast
+}eJobEnum_t;
+
+typedef struct sJob_t {
+	eJobEnum_t job;
+	void *payload;
+}sJob_t;
 
 typedef struct sJobCallbackDesc_t {
 	eJobEnum_t job;

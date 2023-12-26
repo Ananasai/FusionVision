@@ -12,7 +12,7 @@
 #include <stddef.h>
 
 #define __DEBUG_FILE_NAME__ "JOB"
-#define QUEUE_DESC(_enum, _name, _length) [_enum] = {(sString_t){_name, sizeof(_name)} ,NULL, _length}
+#define QUEUE_DESC(_enum, _name, _length) [_enum] = {(sString_t){_name, sizeof(_name)}, NULL, _length}
 
 typedef struct sQueue_t {
 	sString_t name;
