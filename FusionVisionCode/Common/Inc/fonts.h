@@ -11,12 +11,12 @@
 #include <stdint.h>
 
 /* SPECIAL SYMBOLS ONLY ON 11x18 FONT */ //TODO: maybe use special ui elements instead of ascii?
-#define BATTERY_ICON_FULL_LEFT "\x7F"
-#define BATTERY_ICON_FULL_MIDDLE "\x80"
-#define BATTERY_ICON_FULL_RIGHT "\x81"
-#define BATTERY_ICON_EMPTY_LEFT "\x82"
-#define BATTERY_ICON_EMPTY_MIDDLE "\x83"
-#define BATTERY_ICON_EMPTY_RIGHT "x84"
+#define BATTERY_ICON_FULL_LEFT '\x7F'
+#define BATTERY_ICON_FULL_MIDDLE '\x80'
+#define BATTERY_ICON_FULL_RIGHT '\x81'
+#define BATTERY_ICON_EMPTY_LEFT '\x82'
+#define BATTERY_ICON_EMPTY_MIDDLE '\x83'
+#define BATTERY_ICON_EMPTY_RIGHT '\x84'
 
 typedef enum eFont_t {
 	eFontFirst = 0,

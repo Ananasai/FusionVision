@@ -31,6 +31,7 @@ static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argume
 static char current_param_name_text[20] = "DEFAULT";
 static char current_param_value_text[20] = "DEFAULT";
 static char time_text[20] = "66.66.66";
+static char battery_icon_text[3] = "000";
 
 static const sUiPanel_t main_menu_panel = {
 	.x = 50,
@@ -69,7 +70,7 @@ static const sUiPanel_t constant_menu = {
 	.children = (sUiElementType_t[]) {
 		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
 		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter),
-		LABEL(BATTERY_ICON_FULL_LEFT BATTERY_ICON_FULL_MIDDLE BATTERY_ICON_FULL_RIGHT, 35, 290, eFont11x18, eAlignmentCenter),
+		LABEL(battery_icon_text, 35, 290, eFont11x18, eAlignmentCenter),
 	},
 	.children_amount = 3,
 	.selectable = 0
@@ -281,6 +282,25 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify i
 	RTC_DateTypeDef date; /* Need read date for value to update */
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
+	/* Battery */
+	uint32_t battery_level = 67;
+	if(battery_level > 70){ //TODO: improve
+		battery_icon_text[0] = BATTERY_ICON_FULL_LEFT;
+		battery_icon_text[1] = BATTERY_ICON_FULL_MIDDLE;
+		battery_icon_text[2] = BATTERY_ICON_FULL_RIGHT;
+	} else if(battery_level > 60){
+		battery_icon_text[0] = BATTERY_ICON_FULL_LEFT;
+		battery_icon_text[1] = BATTERY_ICON_FULL_MIDDLE;
+		battery_icon_text[2] = BATTERY_ICON_EMPTY_RIGHT;
+	} else if (battery_level > 30){
+		battery_icon_text[0] = BATTERY_ICON_FULL_LEFT;
+		battery_icon_text[1] = BATTERY_ICON_EMPTY_MIDDLE;
+		battery_icon_text[2] = BATTERY_ICON_EMPTY_RIGHT;
+	} else{
+		battery_icon_text[0] = BATTERY_ICON_EMPTY_LEFT;
+		battery_icon_text[1] = BATTERY_ICON_EMPTY_MIDDLE;
+		battery_icon_text[2] = BATTERY_ICON_EMPTY_RIGHT;
+	}
 	return true;
 }
 #endif
