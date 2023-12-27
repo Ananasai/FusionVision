@@ -32,7 +32,7 @@ static char current_param_name_text[20] = "DEFAULT";
 static char current_param_value_text[20] = "DEFAULT";
 static char time_text[20] = "66.66.66";
 
-static const sUiPanel_t main_menu = {
+static const sUiPanel_t main_menu_panel = {
 	.x = 50,
 	.y = 175,
 	.spacing_y = 40,
@@ -47,6 +47,7 @@ static const sUiPanel_t main_menu = {
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
+/* Default menu for changing parameters */
 static const sUiPanel_t param_change_default_panel = {
 	.x = 50,
 	.y = 175,
@@ -67,14 +68,15 @@ static const sUiPanel_t constant_menu = {
 	.spacing_y = 40,
 	.children = (sUiElementType_t[]) {
 		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
-		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter)
+		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter),
+		LABEL(BATTERY_ICON_FULL_LEFT BATTERY_ICON_FULL_MIDDLE BATTERY_ICON_FULL_RIGHT, 35, 290, eFont11x18, eAlignmentCenter),
 	},
-	.children_amount = 2,
+	.children_amount = 3,
 	.selectable = 0
 };
 
 static sPanelNavDesc_t panel_lut[ePanelLast] = {
-	[ePanelMainMenu] = PANEL(&main_menu, ePanelMainMenu),
+	[ePanelMainMenu] = PANEL(&main_menu_panel, ePanelMainMenu),
 	[ePanelParamChangeDefault] = PANEL(&param_change_default_panel, ePanelMainMenu) //TODO: back button will not work
 };
 
@@ -141,14 +143,14 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 		}
 		case eButtonOk: {
 			uint32_t selectable = 0;
-			for(uint32_t i = 0; i < main_menu.children_amount; i++){
-				if(main_menu.children[i].type == eUiElementTypeButton){
+			for(uint32_t i = 0; i < main_menu_panel.children_amount; i++){
+				if(main_menu_panel.children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
 						/* Found required button */
 						panel_lut[current_active_panel_index].last_btn = selectable;
-						switch(main_menu.children[i].type){
+						switch(main_menu_panel.children[i].type){
 							case eUiElementTypeButton: {
-								const sUiButton_t *button = main_menu.children[i].element.button;
+								const sUiButton_t *button = main_menu_panel.children[i].element.button;
 								if(button->callback == NULL){
 									break;
 								}
