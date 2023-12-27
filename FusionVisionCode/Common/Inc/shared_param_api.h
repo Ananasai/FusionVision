@@ -20,6 +20,7 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamScreenState,
 	eSharedParamScreenOptim,
 	eSharedParamEdgeAlgorithm,
+	eSharedParamBatteryLevel,
 	eSharedParamLast
 }eSharedParamEnum_t;
 

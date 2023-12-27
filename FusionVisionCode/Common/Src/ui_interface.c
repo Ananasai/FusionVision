@@ -283,7 +283,8 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify i
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
 	/* Battery */
-	uint32_t battery_level = 67;
+	uint32_t battery_level = 0;
+	Shared_param_API_Read(eSharedParamBatteryLevel, &battery_level);
 	if(battery_level > 70){ //TODO: improve
 		battery_icon_text[0] = BATTERY_ICON_FULL_LEFT;
 		battery_icon_text[1] = BATTERY_ICON_FULL_MIDDLE;

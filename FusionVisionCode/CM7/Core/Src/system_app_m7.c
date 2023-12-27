@@ -61,14 +61,12 @@ bool System_APP_M7_Run(void){
 		frame_event_flag = false;
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
 		UI_APP_DrawAll();
-		HAL_Delay(10); //TODO: magic remove
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
 		//LCD_IO_WriteCmd16(0x2C);
 		//NOTE: DMA LENgth ONLY 16bit
 		//HAL_StatusTypeDef status0 = HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t)image_buffer, LCD_ADDR_DATA, 480*106/2);
 		//HAL_StatusTypeDef status3 = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0, HAL_DMA_FULL_TRANSFER, 100);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		HAL_Delay(10);  //TODO: magic remove
 		//ili9486_DrawRGBImageInterlaced(0, 0, 480, 320, image_buffer, 0);
 		//SCB_CleanDCache_by_Addr((uint32_t*)LCD_ADDR_DATA, 480*320);
 		//HAL_StatusTypeDef status = HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)image_buffer, (uint32_t)LCD_ADDR_DATA, 100, 100);
