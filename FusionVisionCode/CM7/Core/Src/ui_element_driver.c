@@ -42,7 +42,7 @@ bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer
 	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT)){ //TODO: || (loc_x < length * curr_font_width)
 		return false;
 	}
-	if(text_param.alignment == eTextAlignmentCenter) { //TODO: right and left alignment
+	if(text_param.alignment == eHorizontalAlignmentCenter) { //TODO: right and left alignment
 		loc_x += (strlen(string.text) * curr_font_width) >> 1;
 	}
 	size_t max_lines = strlen(string.text) / 10;

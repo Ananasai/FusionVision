@@ -29,35 +29,27 @@ typedef enum eFont_t {
 	eFontLast
 }eFont_t;
 
-typedef enum eTextAlignment_t { //TODO: remove for horizontal alignemnt
-	eTextAlignmentFirst = 0,
-	eTextAlignmentLeft = eTextAlignmentFirst,
-	eTextAlignmentCenter,
-	eTextAlignmentRight,
-	eTextAlignemntLast
-}eTextAlignment_t;
-
 typedef enum eAlignmentVertical_t { //TODO: misleading naming?
 	eVerticalAlignmentFirst = 0,
 	eVerticalAlignmentNone = eVerticalAlignmentFirst,
-	eAlignmentTop,
-	eAlignmentMiddle,
-	eAlignmentBottom,
+	eVerticalAlignmentTop,
+	eVerticalAlignmentMiddle,
+	eVerticalAlignmentBottom,
 	eVerticalAlignmentLast
 }eAlignmentVertical_t;
 
 typedef enum eAlignmentHorizontal_t {
 	eHorizontalAlignmentFirst = 0,
 	eHorizontalAlignmentNone = eHorizontalAlignmentFirst,
-	eAlignmentLefts,
-	eAlignmentCenter,
-	eAlignmentRight,
+	eHorizontalAlignmentLeft,
+	eHorizontalAlignmentCenter,
+	eHorizontalAlignmentRight,
 	eHorizonalAlignmentLast
 }eAlignmentHorizontal_t;
 
 typedef struct sTextParam_t {
 	eFont_t font;
-	eTextAlignment_t alignment;
+	eAlignmentHorizontal_t alignment;
 }sTextParam_t;
 
 typedef struct sFontDesc_t {
