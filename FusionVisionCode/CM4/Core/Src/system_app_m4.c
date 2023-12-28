@@ -14,6 +14,7 @@
 #include "job_api.h"
 #include "shared_param_api.h"
 #include "power_track_app.h"
+#include "serial_app.h"
 #include <stdbool.h>
 #include "string_common.h"
 
@@ -34,6 +35,7 @@ typedef enum eAppEnum_t {
 	eAppBattery,
 	eAppADC,
 	eAppPowerTrack,
+	eAppSerial,
 	eAppLast /* MUST BE LEFT LAST */
 }eAppEnum_t;
 
@@ -43,7 +45,8 @@ static const sAppDesc_t const_app_lut[eAppLast] = {
 	APP_DESC(eAppLighting, "LIGHTING", &Lighting_APP_Start),
 	APP_DESC(eAppBattery, "BATTERY", &Battery_APP_Start),
 	APP_DESC(eAppADC, "ADC", &Adc_APP_Start),
-	APP_DESC(eAppPowerTrack, "PWR TRACK", &Power_track_APP_Start)
+	APP_DESC(eAppPowerTrack, "PWR TRACK", &Power_track_APP_Start),
+	APP_DESC(eAppSerial, "SERIAL", &Serial_APP_Start),
 };
 
 /* RTOS CMSIS V2 documentation: https://www.keil.com/pack/doc/CMSIS/RTOS2/html/rtos_api2.html */
