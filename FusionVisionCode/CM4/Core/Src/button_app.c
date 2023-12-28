@@ -17,7 +17,7 @@
 #define BUTTON_EVENT_FLAG_BTN_2 0x02
 #define BUTTON_EVENT_FLAG_BTN_3 0x04
 #define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 | BUTTON_EVENT_FLAG_BTN_2 | BUTTON_EVENT_FLAG_BTN_3)
-#define DOUBLE_CLICK_TIMEOUT_MS 400
+#define DOUBLE_CLICK_TIMEOUT_MS 100//Was: 400
 #define LONG_CLICK_TIMEOUT_MS 500
 
 typedef void (*Button_Callback)(eButtonType_t, eButtonPress_t);
@@ -88,29 +88,33 @@ void Button_APP_Thread(void *argument){
 				  /* Falling btn edge */
 				  if(button_state_lut[btn].high == false){
 					  /* Is if long click */
+					  /*
 					  if(curr_time - button_state_lut[btn].last_press_time >= LONG_CLICK_TIMEOUT_MS){
 						  button_state_lut[btn].click_active = false;
 						  debug("Long click\r\n");
 						  (*button_desc_lut[btn].callback)(btn, eButtonPressLong);
 					  }
+					  */
 				  }else{ /* Rising btn edge */
 					  /* Check if double click */
-					  if(curr_time - button_state_lut[btn].last_press_time <= DOUBLE_CLICK_TIMEOUT_MS){
-						  button_state_lut[btn].click_active = false;
-						  button_state_lut[btn].last_press_time = curr_time;
-						  debug("Double click\r\n");
-						  (*button_desc_lut[btn].callback)(btn, eButtonPressDouble);
-					  }else{ /* Record time for single double/signal click tracking */
+
+					  //if(curr_time - button_state_lut[btn].last_press_time <= DOUBLE_CLICK_TIMEOUT_MS){
+						//  button_state_lut[btn].click_active = false;
+						//  button_state_lut[btn].last_press_time = curr_time;
+						//  debug("Double click\r\n");
+						//  (*button_desc_lut[btn].callback)(btn, eButtonPressDouble);
+					  //}else{ /* Record time for single double/signal click tracking */
 						  button_state_lut[btn].click_active = true;
 						  button_state_lut[btn].last_press_time = curr_time;
-					  }
+					  //}
+
 				  }
 			  }
 		  }
 	}
 }
 
-/* Timer for single click timeout  */
+/* Timer for single click timeout - debouncing */
 static void Button_Timer(void *argument){
 	uint32_t curr_time = HAL_GetTick();
 	for(eButtonType_t btn = eButtonFirst; btn < eButtonLast; btn++){
