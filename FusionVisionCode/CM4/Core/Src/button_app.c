@@ -17,12 +17,8 @@
 #define BUTTON_EVENT_FLAG_BTN_2 0x02
 #define BUTTON_EVENT_FLAG_BTN_3 0x04
 #define BUTTON_EVENT_FLAG_ALL (BUTTON_EVENT_FLAG_BTN_1 | BUTTON_EVENT_FLAG_BTN_2 | BUTTON_EVENT_FLAG_BTN_3)
-#define DOUBLE_CLICK_TIMEOUT_MS 200
+#define DOUBLE_CLICK_TIMEOUT_MS 400
 #define LONG_CLICK_TIMEOUT_MS 500
-
-#define EMPTY_BTN_STATE {.last_press_time = 0, .click_active = false, .high = false}
-
-
 
 typedef void (*Button_Callback)(eButtonType_t, eButtonPress_t);
 

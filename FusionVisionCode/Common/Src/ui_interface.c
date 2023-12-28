@@ -35,7 +35,7 @@ static char battery_icon_text[3] = "000";
 
 /* Main menu panel */
 static const sUiPanel_t main_menu_panel = {
-	.x = 50,
+	.x = 60,
 	.y = 270,
 	.vert_align = eVerticalAlignmentMiddle,
 	.hor_align = eHorizontalAlignmentRight,
@@ -53,7 +53,7 @@ static const sUiPanel_t main_menu_panel = {
 
 /* Video parameter menu */
 static const sUiPanel_t video_settings_panel = {
-	.x = 50,
+	.x = 60,
 	.y = 270,
 	.vert_align = eVerticalAlignmentMiddle,
 	.hor_align = eHorizontalAlignmentRight,
@@ -61,7 +61,6 @@ static const sUiPanel_t video_settings_panel = {
 	.children = (sUiElementType_t[]) {
 		LABEL("Video",  0, 0, eFont11x18, eHorizontalAlignmentCenter), //TODO: add mutiple line text
 		LABEL("settings",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
-		PARAM_CHANGE_BUTTON("Threshold", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamEdgeThreshold),
 		PARAM_CHANGE_BUTTON("State", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamScreenState),
 		PARAM_CHANGE_BUTTON("Optim", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamScreenOptim),
 		NAV_BUTTON("Back", 0, 0, eFont11x18, eHorizontalAlignmentCenter, ePanelMainMenu),
@@ -73,7 +72,7 @@ static const sUiPanel_t video_settings_panel = {
 
 /* Video parameter menu */
 static const sUiPanel_t edge_settings_panel = {
-	.x = 50,
+	.x = 60,
 	.y = 270,
 	.vert_align = eVerticalAlignmentMiddle,
 	.hor_align = eHorizontalAlignmentRight,
@@ -82,16 +81,17 @@ static const sUiPanel_t edge_settings_panel = {
 		LABEL("Edge",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
 		LABEL("settings",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
 		PARAM_CHANGE_BUTTON("Threshold", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamEdgeThreshold),
+		PARAM_CHANGE_BUTTON("Algorithm", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamEdgeAlgorithm),
 		NAV_BUTTON("Back", 0, 0, eFont11x18, eHorizontalAlignmentCenter, ePanelMainMenu),
 	},
-	.children_amount = 4,
-	.selectable = 2,
+	.children_amount = 5,
+	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
 /* Video parameter menu */
 static const sUiPanel_t thermal_settings_panel = {
-	.x = 50,
+	.x = 60,
 	.y = 270,
 	.vert_align = eVerticalAlignmentMiddle,
 	.hor_align = eHorizontalAlignmentRight,
@@ -111,7 +111,7 @@ static const sUiPanel_t thermal_settings_panel = {
 
 /* Default menu for changing parameters */
 static const sUiPanel_t param_change_default_panel = {
-	.x = 50,
+	.x = 60,
 	.y = 270,
 	.vert_align = eVerticalAlignmentMiddle,
 	.hor_align = eHorizontalAlignmentRight,
@@ -127,7 +127,7 @@ static const sUiPanel_t param_change_default_panel = {
 
 /* Constant visible menu with RTC and TM */
 static const sUiPanel_t constant_menu = {
-	.x = 50,
+	.x = 60,
 	.y = 175,
 	.vert_align = eVerticalAlignmentNone,
 	.hor_align = eHorizontalAlignmentNone,
@@ -154,6 +154,7 @@ typedef struct sParamValTextDesc_t {
 	char *texts[10]; //TODO: could overflow if more than 10
 }sParamValTextDesc_t;
 
+/* LUT for dynamic parameter change value text */
 static const sParamValTextDesc_t param_value_text[eSharedParamLast] = {
 	[eSharedParamScreenState] = {
 		.count = 2,
@@ -211,14 +212,12 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			break;
 		}
 		case eButtonOk: {
-			debug("Button OK %d %d\r\n", current_active_button_index, current_active_button_index);
 			uint32_t selectable = 0;
 			for(uint32_t i = 0; i < panel_lut[current_active_panel_index].panel->children_amount; i++){
 				if(panel_lut[current_active_panel_index].panel->children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
 						/* Found required button */
 						panel_lut[current_active_panel_index].last_btn = selectable;
-						debug("Found button %d\r\n", selectable);
 						switch(panel_lut[current_active_panel_index].panel->children[i].type){
 							case eUiElementTypeButton: {
 								const sUiButton_t *button = panel_lut[current_active_panel_index].panel->children[i].element.button;
@@ -266,18 +265,18 @@ void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press){
 
 /* Defines nav button logic -> opening new panel */
 static void UI_NavButtonPressed(eButtonPress_t press, const void *argument){
-	ePanel_t *target = (ePanel_t *)argument;
+	ePanel_t *target_panel = (ePanel_t *)argument;
 	current_active_button_index = 0;
-	current_active_panel_index = *target;
+	current_active_panel_index = *target_panel;
 	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
-	debug("Nav pressed: %d %d\r\n", current_active_panel_index, current_active_button_index);
 }
 
 /* Defines param button logic -> opening param change default panel */
 static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argument){
 	current_param_back_btn = current_active_button_index;
 	eSharedParamEnum_t *new_param = (eSharedParamEnum_t *)argument;
+	panel_lut[ePanelParamChangeDefault].parent = current_active_panel_index;
 	current_active_panel_index = ePanelParamChangeDefault;
 	current_param = *new_param;
 	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
@@ -353,7 +352,7 @@ bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify i
 	RTC_DateTypeDef date; /* Need read date for value to update */
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-	/* Battery */
+	/* Battery indicator */
 	uint32_t battery_level = 0;
 	Shared_param_API_Read(eSharedParamBatteryLevel, &battery_level);
 	if(battery_level > 70){ //TODO: improve

@@ -41,7 +41,7 @@ typedef enum eScreenOptim_t {
 
 typedef enum eEdgeAlgorithm_t {
 	eEdgeAlgorithmFirst = 0,
-	eEdgeAlgorithmSobel,
+	eEdgeAlgorithmSobel = eEdgeAlgorithmFirst,
 	eEdgeAlgorithmRoberts,
 	eEdgeAlgorithmLast
 }eEdgeAlgorithm_t;

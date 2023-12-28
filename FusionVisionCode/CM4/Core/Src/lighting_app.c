@@ -54,5 +54,5 @@ static void Lighting_app_thread(void *argument){
 static void Lighting_job_recAdc(void *payload){
 	float *adc_val_v = (float *)payload;
 	float R1 = (float)(VIN * R2) / (float)(*adc_val_v) - R2;
-	debug("Photo resistor: %.2f\r\n", R1);
+	//debug("Photo resistor: %.2f\r\n", R1);
 }
