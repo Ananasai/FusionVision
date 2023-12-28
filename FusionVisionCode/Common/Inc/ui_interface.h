@@ -41,6 +41,9 @@ typedef enum eUiElementType_t {
 typedef enum ePanel_t {
 	ePanelFirst = 0,
 	ePanelMainMenu = ePanelFirst,
+	ePanelVideoSettings,
+	ePanelEdgeSettings,
+	ePanelThermalSettings,
 	ePanelParamChangeDefault,
 	ePanelLast
 }ePanel_t;

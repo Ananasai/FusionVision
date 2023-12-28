@@ -33,25 +33,78 @@ static char current_param_value_text[20] = "DEFAULT";
 static char time_text[20] = "66.66.66";
 static char battery_icon_text[3] = "000";
 
+/* Main menu panel */
 static const sUiPanel_t main_menu_panel = {
 	.x = 50,
-	.y = 175,
+	.y = 270,
 	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
     	LABEL("Menu",  0, 0, eFont11x18, eAlignmentCenter),
-    	PARAM_CHANGE_BUTTON("Edge", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamEdgeThreshold),
-		PARAM_CHANGE_BUTTON("State", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenState),
-		PARAM_CHANGE_BUTTON("Optim", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenOptim),
+    	NAV_BUTTON("Video", 0, 0, eFont11x18, eAlignmentCenter, ePanelVideoSettings),
+		NAV_BUTTON("Edge", 0, 0, eFont11x18, eAlignmentCenter, ePanelEdgeSettings),
+		NAV_BUTTON("Thermal", 0, 0, eFont11x18, eAlignmentCenter, ePanelThermalSettings),
     },
     .children_amount = 4,
 	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
+/* Video parameter menu */
+static const sUiPanel_t video_settings_panel = {
+	.x = 50,
+	.y = 270,
+	.spacing_y = 40,
+	.children = (sUiElementType_t[]) {
+		LABEL("Video",  0, 0, eFont11x18, eAlignmentCenter), //TODO: add mutiple line text
+		LABEL("settings",  0, 0, eFont11x18, eAlignmentCenter),
+		PARAM_CHANGE_BUTTON("Threshold", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamEdgeThreshold),
+		PARAM_CHANGE_BUTTON("State", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenState),
+		PARAM_CHANGE_BUTTON("Optim", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamScreenOptim),
+		NAV_BUTTON("Back", 0, 0, eFont11x18, eAlignmentCenter, ePanelMainMenu),
+	},
+	.children_amount = 6,
+	.selectable = 4,
+	.btn_callback = &UI_NavigationalButtonCallback
+};
+
+/* Video parameter menu */
+static const sUiPanel_t edge_settings_panel = {
+	.x = 50,
+	.y = 270,
+	.spacing_y = 40,
+	.children = (sUiElementType_t[]) {
+		LABEL("Edge",  0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("settings",  0, 0, eFont11x18, eAlignmentCenter),
+		PARAM_CHANGE_BUTTON("Threshold", 0, 0, eFont11x18, eAlignmentCenter, eSharedParamEdgeThreshold),
+		NAV_BUTTON("Back", 0, 0, eFont11x18, eAlignmentCenter, ePanelMainMenu),
+	},
+	.children_amount = 4,
+	.selectable = 2,
+	.btn_callback = &UI_NavigationalButtonCallback
+};
+
+/* Video parameter menu */
+static const sUiPanel_t thermal_settings_panel = {
+	.x = 50,
+	.y = 270,
+	.spacing_y = 40,
+	.children = (sUiElementType_t[]) {
+		LABEL("Thermal",  0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("settings",  0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("WIP",  0, 0, eFont11x18, eAlignmentCenter),
+		LABEL("WIP",  0, 0, eFont11x18, eAlignmentCenter),
+		NAV_BUTTON("Back", 0, 0, eFont11x18, eAlignmentCenter, ePanelMainMenu),
+	},
+	.children_amount = 5,
+	.selectable = 1,
+	.btn_callback = &UI_NavigationalButtonCallback
+};
+
+
 /* Default menu for changing parameters */
 static const sUiPanel_t param_change_default_panel = {
 	.x = 50,
-	.y = 175,
+	.y = 270,
 	.spacing_y = 40,
     .children = (sUiElementType_t[]) {
 		LABEL(current_param_name_text, 0, 0, eFont11x18, eAlignmentCenter),
@@ -69,7 +122,7 @@ static const sUiPanel_t constant_menu = {
 	.spacing_y = 40,
 	.children = (sUiElementType_t[]) {
 		LABEL(time_text, 128, 290, eFont11x18, eAlignmentCenter),
-		LABEL("Group A tm", 120, 1, eFont11x18, eAlignmentCenter),
+		LABEL("Group A", 120, 1, eFont11x18, eAlignmentCenter),
 		LABEL(battery_icon_text, 35, 290, eFont11x18, eAlignmentCenter),
 	},
 	.children_amount = 3,
@@ -78,7 +131,10 @@ static const sUiPanel_t constant_menu = {
 
 static sPanelNavDesc_t panel_lut[ePanelLast] = {
 	[ePanelMainMenu] = PANEL(&main_menu_panel, ePanelMainMenu),
-	[ePanelParamChangeDefault] = PANEL(&param_change_default_panel, ePanelMainMenu) //TODO: back button will not work
+	[ePanelVideoSettings] = PANEL(&video_settings_panel, ePanelMainMenu),
+	[ePanelEdgeSettings] = PANEL(&edge_settings_panel, ePanelMainMenu),
+	[ePanelThermalSettings] = PANEL(&thermal_settings_panel, ePanelMainMenu),
+	[ePanelParamChangeDefault] = PANEL(&param_change_default_panel, ePanelVideoSettings) //TODO: back button will not work on correct panel
 };
 
 typedef struct sParamValTextDesc_t {
@@ -143,15 +199,17 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			break;
 		}
 		case eButtonOk: {
+			debug("Button OK %d %d\r\n", current_active_button_index, current_active_button_index);
 			uint32_t selectable = 0;
-			for(uint32_t i = 0; i < main_menu_panel.children_amount; i++){
-				if(main_menu_panel.children[i].type == eUiElementTypeButton){
+			for(uint32_t i = 0; i < panel_lut[current_active_panel_index].panel->children_amount; i++){
+				if(panel_lut[current_active_panel_index].panel->children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
 						/* Found required button */
 						panel_lut[current_active_panel_index].last_btn = selectable;
-						switch(main_menu_panel.children[i].type){
+						debug("Found button %d\r\n", selectable);
+						switch(panel_lut[current_active_panel_index].panel->children[i].type){
 							case eUiElementTypeButton: {
-								const sUiButton_t *button = main_menu_panel.children[i].element.button;
+								const sUiButton_t *button = panel_lut[current_active_panel_index].panel->children[i].element.button;
 								if(button->callback == NULL){
 									break;
 								}
@@ -201,6 +259,7 @@ static void UI_NavButtonPressed(eButtonPress_t press, const void *argument){
 	current_active_panel_index = *target;
 	Shared_param_API_Write(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
+	debug("Nav pressed: %d %d\r\n", current_active_panel_index, current_active_button_index);
 }
 
 /* Defines param button logic -> opening param change default panel */
