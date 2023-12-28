@@ -63,8 +63,20 @@ bool UI_APP_DrawAll(void){
 			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
 			last_ui_update_flag = false;
 		}
-		uint16_t panel_x = curr_panel->x;
-		uint16_t panel_y = curr_panel->y;
+		/* Decide on panel global position and alignment */
+		uint16_t panel_x;
+		uint16_t panel_y;
+		if(curr_panel->vert_align == eVerticalAlignmentNone){
+			panel_y = curr_panel->y;
+		} else{
+			//TODO: add protections
+			panel_y = SCREEN_HEIGHT - (SCREEN_HEIGHT - curr_panel->children_amount * curr_panel->spacing_y) / 2 - curr_panel->spacing_y;
+		}
+		if(curr_panel->hor_align == eHorizontalAlignmentNone){
+			panel_x = curr_panel->x;
+		} else{
+			panel_x = curr_panel->x; //TODO: change
+		}
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel->children_amount; i++){
 			HAL_Delay(1); //TODO: MAGIC

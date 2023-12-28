@@ -73,8 +73,10 @@ typedef struct sUiElementType_t {
 }sUiElementType_t;
 
 typedef struct sUiPanel_t {
-	uint16_t x;
+	uint16_t x; /* x and y coordinated only used if no alignment selected */
 	uint16_t y;
+	eAlignmentVertical_t vert_align;
+	eAlignmentHorizontal_t hor_align;
 	uint16_t spacing_y;
 	sUiElementType_t *children;
 	size_t children_amount;

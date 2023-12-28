@@ -10,6 +10,9 @@
 
 #include <stdint.h>
 
+#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 480
+
 /* SPECIAL SYMBOLS ONLY ON 11x18 FONT */ //TODO: maybe use special ui elements instead of ascii?
 #define BATTERY_ICON_FULL_LEFT '\x7F'
 #define BATTERY_ICON_FULL_MIDDLE '\x80'
@@ -26,17 +29,35 @@ typedef enum eFont_t {
 	eFontLast
 }eFont_t;
 
-typedef enum eAlignment_t {
-	eAlignmentFirst = 0,
-	eAlignmentLeft = eAlignmentFirst,
+typedef enum eTextAlignment_t { //TODO: remove for horizontal alignemnt
+	eTextAlignmentFirst = 0,
+	eTextAlignmentLeft = eTextAlignmentFirst,
+	eTextAlignmentCenter,
+	eTextAlignmentRight,
+	eTextAlignemntLast
+}eTextAlignment_t;
+
+typedef enum eAlignmentVertical_t { //TODO: misleading naming?
+	eVerticalAlignmentFirst = 0,
+	eVerticalAlignmentNone = eVerticalAlignmentFirst,
+	eAlignmentTop,
+	eAlignmentMiddle,
+	eAlignmentBottom,
+	eVerticalAlignmentLast
+}eAlignmentVertical_t;
+
+typedef enum eAlignmentHorizontal_t {
+	eHorizontalAlignmentFirst = 0,
+	eHorizontalAlignmentNone = eHorizontalAlignmentFirst,
+	eAlignmentLefts,
 	eAlignmentCenter,
 	eAlignmentRight,
-	eAlignemntLast
-}eAlignment_t;
+	eHorizonalAlignmentLast
+}eAlignmentHorizontal_t;
 
 typedef struct sTextParam_t {
 	eFont_t font;
-	eAlignment_t alignment;
+	eTextAlignment_t alignment;
 }sTextParam_t;
 
 typedef struct sFontDesc_t {
