@@ -27,6 +27,9 @@ static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
 static bool printout_flag = false;
 static uint32_t line_scanned_amount = 0;
+//uint32_t first_lines = 0;
+//uint32_t second_lines = 0;
+static bool first_vsync = true;
 
 /* Executed before M4 is launched */
 bool System_APP_M7_PreInit(void){
@@ -46,7 +49,7 @@ bool System_APP_M7_Start(void){
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
-	HAL_Delay(100);
+	HAL_Delay(1000);
 	/* Display splash screen */
 	ili9486_DrawRGBImage(0, 0, 480, 320, (uint16_t *)splash_screen);
 	/* Init camera */
@@ -56,6 +59,7 @@ bool System_APP_M7_Start(void){
 	Diagnostics_APP_RecordStart(eDiagEventFrame);
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
 	/* Start camera conversion */
+	first_vsync = true;
 	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
@@ -87,13 +91,11 @@ bool System_APP_M7_Run(void){
 		}
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
+		line_scanned_amount = 0;
+		first_vsync = true;
 		HAL_DCMI_Resume(&hdcmi);
 	}
-	if(line_scanned_amount > 3){
-
-	}
 	if(frame_half_event_flag) {
-		frame_half_event_flag = false;
 		uint32_t screen_state = 0;
 		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
 		if(screen_state == eScreenStateProcessed){
@@ -102,6 +104,7 @@ bool System_APP_M7_Run(void){
 			//HAL_Delay(1);
 			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
+		frame_half_event_flag = false;
 		//UI_APP_DrawAll(image_buffer);
 	}
 	return true;
@@ -128,19 +131,32 @@ static bool Printout(void){
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 	HAL_DCMI_Suspend(hdcmi);
 	Diagnostics_APP_RecordEnd(eDiagEventCamera);
-	line_scanned_amount = 0;
+	//line_scanned_amount = 0;
 	frame_event_flag = true;
 
 }
 
+void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
+	if(first_vsync){
+		line_scanned_amount = 0;
+		first_vsync = false;
+	}else{
+
+	}
+}
 //TODO: doesn't work
-//void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
-//	line_scanned_amount++;
-//}
+void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
+	line_scanned_amount++;
+	if(first_vsync == false){
+		if(line_scanned_amount == 3){
+			frame_half_event_flag = true;
+		}
+	}
+}
 
 /* End of frame conversion IRQ */
 void HAL_DCMI_HalfFrameEventCallback(void){
-	frame_half_event_flag = true;
+	//frame_half_event_flag = true;
 }
 
 //void HAL_DMA2D_CLUTLoadingCpltCallback(DMA2D_HandleTypeDef *hdma2d){
