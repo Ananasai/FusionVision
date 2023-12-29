@@ -66,7 +66,7 @@ static const sUiPanel_t video_settings_panel = {
 		NAV_BUTTON("Back", 0, 0, eFont11x18, eHorizontalAlignmentCenter, ePanelMainMenu),
 	},
 	.children_amount = 6,
-	.selectable = 4,
+	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
