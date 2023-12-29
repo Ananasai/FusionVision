@@ -53,6 +53,8 @@ I2C_HandleTypeDef hi2c4;
 
 RTC_HandleTypeDef hrtc;
 
+TIM_HandleTypeDef htim2;
+
 UART_HandleTypeDef huart3;
 
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
@@ -71,6 +73,7 @@ static void MX_DCMI_Init(void);
 static void MX_FMC_Init(void);
 static void MX_I2C4_Init(void);
 static void MX_RTC_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -147,6 +150,7 @@ Error_Handler();
   MX_FMC_Init();
   MX_I2C4_Init();
   MX_RTC_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   MX_USART3_UART_Init();
   if(System_APP_M7_Start() == false){
@@ -406,6 +410,51 @@ static void MX_RTC_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 2000-1;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 4294967295;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief USART3 Initialization Function
   * @param None
   * @retval None
@@ -471,8 +520,8 @@ static void MX_DMA_Init(void)
   hdma_memtomem_dma2_stream0.Init.Direction = DMA_MEMORY_TO_MEMORY;
   hdma_memtomem_dma2_stream0.Init.PeriphInc = DMA_PINC_ENABLE;
   hdma_memtomem_dma2_stream0.Init.MemInc = DMA_MINC_DISABLE;
-  hdma_memtomem_dma2_stream0.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-  hdma_memtomem_dma2_stream0.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+  hdma_memtomem_dma2_stream0.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+  hdma_memtomem_dma2_stream0.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
   hdma_memtomem_dma2_stream0.Init.Mode = DMA_NORMAL;
   hdma_memtomem_dma2_stream0.Init.Priority = DMA_PRIORITY_HIGH;
   hdma_memtomem_dma2_stream0.Init.FIFOMode = DMA_FIFOMODE_ENABLE;

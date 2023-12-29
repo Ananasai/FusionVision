@@ -11,8 +11,6 @@
 #include <stdbool.h>
 
 bool Button_APP_Start(void);
-void Button_APP_EdgeThresholdUpPressed(void);
-void Button_APP_EdgeThresholdDownPressed(void);
 
 
 #endif /* INC_BUTTON_APP_H_ */

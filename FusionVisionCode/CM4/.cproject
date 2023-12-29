@@ -54,7 +54,6 @@
 									<listOptionValue builtIn="false" value="../../Middlewares/Third_Party/FreeRTOS/Source/include"/>
 									<listOptionValue builtIn="false" value="../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 									<listOptionValue builtIn="false" value="../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"/>
-									<listOptionValue builtIn="false" value="../Core/Common"/>
 									<listOptionValue builtIn="false" value="../../Common"/>
 									<listOptionValue builtIn="false" value="../../Common/Inc"/>
 									<listOptionValue builtIn="false" value="../../Common/Src"/>

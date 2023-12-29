@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define UI_UPDATE_TIMEOUT 2000
+#define UI_UPDATE_TIMEOUT 4000
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
 typedef enum eUiElementSourceType_t {
@@ -42,20 +42,20 @@ bool UI_APP_Init(uint16_t *new_image_buffer){
 		return false;
 	}
 	image_buffer = new_image_buffer;
-	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated); //TODO: CHANGE TO OTHER SEMAPHGORE
+	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated);
 }
 
 bool UI_APP_DrawAll(void){
 	UI_Interface_UpdateLabels(hrtc);
-	sUiPanel_t curr_panel;
+	const sUiPanel_t *curr_panel;
 	UI_Interface_GetConstantPanel(&curr_panel);
-	for(size_t i = 0; i < curr_panel.children_amount; i++){
-		UI_DRIVER_DrawString(curr_panel.children[i].x, curr_panel.children[i].y, image_buffer, curr_panel.children[i].element.label->content, strlen(curr_panel.children[i].element.label->content), eFont11x18);
+	for(size_t i = 0; i < curr_panel->children_amount; i++){
+		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, *curr_panel->children[i].element.label->string, *curr_panel->children[i].param, false);
 	}
 	uint32_t curr_time = HAL_GetTick();
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
 		/* Draw menu if active */
-		if(UI_Interface_GetCurrentPanel(0, &curr_panel) == false){
+		if(UI_Interface_GetCurrentPanel(&curr_panel) == false){
 			return false;
 		}
 		/* Get new variables if UI changed */
@@ -63,40 +63,39 @@ bool UI_APP_DrawAll(void){
 			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
 			last_ui_update_flag = false;
 		}
-		uint16_t panel_x = 100;
-		uint16_t panel_y = 200;
+		/* Decide on panel global position and alignment */
+		uint16_t panel_x;
+		uint16_t panel_y;
+		if(curr_panel->vert_align == eVerticalAlignmentNone){
+			panel_y = curr_panel->y;
+		} else{
+			//TODO: add protections
+			panel_y = SCREEN_HEIGHT - (SCREEN_HEIGHT - curr_panel->children_amount * curr_panel->spacing_y) / 2 - curr_panel->spacing_y;
+		}
+		if(curr_panel->hor_align == eHorizontalAlignmentNone){
+			panel_x = curr_panel->x;
+		} else{
+			panel_x = curr_panel->x; //TODO: change
+		}
 		uint32_t selectable_i = 0;
-		for(size_t i = 0; i < curr_panel.children_amount; i++){
+		for(size_t i = 0; i < curr_panel->children_amount; i++){
 			HAL_Delay(1); //TODO: MAGIC
-			switch(curr_panel.children[i].type){
+			switch(curr_panel->children[i].type){
 				case(eUiElementTypeLabel): {
-					sUiLabel_t label = (sUiLabel_t)(*curr_panel.children[i].element.label); //TODO: DONT COPy
-					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, label.content, strlen(label.content), eFont11x18);
+					sUiLabel_t label = (sUiLabel_t)(*curr_panel->children[i].element.label); //TODO: DONT COPy
+					UI_DRIVER_DrawString(panel_x, panel_y, image_buffer, *label.string, *curr_panel->children[i].param, false);
 				} break;
 				case (eUiElementTypeButton): {
-					sUiButton_t button = (sUiButton_t)(*curr_panel.children[i].element.button);
-					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, button.content, button.length, eFont11x18, selectable_i == curr_active_ui_button);
+					sUiButton_t button = (sUiButton_t)(*curr_panel->children[i].element.button);
+					UI_DRIVER_DrawButton(panel_x, panel_y, image_buffer, *button.string, *curr_panel->children[i].param, selectable_i == curr_active_ui_button);
 					selectable_i++;
 				}break;
 				default: {
 					/* Should not happen */
 				}break;
 			}
-			panel_y -= 50;
+			panel_y -= curr_panel->spacing_y;
 		}
-	}
-	return true;
-}
-
-bool UI_APP_Printout(void){
-	for(uint16_t y = 0; y < 320; y++){
-		for(uint16_t x = 0; x < 480; x++){
-			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * 480));
-			if(x % 120 == 0){
-				DEBUG_API_LOG("\r\n", NULL, NULL);
-			}
-		}
-		DEBUG_API_LOG("\r\n", NULL, NULL);
 	}
 	return true;
 }

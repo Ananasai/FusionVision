@@ -116,7 +116,7 @@ static  uint16_t  yStart, yEnd;
 // LCD write commands
 void LCD_IO_WriteCmd8(uint8_t Cmd)
 {
-  *(uint8_t *)LCD_ADDR_BASE = Cmd;
+  *(volatile uint8_t *)LCD_ADDR_BASE = Cmd;
 }
 
 //-----------------------------------------------------------------------------
@@ -228,6 +228,7 @@ void ili9486_DisplayOff(void)
 
 void ili9486_Init(void)
 {
+	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
   HAL_Delay(10);
   LCD_IO_WriteCmd8(ILI9486_SWRESET);
   HAL_Delay(100);
@@ -311,5 +312,23 @@ void ili9486_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
   ILI9486_LCDMUTEX_PUSH();
   LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize * Ysize);
   ILI9486_LCDMUTEX_POP();
+}
+
+void ili9486_DrawRGBImageInterlaced(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t Ysize, uint16_t *pData, uint8_t line_start)
+{
+	ili9486_DrawRGBImage(0, 0, 480, 160, pData);
+	ili9486_DrawRGBImage(0, 160, 480, 160, pData+480*160);
+	//static lines = 0 ? lines == 1 : 1;
+	//for(uint16_t line = lines; line < 200; line += 2){
+	//	ili9486_DrawRGBImage(0, line, 480, 1, pData+Xsize*line);
+	//}
+	/*
+	for(uint16_t line = 0; line < 254; line += 2){
+		ili9486_SetDisplayWindow(Xpos, line, Xsize, 2);
+		HAL_Delay(10);
+		LCD_IO_WriteCmd8MultipleData16(ILI9486_RAMWR, pData, Xsize*2);
+		HAL_Delay(10);
+	}
+	*/
 }
 

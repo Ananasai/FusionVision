@@ -7,79 +7,52 @@
 
 #include "lighting_app.h"
 #include "debug_api.h"
+#include "job_api.h"
 #include <main.h>
 #include <cmsis_os2.h>
 
-#define __DEBUG_FILE_NAME__ "LGHT_APP"
-#define LIGHTING_TIMER_PERIOD 1000
-#define LIGHTING_EVENT_FLAGS_ADC_READY 0x01
+#define __DEBUG_FILE_NAME__ "LIGHT"
 
-extern ADC_HandleTypeDef hadc1;
+#define R2 25000
+#define VIN 5
 
-const static osTimerAttr_t lighting_timer_attribute = {
-		.name = "lighting timer"
-};
-const static osThreadAttr_t lughting_thread_attribute = {
-		.name = "lighting app",
-		.priority = osPriorityNormal
-};
-
-static osTimerId_t lighting_timer_id = NULL;
-static osThreadId_t lighting_thread_id = NULL;
-static osEventFlagsId_t lighting_event_flags_id = NULL;
-//static uint16_t curr_adc_value = 0x00;
-
-static void Lighting_app_timer(void *argument);
 static void Lighting_app_thread(void *argument);
+static void Lighting_job_recAdc(void *payload);
+
+static const osThreadAttr_t lighting_thread_attribute = {
+	.name = "lighting app",
+	.priority = osPriorityNormal
+};
+
+static const sJobCallbackDesc_t job_callbacks[] = {
+		{.callback = Lighting_job_recAdc, .job = eJobRecAdc},
+};
+
+static osThreadId_t lighting_thread_id = NULL;
+
 
 bool Lighting_APP_Start(void){
-	lighting_event_flags_id = osEventFlagsNew(NULL);
-	if(lighting_event_flags_id == NULL){
-		error("Creating lighting event flags\r\n");
-		return false;
-	}
-	lighting_timer_id = osTimerNew(&Lighting_app_timer, osTimerPeriodic, NULL, &lighting_timer_attribute);
-	if(lighting_timer_id == NULL){
-		error("Creating lighting timer\r\n");
-		return false;
-	}
-	if(osTimerStart(lighting_timer_id, LIGHTING_TIMER_PERIOD) != osOK){
-		error("Starting lighting timer\r\n");
-		return false;
-	}
-	lighting_thread_id = osThreadNew(&Lighting_app_thread, NULL, &lughting_thread_attribute);
+	lighting_thread_id = osThreadNew(&Lighting_app_thread, NULL, &lighting_thread_attribute);
 	if(lighting_thread_id == NULL){
 		error("Starting lighting thread\r\n");
 		return false;
 	}
+	if(Job_API_CreateQueue(eQueueLighting) == false){
+		return false;
+	}
 	return true;
 }
-
-
-void Lighting_app_timer(void *argument){
-	/* Do ADC start here*/
-	HAL_ADC_Start_IT (&hadc1);
-}
-
+//TODO: add functionality and software PWM
 static void Lighting_app_thread(void *argument){
-	uint32_t current_flag = 0x00;
 	/* Wait for ADC end conversion FLAG */
 	while(true){
-		current_flag = osEventFlagsWait(lighting_event_flags_id, LIGHTING_EVENT_FLAGS_ADC_READY, osFlagsWaitAny, osWaitForever);
-		switch(current_flag){
-			case LIGHTING_EVENT_FLAGS_ADC_READY: {
-				/* ADC conversion here */
-				break;
-			}
-			default: {
-				error("Invalid flag\r\n");
-				break;
-			}
-		}
+		Job_API_WaitNew(eQueueLighting, job_callbacks, 1);
 	}
 }
 
-//void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){ //TODO: NOW WORKS ONLY WITH ONE ADC, MAKE INTO SEPERATRE FILE
-//	curr_adc_value = HAL_ADC_GetValue(&hadc1);
-//	osEventFlagsSet(lighting_event_flags_id, LIGHTING_EVENT_FLAGS_ADC_READY);
-//}
+/* Formula for photo resistor resistance R1 = (Vin * R2) / Vout - R2*/
+static void Lighting_job_recAdc(void *payload){
+	float *adc_val_v = (float *)payload;
+	float R1 = (float)(VIN * R2) / (float)(*adc_val_v) - R2;
+	//debug("Photo resistor: %.2f\r\n", R1);
+}

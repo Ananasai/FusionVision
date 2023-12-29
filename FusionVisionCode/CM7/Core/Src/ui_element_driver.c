@@ -6,11 +6,11 @@
  */
 
 #include "ui_element_driver.h"
+#include <string.h>
 
+#define MAX_CHAR_PER_LINE 10
 #define UI_COLOUR 0xFFFF
 #define UI_COLOUR_INVERTED 0x0000
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 320
 
 #define PIXEL(x, y, buffer) (buffer + SCREEN_WIDTH*(y) + (x))
 
@@ -36,26 +36,36 @@ bool UI_DRIVER_DrawCharacter(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buf
 	return true;
 }
 
-bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font){
-	uint8_t curr_font_width = font_lut[font].width;
-	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
+bool UI_DRIVER_DrawString(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, sString_t string, sTextParam_t text_param, bool invert){
+	uint8_t curr_font_width = font_lut[text_param.font].width;
+	uint8_t curr_font_height = font_lut[text_param.font].height;
+	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT)){ //TODO: || (loc_x < length * curr_font_width)
 		return false;
 	}
-	for(size_t i = 0; i < length; i++){
-		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), font, false);
+	if(text_param.alignment == eHorizontalAlignmentCenter) { //TODO: right and left alignment
+		loc_x += (strlen(string.text) * curr_font_width) >> 1;
+	}
+	size_t max_lines = strlen(string.text) / 10;
+	size_t lines = 1; //TODO: make several lines procedural
+	if(strlen(string.text) > MAX_CHAR_PER_LINE){
+		lines = 2;
+	}
+	for(size_t line = 0; line < lines; line++){
+		for(size_t i = 0; i < strlen(string.text); i++){ //TODO: string.length
+			size_t char_i = line * MAX_CHAR_PER_LINE + i;
+			if(char_i == strlen(string.text)){
+				return true;
+			}
+			UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y - line*curr_font_height, image_buffer, *(string.text + char_i), text_param.font, invert);
+		}
 	}
 	return true;
 }
 
-bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, const char *text, size_t length, eFont_t font, bool selected){
-	uint8_t curr_font_width = font_lut[font].width;
-	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT) || (loc_x < length * curr_font_width)){
+bool UI_DRIVER_DrawButton(uint16_t loc_x, uint16_t loc_y, uint16_t *image_buffer, sString_t string, sTextParam_t text_param, bool selected){
+	if((loc_x > SCREEN_WIDTH) || (loc_y > SCREEN_HEIGHT)){
 		return false;
 	}
-	for(size_t i = 0; i < length; i++){
-		UI_DRIVER_DrawCharacter(loc_x - i * curr_font_width, loc_y, image_buffer, *(text + i), font, selected);
-	}
+	UI_DRIVER_DrawString(loc_x, loc_y, image_buffer, string, text_param, selected);
 	return true;
 }
-
-
