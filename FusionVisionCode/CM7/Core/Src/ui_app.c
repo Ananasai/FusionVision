@@ -79,7 +79,6 @@ bool UI_APP_DrawAll(void){
 		}
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel->children_amount; i++){
-			HAL_Delay(1); //TODO: MAGIC
 			switch(curr_panel->children[i].type){
 				case(eUiElementTypeLabel): {
 					sUiLabel_t label = (sUiLabel_t)(*curr_panel->children[i].element.label); //TODO: DONT COPy
