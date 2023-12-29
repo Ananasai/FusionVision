@@ -4,6 +4,8 @@
  *  Created on: Dec 17, 2023
  *      Author: simon
  */
+#pragma GCC push_options
+#pragma GCC optimize ("O3")
 
 #include "image_processing_app.h"
 #include "shared_param_api.h"
@@ -146,3 +148,5 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	}
 	return true;
 }
+
+#pragma GCC pop_options
