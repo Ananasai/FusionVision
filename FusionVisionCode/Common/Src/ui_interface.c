@@ -159,7 +159,7 @@ static const sParamValTextDesc_t param_value_text[eSharedParamLast] = {
 	[eSharedParamScreenState] = {
 		.count = 2,
 		.texts = {
-			[eScreenStatePassthrough] = "Passthrough",
+			[eScreenStatePassthrough] = "Original",
 			[eScreenStateProcessed] = "Processed"}
 	},
 	[eSharedParamScreenOptim] = {
