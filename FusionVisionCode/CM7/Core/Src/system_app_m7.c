@@ -21,14 +21,13 @@
 static void Printout_IRQ(void);
 static bool Printout(void);
 
-static uint16_t image_buffer[480*320+1] = {0};
+static uint16_t image_buffer[480*320] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
 static bool printout_flag = false;
+
 static uint32_t line_scanned_amount = 0;
-//uint32_t first_lines = 0;
-//uint32_t second_lines = 0;
 static bool first_vsync = true;
 
 /* Executed before M4 is launched */
@@ -49,9 +48,9 @@ bool System_APP_M7_Start(void){
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
-	HAL_Delay(1000);
 	/* Display splash screen */
 	ili9486_DrawRGBImage(0, 0, 480, 320, (uint16_t *)splash_screen);
+	//HAL_Delay(10);
 	/* Init camera */
 	ov2640_Init(0x60);
 	/* Start time tracking */
@@ -82,15 +81,14 @@ bool System_APP_M7_Run(void){
 		//HAL_StatusTypeDef status2 = HAL_DMA2D_PollForTransfer(&hdma2d, 1000);
 		Diagnostics_APP_RecordEnd(eDiagEventDisplay);
 		Diagnostics_APP_RecordEnd(eDiagEventFrame);
-		//static uint8_t line_start = 0;
-		//line_start = 1 ? line_start == 0 : 1;
-		//
+		/* Printout whole frame if callback received */
 		if(printout_flag){
 			Printout();
 			printout_flag = false;
 		}
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
+		/* Start recording next frame */
 		line_scanned_amount = 0;
 		first_vsync = true;
 		HAL_DCMI_Resume(&hdcmi);
@@ -140,11 +138,10 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
 	if(first_vsync){
 		line_scanned_amount = 0;
 		first_vsync = false;
-	}else{
-
 	}
 }
-//TODO: doesn't work
+/* Line end event, used for faster response than half transfer */
+//TODO: problem, doesn't improve time than just using half transfer irq
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
 	line_scanned_amount++;
 	if(first_vsync == false){
@@ -158,7 +155,3 @@ void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
 void HAL_DCMI_HalfFrameEventCallback(void){
 	//frame_half_event_flag = true;
 }
-
-//void HAL_DMA2D_CLUTLoadingCpltCallback(DMA2D_HandleTypeDef *hdma2d){
-
-//}
