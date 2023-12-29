@@ -42,7 +42,7 @@ static osThreadId_t serial_thread_id = NULL;
 static osEventFlagsId_t serial_flags_id = NULL;
 
 static void Serial_Thread(void *arg);
-static bool Serial_Match_CMD(const sSerialCommand_t *cmd_table, sString_t incoming);
+static bool Serial_Match_CMD(const sSerialCommandTable_t *cmd_table, sString_t incoming);
 
 bool Serial_APP_Start(void){
 	serial_thread_id = osThreadNew(Serial_Thread, NULL, &serial_thread_attr);
@@ -84,7 +84,7 @@ static void Serial_Thread(void *arg){
 				delimiter_index++;
 				if(delimiter_index == CMD_DELIMITER_LEN){
 					/* Found matching delimiter */
-					if(Serial_Match_CMD(serial_commands, (sString_t){.text = (char *)rx_buffer, .length = rx_buffer_index-CMD_DELIMITER_LEN}) == false){
+					if(Serial_Match_CMD(&serial_commands, (sString_t){.text = (char *)rx_buffer, .length = rx_buffer_index-CMD_DELIMITER_LEN}) == false){
 						error("Invalid command\r\n");
 					}
 					delimiter_index = 0;
@@ -100,11 +100,9 @@ static void Serial_Thread(void *arg){
 	}
 }
 
-static bool Serial_Match_CMD(const sSerialCommand_t *cmd_table, sString_t incoming){
-	debug("Match: %c %d", *incoming.text, incoming.length);
-	uint32_t cmd_table_size = 2;//sizeof(*cmd_table) / sizeof(*cmd_table); //TODO: fix array length
-	for(uint32_t cmd = 0; cmd < cmd_table_size; cmd++){
-		const sSerialCommand_t *current_cmd = cmd_table + cmd;
+static bool Serial_Match_CMD(const sSerialCommandTable_t *cmd_table, sString_t incoming){
+	for(uint32_t cmd = 0; cmd < cmd_table->length; cmd++){
+		const sSerialCommand_t *current_cmd = cmd_table->commands + cmd;
 		if(current_cmd->string.length != incoming.length){
 			continue;
 		}

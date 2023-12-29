@@ -18,10 +18,14 @@
 
 #define __DEBUG_FILE_NAME__ "M7"
 
+static void Printout_IRQ(void);
+static bool Printout(void);
+
 static uint16_t image_buffer[480*320+1] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_half_event_flag = false;
+static bool printout_flag = false;
 static uint32_t line_scanned_amount = 0;
 
 /* Executed before M4 is launched */
@@ -39,6 +43,7 @@ bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
 	IMG_PROCESSING_APP_Init(image_buffer);
+	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
 	HAL_Delay(100);
@@ -76,6 +81,10 @@ bool System_APP_M7_Run(void){
 		//static uint8_t line_start = 0;
 		//line_start = 1 ? line_start == 0 : 1;
 		//
+		if(printout_flag){
+			Printout();
+			printout_flag = false;
+		}
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
 		HAL_DCMI_Resume(&hdcmi);
@@ -94,6 +103,23 @@ bool System_APP_M7_Run(void){
 			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
 		//UI_APP_DrawAll(image_buffer);
+	}
+	return true;
+}
+
+static void Printout_IRQ(void){
+	printout_flag = true;
+}
+
+static bool Printout(void){
+	for(uint16_t y = 0; y < 320; y++){
+		for(uint16_t x = 0; x < 480; x++){
+			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * 480));
+			if(x % 120 == 0){
+				DEBUG_API_LOG("\r\n", NULL, NULL);
+			}
+		}
+		DEBUG_API_LOG("\r\n", NULL, NULL);
 	}
 	return true;
 }

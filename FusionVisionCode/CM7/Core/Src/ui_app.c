@@ -100,19 +100,6 @@ bool UI_APP_DrawAll(void){
 	return true;
 }
 
-bool UI_APP_Printout(void){
-	for(uint16_t y = 0; y < 320; y++){
-		for(uint16_t x = 0; x < 480; x++){
-			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * 480));
-			if(x % 120 == 0){
-				DEBUG_API_LOG("\r\n", NULL, NULL);
-			}
-		}
-		DEBUG_API_LOG("\r\n", NULL, NULL);
-	}
-	return true;
-}
-
 /* Ui update event on semaphore release, record time*/
 static void UI_Updated(void){
 	last_ui_update_time = HAL_GetTick();

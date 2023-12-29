@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
 typedef struct sString_t {
 	char *text;
 	uint32_t length;
