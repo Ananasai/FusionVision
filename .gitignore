@@ -112,3 +112,5 @@ scripts/__pycache__/
 *.launch
 *.prefs
 *.xml
+
+*.bmp
