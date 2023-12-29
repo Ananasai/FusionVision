@@ -13,11 +13,13 @@
 #include "debug_api.h"
 #include "job_api.h"
 #include "shared_param_api.h"
+#include "power_track_app.h"
+#include "serial_app.h"
 #include <stdbool.h>
 #include "string_common.h"
 
 #define __DEBUG_FILE_NAME__ "SYS"
-#define APP_DESC(app_enum, name, init) [app_enum] = {(sString_t){.string = name, .length = sizeof(name)}, init}
+#define APP_DESC(app_enum, name, init) [app_enum] = {(sString_t){.text = name, .length = sizeof(name)}, init}
 
 typedef struct sAppDesc_t {
 	sString_t name;
@@ -32,6 +34,8 @@ typedef enum eAppEnum_t {
 	eAppLighting,
 	eAppBattery,
 	eAppADC,
+	eAppPowerTrack,
+	eAppSerial,
 	eAppLast /* MUST BE LEFT LAST */
 }eAppEnum_t;
 
@@ -41,6 +45,8 @@ static const sAppDesc_t const_app_lut[eAppLast] = {
 	APP_DESC(eAppLighting, "LIGHTING", &Lighting_APP_Start),
 	APP_DESC(eAppBattery, "BATTERY", &Battery_APP_Start),
 	APP_DESC(eAppADC, "ADC", &Adc_APP_Start),
+	APP_DESC(eAppPowerTrack, "PWR TRACK", &Power_track_APP_Start),
+	APP_DESC(eAppSerial, "SERIAL", &Serial_APP_Start),
 };
 
 /* RTOS CMSIS V2 documentation: https://www.keil.com/pack/doc/CMSIS/RTOS2/html/rtos_api2.html */
@@ -52,7 +58,7 @@ bool System_APP_M4_Start(void){
 	for(eAppEnum_t app = eAppFirst; app < eAppLast; app++){
 		/* Execute initialise function of every app*/
 		if(const_app_lut[app].init_func == NULL){
-			error("Invalid init func of app %s\r\n", const_app_lut[app].name.string);
+			error("Invalid init func of app %s\r\n", const_app_lut[app].name.text);
 			return false;
 		}
 		(*const_app_lut[app].init_func)();

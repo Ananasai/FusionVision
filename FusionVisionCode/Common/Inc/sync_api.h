@@ -16,6 +16,8 @@ typedef enum eSemaphore_t {
 	eSemaphoreUart,
 	eSemaphoreSharedMem,
 	eSemaphoreButton,
+	eSemaphoreUiUpdate,
+	eSemaphorePrintout,
 	eSemaphoreLast
 }eSemaphore_t;
 
@@ -23,5 +25,5 @@ bool Sync_API_WaitSemaphore(eSemaphore_t sem);
 bool Sync_API_TakeSemaphore(eSemaphore_t sem);
 bool Sync_API_ReleaseSemaphore(eSemaphore_t sem);
 bool Sync_API_ReleaseSemaphoreAll(void);
-bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem);
+bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem, void (*new_callback)(void));
 #endif /* INC_SYNC_API_H_ */

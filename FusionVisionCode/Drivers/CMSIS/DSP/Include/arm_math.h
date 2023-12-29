@@ -337,14 +337,6 @@ extern "C"
 {
 #endif
 
-//TODO: my code shouldnt be here
-
-  #define __FORCEINLINE         _Pragma("inline=forced")
-
-
-  #define __STATIC_FORCEINLINE                   static __forceinline
-
-
   /**
    * @brief Macros required for reciprocal calculation in Normalized LMS
    */

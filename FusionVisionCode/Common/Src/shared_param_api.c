@@ -1,20 +1,21 @@
 #include "shared_param_api.h"
 #include "shared_mem_api.h"
+#include "sync_api.h"
 #include <string.h>
 
-#define NEW_PARAM(_enum, _name, _size) [_enum] = {.name = _name, .size = _size}
+#define NEW_PARAM(_enum, _name, _size, _default, _min, _max) [_enum] = {.name = _name, .size = _size, .default_val = _default, .max = _max, .min = _min}
 
 #define ARR_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-typedef struct sSharedParam_t{
-	char *name;
-	size_t size; //BYTES
-}sSharedParam_t;
-
+    //TODO: cache resources if they were not modified
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
-	NEW_PARAM(eSharedParamEdgeThreshold, "Edge threshold", 4),
-	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", 4),
-	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", 4)
+	NEW_PARAM(eSharedParamEdgeThreshold, "Edge", sizeof(uint32_t), 5, 0, 1000),
+	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0, 0, 999),
+	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", sizeof(uint32_t), 0, 0, 999),
+	NEW_PARAM(eSharedParamScreenState, "Screen", sizeof(uint32_t), eScreenStatePassthrough, eScreenStateFirst, eScreenStateLast),
+	NEW_PARAM(eSharedParamScreenOptim, "Optimisation", sizeof(uint32_t), eScreenOptimNone, eScreenOptimFirst, eScreenOptimLast),
+	NEW_PARAM(eSharedParamEdgeAlgorithm, "Algorithm", sizeof(uint32_t), eEdgeAlgorithmSobel, eEdgeAlgorithmFirst, eEdgeAlgorithmLast),
+	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100)
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
@@ -28,25 +29,42 @@ bool Shared_param_API_Init(void){
 		if(last_address >= SHARED_MEM_START + SHARED_MEM_LEN){
 			return false;
 		}
-		/* Clear buffer */ //TODO: move to mem api //TODO: DOUBLE CLEARING ON power on
-		memset((void *)shared_param_address_lut[param], 0, shared_param_lut[param].size);
+		/* Set all buffer to default value of uint32_t type */
+		//TODO: doesnt work with shared_param_api_write, why?
+		uint32_t default_value = shared_param_lut[param].default_val;
+		for(uint32_t i = 0; i < shared_param_lut[param].size/4; i++){
+			memcpy((void *)shared_param_address_lut[param], &default_value, 4);
+		}
 	}
 	return true;
 }
 
-bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){
+bool Shared_param_API_GetDesc(eSharedParamEnum_t param, sSharedParam_t *out){
 	if(param >= eSharedParamLast){
 		return false;
 	}
-	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out);
+	*out = shared_param_lut[param];
+	return true;
 }
 
-bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in, size_t length){
+bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){ //TODO: could implement caching
+	if(param >= eSharedParamLast){
+		return false;
+	}
+	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out, shared_param_lut[param].size);
+}
+
+bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in){
 	if((param >= eSharedParamLast) || (in == NULL)){
 		return false;
 	}
-	if(length > shared_param_lut[param].size){
+	if(Shared_mem_API_Write(shared_param_address_lut[param], in, shared_param_lut[param].size) == false){
 		return false;
 	}
-	return Shared_mem_API_Write(shared_param_address_lut[param], in, length);
+	/* Indicate to M7 that new visual configuration written */
+	if(param > eSharedParamFirst){
+		Sync_API_TakeSemaphore(eSemaphoreUiUpdate);
+		Sync_API_ReleaseSemaphore(eSemaphoreUiUpdate);
+	}
+	return true;
 }

@@ -14,7 +14,7 @@
 
 extern RTC_HandleTypeDef hrtc;
 
-bool UI_APP_DrawAll(uint16_t *image_buffer);
-bool UI_APP_Printout(uint16_t *image_buffer);
+bool UI_APP_Init(uint16_t *new_image_buffer);
+bool UI_APP_DrawAll(void);
 
 #endif /* INC_UI_APP_H_ */

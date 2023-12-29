@@ -8,6 +8,9 @@
 #define PROCESS_ID 1
 #endif
 
+void (*semaphore_callback_lut[eSemaphoreLast])(void) = {0};
+
+
 bool Sync_API_WaitSemaphore(eSemaphore_t sem){
 	//while(HAL_HSEM_IsSemTaken(sem) == 1){ //TODO: not working
 
@@ -32,8 +35,24 @@ bool Sync_API_ReleaseSemaphoreAll(void){
 	return true;
 }
 
-bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem){
-	HAL_HSEM_ActivateNotification(sem); //TODO: MASK
+bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem, void (*new_callback)(void)){
+	semaphore_callback_lut[sem] = new_callback;
+	HAL_HSEM_ActivateNotification(0x1 << sem);
 	return true;
+}
+
+/* HSEM released IRQ, call desired callback*/
+void HAL_HSEM_FreeCallback(uint32_t sem_mask){
+	for(uint8_t i = 0; i < eSemaphoreLast; i++){
+		if(((sem_mask >> i) & 0x01) == 0x01){
+			if(semaphore_callback_lut[i] == NULL){
+				break;
+			}
+			(*semaphore_callback_lut[i])();
+			break;
+		}
+	}
+	/* Reeactivate semaphore irq */
+	HAL_HSEM_ActivateNotification(sem_mask);
 }
 
