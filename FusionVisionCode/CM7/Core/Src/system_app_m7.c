@@ -30,6 +30,13 @@ static bool printout_flag = false;
 static uint32_t line_scanned_amount = 0;
 static bool first_vsync = true;
 
+static uint32_t edge_algorithm = eEdgeAlgorithmSobel;
+
+static const uint32_t algorithm_line_num[eEdgeAlgorithmLast] = {
+		[eEdgeAlgorithmSobel] = 50,
+		[eEdgeAlgorithmRoberts] = 160
+};
+
 /* Executed before M4 is launched */
 bool System_APP_M7_PreInit(void){
 	if(Sync_API_ReleaseSemaphoreAll() == false){
@@ -86,6 +93,7 @@ bool System_APP_M7_Run(void){
 			Printout();
 			printout_flag = false;
 		}
+		Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
 		/* Start recording next frame */
@@ -146,7 +154,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
 	line_scanned_amount++;
 	if(first_vsync == false){
-		if(line_scanned_amount == 10){
+		if(line_scanned_amount == algorithm_line_num[edge_algorithm]){
 			frame_line_event_flag = true;
 		}
 	}
