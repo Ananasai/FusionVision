@@ -67,14 +67,7 @@ bool System_APP_M7_Run(void){
 	/* Synchronization on new image frame received */
 	if(frame_event_flag){
 		frame_event_flag = false;
-		uint32_t screen_state = 0;
-		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
-		if(screen_state == eScreenStateProcessed){
-			Diagnostics_APP_RecordStart(eDiagEventProcessing);
-			IMG_PROCESSING_APP_Compute(image_buffer);
-			//HAL_Delay(1);
-			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
-		}
+
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
@@ -102,7 +95,14 @@ bool System_APP_M7_Run(void){
 		HAL_DCMI_Resume(&hdcmi);
 	}
 	if(frame_half_event_flag) {
-
+		uint32_t screen_state = 0;
+		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
+		if(screen_state == eScreenStateProcessed){
+			Diagnostics_APP_RecordStart(eDiagEventProcessing);
+			IMG_PROCESSING_APP_Compute(image_buffer);
+			//HAL_Delay(1);
+			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
+		}
 		frame_half_event_flag = false;
 		//UI_APP_DrawAll(image_buffer);
 	}
@@ -146,7 +146,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
 	line_scanned_amount++;
 	if(first_vsync == false){
-		if(line_scanned_amount == 3){
+		if(line_scanned_amount == 280){
 			frame_half_event_flag = true;
 		}
 	}
