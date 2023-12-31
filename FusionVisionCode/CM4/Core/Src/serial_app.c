@@ -31,7 +31,7 @@ static uint8_t delimiter_index = 0;
 
 static const osThreadAttr_t serial_thread_attr = {
 	.name = "SERIAL",
-	.priority = osPriorityHigh7
+	.priority = osPriorityAboveNormal
 };
 
 static const osEventFlagsAttr_t serial_flags_attr = {

@@ -128,7 +128,7 @@ static void Button_Timer(void *argument){
 		}
 	}
 }
-
+//TODO: port to separate driver
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   NVIC_DisableIRQ(EXTI0_IRQn);
   NVIC_DisableIRQ(EXTI15_10_IRQn);
@@ -136,6 +136,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	  if(GPIO_Pin == button_desc_lut[btn].pin){
 		  osEventFlagsSet(button_event_flags_id, button_desc_lut[btn].flag);
 	  }
+  }
+  /* Lepton VSYNC irq */
+  if(GPIO_Pin == LEPTON_VSYNC_Pin){
+	  #include "lepton_app.h"
+	  Lepton_APP_VsyncIrq();
   }
   NVIC_EnableIRQ(EXTI0_IRQn);
   NVIC_EnableIRQ(EXTI15_10_IRQn);
