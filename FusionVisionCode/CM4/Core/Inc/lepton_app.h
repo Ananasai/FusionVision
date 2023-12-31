@@ -12,6 +12,7 @@
 #include <stdbool.h>
 
 extern SPI_HandleTypeDef hspi4;
+extern TIM_HandleTypeDef htim3;
 
 void Lepton_APP_VsyncIrq(void);
 bool Lepton_APP_Start(void);

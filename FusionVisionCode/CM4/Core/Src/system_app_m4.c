@@ -19,6 +19,8 @@
 #include <stdbool.h>
 #include "string_common.h"
 
+/* Both core debugging: https://www.st.com/resource/en/application_note/dm00629855-getting-started-with-projects-based-on-dualcore-stm32h7-microcontrollers-in-stm32cubeide-stmicroelectronics.pdf */
+
 #define __DEBUG_FILE_NAME__ "SYS"
 #define APP_DESC(app_enum, name, init) [app_enum] = {(sString_t){.text = name, .length = sizeof(name)}, init}
 
