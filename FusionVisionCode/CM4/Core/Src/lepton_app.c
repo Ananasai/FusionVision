@@ -16,6 +16,15 @@
 
 #define RX_BUFF_LEN 1000
 #define PACKET_LEN 164
+#define PACKET_DATA_LEN 160
+#define PACKET_IN_SEGMENT 60
+#define SEGMENT_DATA_LEN (PACKET_DATA_LEN * PACKET_IN_SEGMENT)
+
+#define PACKET_PIXEL_AMOUNT 80
+#define SEGMENT_PIXEL_AMOUNT (PACKET_PIXEL_AMOUNT * PACKET_IN_SEGMENT)
+
+#define FRAME_WIDTH 160
+#define FRAME_HEIGHT 120
 
 /* DATASHEET: https://cdn.sparkfun.com/assets/f/6/3/4/c/Lepton_Engineering_Datasheet_Rev200.pdf */
 /* I2C registers: https://cdn.sparkfun.com/assets/0/6/d/2/e/16465-FLIRLepton-SoftwareIDD.pdf */
@@ -57,8 +66,10 @@ static osEventFlagsId_t lepton_flags_id = NULL;
 static uint8_t rx_byte = 0x00;
 static uint8_t rx_index = 0;
 static uint8_t rx_buffer[RX_BUFF_LEN] = {0};
-static uint16_t packet_index = 0;
-static uint16_t segment_index = 0;
+static uint16_t curr_packet_index = 0;
+static uint16_t curr_segment_index = 0;
+
+static uint8_t pixels[FRAME_WIDTH * FRAME_HEIGHT] = {0};
 
 bool Lepton_APP_Start(void){
 	lepton_thread_id = osThreadNew(Lepton_Thread, NULL, &lepton_thread_attr);
@@ -90,8 +101,29 @@ static void Lepton_Thread(void *arg){
 			/* Received packet */
 			/* Checked discard packet */
 			if((rx_buffer[0] & 0x0F) == 0x0F){
-
+				curr_packet_index = 0;
+				curr_segment_index = 0;
+				continue;
 			}
+			uint32_t packet_number = rx_buffer[1];
+			curr_packet_index = packet_number;
+			if(packet_number == 20){
+				uint32_t segment_number = rx_buffer[0] >> 4;
+				if(segment_number != 0){
+					curr_segment_index = segment_number - 1;
+				}
+			}else{
+				uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
+				/* Get every other pixel as AGC is on */
+				for(uint16_t i = 5; i < 160; i += 2){
+					pixels[pixel_index] = rx_buffer[i];
+					pixel_index++;
+				}
+			}
+			if(curr_packet_index == PACKET_IN_SEGMENT - 1){
+				curr_segment_index++;
+			}
+
 		}
 	}
 }
