@@ -8,7 +8,6 @@
 #include "lepton_app.h"
 #include "debug_api.h"
 #include "circular_buffer.h"
-#include "cmsis_os2.h"
 
 static const uint8_t test_data[] = {
 		0x10,0x0,
@@ -525,20 +524,7 @@ static uint32_t test_data_index = 0;
  * PWR_DWN_L - active low shutdown
  * RESET_L - active low reset
  * */
-
-static void Lepton_Thread(void *arg);
-
-static const osThreadAttr_t lepton_thread_attr = {
-	.name = "Lepton",
-	.priority = osPriorityHigh
-};
-
-static const osEventFlagsAttr_t lepton_flags_attr = {
-		.name = "Lepton"
-};
-
-static osThreadId_t lepton_thread_id = NULL;
-static osEventFlagsId_t lepton_flags_id = NULL;
+static bool rx_byte_flag = false;
 
 static uint8_t rx_byte = 0x00;
 static uint8_t rx_buffer[CIRC_BUF_LEN] = {0}; //TODO: shorten?
@@ -555,21 +541,6 @@ bool Lepton_APP_Start(void){
 		error("Creating ciruclar buffer\r\n");
 		return false;
 	}
-	lepton_thread_id = osThreadNew(Lepton_Thread, NULL, &lepton_thread_attr);
-	if(lepton_thread_id == NULL){
-		error("Creating lepton thread\r\n");
-		return false;
-	}
-	lepton_flags_id = osEventFlagsNew(&lepton_flags_attr);
-	if(lepton_flags_id == NULL){
-		error("Creating lepton flags\r\n");
-		return false;
-	}
-	return true;
-}
-
-static void Lepton_Thread(void *arg){
-	uint32_t flags = 0;
 	/* Lepton initialisation */
 	/* Datasheet page 17 */
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_SET);
@@ -577,52 +548,56 @@ static void Lepton_Thread(void *arg){
 	osDelay(1);
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_SET);
 	/* Start receive SPI */
+	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
 	//HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
 	HAL_TIM_Base_Start_IT(&htim3);
-	while(1){
-		flags = osEventFlagsWait(lepton_flags_id, FLAGS_ALL, osFlagsWaitAny, osWaitForever);
-		if(flags == FLAGS_RX){
-			bool packet_received = false;
-			/* Received byte */
-			uint8_t circ_byte = 0;
-			while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
-				rx_buffer[rx_buffer_index] = circ_byte;
-				rx_buffer_index++;
-				if(rx_buffer_index == PACKET_LEN){
-					packet_received = true;
-				}
-				/* Start reading from zero */
-				rx_buffer_index = 0;
+	return true;
+}
+
+void Lepton_APP_Run(void){
+	if(rx_byte_flag){
+		rx_byte_flag = false;
+		bool packet_received = false;
+		/* Received byte */
+		uint8_t circ_byte = 0;
+		while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
+			rx_buffer[rx_buffer_index] = circ_byte;
+			rx_buffer_index++;
+			if(rx_buffer_index == PACKET_LEN){
+				packet_received = true;
 			}
-			if(packet_received){
-				/* Checked discard packet */
-				if((rx_buffer[0] & 0x0F) == 0x0F){
+			/* Start reading from zero */
+			rx_buffer_index = 0;
+		}
+		if(packet_received){
+			/* Checked discard packet */
+			if((rx_buffer[0] & 0x0F) == 0x0F){
+				curr_packet_index = 0;
+				curr_segment_index = 0;
+				return;
+			}
+			/* Valid packet */
+			uint32_t packet_number = rx_buffer[1];
+			curr_packet_index = packet_number;
+			if(packet_number == 20){
+				uint32_t segment_number = rx_buffer[0] >> 4;
+				/* Check if discard or invalid packet */
+				if(segment_number == 0){
 					curr_packet_index = 0;
 					curr_segment_index = 0;
-					continue;
+					return;
 				}
-				/* Valid packet */
-				uint32_t packet_number = rx_buffer[1];
-				curr_packet_index = packet_number;
-				if(packet_number == 20){
-					uint32_t segment_number = rx_buffer[0] >> 4;
-					if(segment_number == 0){
-						curr_packet_index = 0;
-						curr_segment_index = 0;
-						continue;
-					}
-					curr_segment_index = segment_number - 1;
-				}
+				curr_segment_index = segment_number - 1;
+			}
 
-				uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
-				/* Get every other pixel as AGC is on */
-				for(uint16_t i = 5; i < 160; i += 2){
-					pixels[pixel_index] = rx_buffer[i];
-					pixel_index++;
-				}
-				if(curr_packet_index == PACKET_IN_SEGMENT - 1){
-					curr_segment_index++;
-				}
+			uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
+			/* Get every other pixel as AGC is on */
+			for(uint16_t i = 5; i < 160; i += 2){
+				pixels[pixel_index] = rx_buffer[i];
+				pixel_index++;
+			}
+			if(curr_packet_index == PACKET_IN_SEGMENT - 1){
+				curr_segment_index++;
 			}
 		}
 	}
@@ -631,7 +606,7 @@ static void Lepton_Thread(void *arg){
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
     	Circular_buffer_push(&circ_buffer, rx_byte);
-		osEventFlagsSet(lepton_flags_id, FLAGS_RX);
+    	rx_byte_flag = true;
     	/* Continue reading */
     	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
     }
@@ -646,14 +621,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		rx_byte = test_data[test_data_index];
 		test_data_index++;
 		Circular_buffer_push(&circ_buffer, rx_byte);
-		osEventFlagsSet(lepton_flags_id, FLAGS_RX);
+		rx_byte_flag = true;
 		/* Continue reading */
 		//HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
 
 	}
 }
 
-/* Called on vsync rising edge */
+/* Called on vsync rising edge */ //TODO: IMPLEMENT FORM OTHER CORE
 void Lepton_APP_VsyncIrq(void){
 
 }

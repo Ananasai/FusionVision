@@ -71,6 +71,7 @@ bool System_APP_M7_Start(void){
 }
 
 bool System_APP_M7_Run(void){
+	Lepton_APP_Run();
 	/* Event on full frame received from DCMI  */
 	if(frame_event_flag){
 		frame_event_flag = false;

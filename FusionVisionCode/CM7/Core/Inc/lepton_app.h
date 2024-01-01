@@ -16,5 +16,6 @@ extern TIM_HandleTypeDef htim3;
 
 void Lepton_APP_VsyncIrq(void);
 bool Lepton_APP_Start(void);
+void Lepton_APP_Run(void);
 
 #endif /* INC_LEPTON_APP_H_ */

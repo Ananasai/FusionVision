@@ -15,7 +15,7 @@
 #include "shared_param_api.h"
 #include "power_track_app.h"
 #include "serial_app.h"
-#include "lepton_app.h"
+//#include "lepton_app.h"
 #include <stdbool.h>
 #include "string_common.h"
 
@@ -39,7 +39,7 @@ typedef enum eAppEnum_t {
 	eAppADC,
 	eAppPowerTrack,
 	eAppSerial,
-	eAppLepton,
+	//eAppLepton,
 	eAppLast /* MUST BE LEFT LAST */
 }eAppEnum_t;
 
@@ -51,7 +51,7 @@ static const sAppDesc_t const_app_lut[eAppLast] = {
 	APP_DESC(eAppADC, "ADC", &Adc_APP_Start),
 	APP_DESC(eAppPowerTrack, "PWR TRACK", &Power_track_APP_Start),
 	APP_DESC(eAppSerial, "SERIAL", &Serial_APP_Start),
-	APP_DESC(eAppLepton, "LEPTON", &Lepton_APP_Start)
+	//APP_DESC(eAppLepton, "LEPTON", &Lepton_APP_Start)
 };
 
 /* RTOS CMSIS V2 documentation: https://www.keil.com/pack/doc/CMSIS/RTOS2/html/rtos_api2.html */

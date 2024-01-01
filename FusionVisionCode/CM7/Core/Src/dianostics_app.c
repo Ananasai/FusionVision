@@ -57,13 +57,13 @@ void Diagnostics_APP_RecordEnd(eDiagEvent_t event) {
 		}
 	}
 }
-//TODO: might not work as differencyt interrupt is trigered
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
+//TODO: might not work as differencyt interrupt is trigered //TODO: IMPLEMENT
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
   // Check which version of the timer triggered this callback and toggle LED
-  if (htim == &htim2)
-  {
-	  error("TIMER OVERFLOW\r\n");
-  }
-}
+//  if (htim == &htim2)
+//  {
+//	  error("TIMER OVERFLOW\r\n");
+//  }
+//}
 
