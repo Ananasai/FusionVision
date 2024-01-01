@@ -43,3 +43,4 @@ bool Circular_buffer_push(sCircularBuffer_t *circ, uint8_t in){
 }
 
 //TODO: circ buffer deinit
+//TODO: handle overflow, make variable in struct if full

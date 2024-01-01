@@ -22,11 +22,6 @@
 
 #define CIRC_BUF_MAX 20
 
- //TODO: implement proper cyclic buffer
-//static uint8_t rx_cyclic_buff[RX_CYCL_BUF_LEN] = {0};
-//static uint8_t rx_cyclic_buff_head = 0;
-//static uint8_t rx_cyclic_buff_tail = 0;
-
 static uint8_t rx_buffer[RX_BUFF_MAX_LEN] = {0};
 static uint8_t rx_buffer_index = 0;
 static uint8_t rx_byte = 0;
@@ -83,15 +78,8 @@ static void Serial_Thread(void *arg){
 		}
 		uint8_t circ_byte = 0;
 		while(Circular_buffer_pop(&circular_buffer, &circ_byte)) {
-		//while(rx_cyclic_buff_tail != rx_cyclic_buff_head){
-			//rx_buffer[rx_buffer_index] = rx_cyclic_buff[rx_cyclic_buff_tail];
 			rx_buffer[rx_buffer_index] = circ_byte;
 			rx_buffer_index++;
-			//if(rx_cyclic_buff_tail == RX_CYCL_BUF_LEN - 1){
-			//	rx_cyclic_buff_tail = 0;
-			//}else{
-			//	rx_cyclic_buff_tail++;
-			//}
 			/* Compare delimiter */
 			if(rx_buffer[rx_buffer_index-1] == CMD_DELIMITER[delimiter_index]){
 				/* Found matching char */
@@ -133,13 +121,6 @@ static bool Serial_Match_CMD(const sSerialCommandTable_t *cmd_table, sString_t i
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){ //TODO: handle cyclic buffer overflow
 	Circular_buffer_push(&circular_buffer, rx_byte);
-	//rx_cyclic_buff[rx_cyclic_buff_head] = rx_byte;
-	//if(rx_cyclic_buff_head == RX_CYCL_BUF_LEN - 1){
-	//	rx_cyclic_buff_head = 0;
-	//}
-	//else{
-	//	rx_cyclic_buff_head++;
-	//}
 	osEventFlagsSet(serial_flags_id, FLAGS_RX);
 	HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
 }

@@ -7,6 +7,7 @@
 
 #include "lepton_app.h"
 #include "debug_api.h"
+#include "circular_buffer.h"
 #include "cmsis_os2.h"
 
 static const uint8_t test_data[] = {
@@ -490,7 +491,7 @@ static uint32_t test_data_index = 0;
 #define FLAGS_RX 0x01
 #define FLAGS_ALL (FLAGS_RX)
 
-#define RX_BUFF_LEN 1000
+#define CIRC_BUF_LEN 340
 #define PACKET_LEN 164
 #define PACKET_DATA_LEN 160
 #define PACKET_IN_SEGMENT 60
@@ -540,14 +541,20 @@ static osThreadId_t lepton_thread_id = NULL;
 static osEventFlagsId_t lepton_flags_id = NULL;
 
 static uint8_t rx_byte = 0x00;
-static uint8_t rx_index = 0;
-static uint8_t rx_buffer[RX_BUFF_LEN] = {0};
+static uint8_t rx_buffer[CIRC_BUF_LEN] = {0}; //TODO: shorten?
+static uint32_t rx_buffer_index = 0;
 static uint16_t curr_packet_index = 0;
 static uint16_t curr_segment_index = 0;
+
+static sCircularBuffer_t circ_buffer;
 
 volatile uint8_t pixels[FRAME_WIDTH * FRAME_HEIGHT] = {0};
 
 bool Lepton_APP_Start(void){
+	if(Circular_buffer_create(&circ_buffer, CIRC_BUF_LEN) == false){
+		error("Creating ciruclar buffer\r\n");
+		return false;
+	}
 	lepton_thread_id = osThreadNew(Lepton_Thread, NULL, &lepton_thread_attr);
 	if(lepton_thread_id == NULL){
 		error("Creating lepton thread\r\n");
@@ -575,46 +582,56 @@ static void Lepton_Thread(void *arg){
 	while(1){
 		flags = osEventFlagsWait(lepton_flags_id, FLAGS_ALL, osFlagsWaitAny, osWaitForever);
 		if(flags == FLAGS_RX){
-			/* Received packet */
-			/* Checked discard packet */
-			if((rx_buffer[0] & 0x0F) == 0x0F){
-				curr_packet_index = 0;
-				curr_segment_index = 0;
-				continue;
+			bool packet_received = false;
+			/* Received byte */
+			uint8_t circ_byte = 0;
+			while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
+				rx_buffer[rx_buffer_index] = circ_byte;
+				rx_buffer_index++;
+				if(rx_buffer_index == PACKET_LEN){
+					packet_received = true;
+				}
+				/* Start reading from zero */
+				rx_buffer_index = 0;
 			}
-			/* Valid packet */
-			uint32_t packet_number = rx_buffer[1];
-			curr_packet_index = packet_number;
-			if(packet_number == 20){
-				uint32_t segment_number = rx_buffer[0] >> 4;
-				if(segment_number != 0){
+			if(packet_received){
+				/* Checked discard packet */
+				if((rx_buffer[0] & 0x0F) == 0x0F){
+					curr_packet_index = 0;
+					curr_segment_index = 0;
+					continue;
+				}
+				/* Valid packet */
+				uint32_t packet_number = rx_buffer[1];
+				curr_packet_index = packet_number;
+				if(packet_number == 20){
+					uint32_t segment_number = rx_buffer[0] >> 4;
+					if(segment_number == 0){
+						curr_packet_index = 0;
+						curr_segment_index = 0;
+						continue;
+					}
 					curr_segment_index = segment_number - 1;
 				}
-			}
 
-			uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
-			/* Get every other pixel as AGC is on */
-			for(uint16_t i = 5; i < 160; i += 2){
-				pixels[pixel_index] = rx_buffer[i];
-				pixel_index++;
+				uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
+				/* Get every other pixel as AGC is on */
+				for(uint16_t i = 5; i < 160; i += 2){
+					pixels[pixel_index] = rx_buffer[i];
+					pixel_index++;
+				}
+				if(curr_packet_index == PACKET_IN_SEGMENT - 1){
+					curr_segment_index++;
+				}
 			}
-			if(curr_packet_index == PACKET_IN_SEGMENT - 1){
-				curr_segment_index++;
-			}
-
 		}
 	}
 }
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
-    	rx_buffer[rx_index] = rx_byte;
-    	rx_index++;
-    	if(rx_index == PACKET_LEN){
-    		/* Received full packet */
-    		osEventFlagsSet(lepton_flags_id, FLAGS_RX);
-    		rx_index = 0;
-    	}
+    	Circular_buffer_push(&circ_buffer, rx_byte);
+		osEventFlagsSet(lepton_flags_id, FLAGS_RX);
     	/* Continue reading */
     	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
     }
@@ -622,22 +639,17 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
 
 // Callback: timer has rolled over
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if (htim == &htim3 )
-	{
+	if (htim == &htim3){
 		if(test_data_index == sizeof(test_data)){
 			return;
 		}
-		rx_buffer[rx_index] = test_data[test_data_index];
+		rx_byte = test_data[test_data_index];
 		test_data_index++;
-		rx_index++;
-		//rx_buffer[rx_index] = rx_byte;
-		if(rx_index == PACKET_LEN){
-			/* Received full packet */
-			osEventFlagsSet(lepton_flags_id, FLAGS_RX);
-			rx_index = 0;
-		}
+		Circular_buffer_push(&circ_buffer, rx_byte);
+		osEventFlagsSet(lepton_flags_id, FLAGS_RX);
 		/* Continue reading */
 		//HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+
 	}
 }
 
