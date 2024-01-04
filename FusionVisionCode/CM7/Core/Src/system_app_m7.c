@@ -24,11 +24,18 @@ static bool Printout(void);
 static uint16_t image_buffer[480*320] = {0};
 
 static bool frame_event_flag = false;
-static bool frame_half_event_flag = false;
+static bool frame_line_event_flag = false;
 static bool printout_flag = false;
 
 static uint32_t line_scanned_amount = 0;
 static bool first_vsync = true;
+
+static uint32_t edge_algorithm = eEdgeAlgorithmSobel;
+
+static const uint32_t algorithm_line_num[eEdgeAlgorithmLast] = {
+		[eEdgeAlgorithmSobel] = 50,
+		[eEdgeAlgorithmRoberts] = 160
+};
 
 /* Executed before M4 is launched */
 bool System_APP_M7_PreInit(void){
@@ -64,7 +71,7 @@ bool System_APP_M7_Start(void){
 }
 
 bool System_APP_M7_Run(void){
-	/* Synchronization on new image frame received */
+	/* Event on full frame received from DCMI  */
 	if(frame_event_flag){
 		frame_event_flag = false;
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
@@ -86,24 +93,25 @@ bool System_APP_M7_Run(void){
 			Printout();
 			printout_flag = false;
 		}
+		Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
 		/* Start recording next frame */
 		line_scanned_amount = 0;
 		first_vsync = true;
+
 		HAL_DCMI_Resume(&hdcmi);
 	}
-	if(frame_half_event_flag) {
+	/* Event after some lines have been received from DCMI */
+	if(frame_line_event_flag) {
 		uint32_t screen_state = 0;
 		Shared_param_API_Read(eSharedParamScreenState, &screen_state);
 		if(screen_state == eScreenStateProcessed){
 			Diagnostics_APP_RecordStart(eDiagEventProcessing);
 			IMG_PROCESSING_APP_Compute(image_buffer);
-			//HAL_Delay(1);
 			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
-		frame_half_event_flag = false;
-		//UI_APP_DrawAll(image_buffer);
+		frame_line_event_flag = false;
 	}
 	return true;
 }
@@ -125,15 +133,16 @@ static bool Printout(void){
 	return true;
 }
 
-/* End of frame conversion IRQ */
+/* End of full frame conversion IRQ */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi){
 	HAL_DCMI_Suspend(hdcmi);
 	Diagnostics_APP_RecordEnd(eDiagEventCamera);
-	//line_scanned_amount = 0;
 	frame_event_flag = true;
 
 }
-
+/* Used to reset line amount after first vsync - because lines keep getting caluclated
+ * even when dcmi is suspended and after wakeup it is waiting for new frame start - vsync
+ * to capture data */
 void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
 	if(first_vsync){
 		line_scanned_amount = 0;
@@ -141,17 +150,17 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi){
 	}
 }
 /* Line end event, used for faster response than half transfer */
-//TODO: problem, doesn't improve time than just using half transfer irq
+//TODO: big improvement if line repsonse set at 3, find out why
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi){
 	line_scanned_amount++;
 	if(first_vsync == false){
-		if(line_scanned_amount == 3){
-			frame_half_event_flag = true;
+		if(line_scanned_amount == algorithm_line_num[edge_algorithm]){
+			frame_line_event_flag = true;
 		}
 	}
 }
 
 /* End of frame conversion IRQ */
-void HAL_DCMI_HalfFrameEventCallback(void){
+//void HAL_DCMI_HalfFrameEventCallback(void){
 	//frame_half_event_flag = true;
-}
+//}
