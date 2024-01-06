@@ -13,6 +13,7 @@
 #include "sync_api.h"
 #include "shared_param_api.h"
 #include "diagnostics_app.h"
+#include "lepton_app.h"
 #include "fonts.h"
 #include <string.h>
 
@@ -52,6 +53,7 @@ bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
 	IMG_PROCESSING_APP_Init(image_buffer);
+	Lepton_APP_Start(image_buffer);
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
@@ -66,12 +68,17 @@ bool System_APP_M7_Start(void){
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
 	/* Start camera conversion */
 	first_vsync = true;
-	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
+	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
-
+static uint8_t lepton_flag = 0x0;
 bool System_APP_M7_Run(void){
-	Lepton_APP_Run();
+	Lepton_APP_Run(&lepton_flag);
+	if(lepton_flag == 0x01){
+		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
+		lepton_flag = 0;
+	}
+	return true;
 	/* Event on full frame received from DCMI  */
 	if(frame_event_flag){
 		frame_event_flag = false;

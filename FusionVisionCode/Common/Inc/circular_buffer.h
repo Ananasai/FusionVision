@@ -9,6 +9,7 @@ typedef struct sCircularBuffer_t {
 	uint32_t head;
 	uint32_t tail;
 	uint32_t max;
+	bool overflow;
 }sCircularBuffer_t;
 
 bool Circular_buffer_create(sCircularBuffer_t *circ, uint32_t length);

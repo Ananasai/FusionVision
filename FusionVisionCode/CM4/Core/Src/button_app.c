@@ -138,10 +138,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	  }
   }
   /* Lepton VSYNC irq */
-  if(GPIO_Pin == LEPTON_VSYNC_Pin){
+  //if(GPIO_Pin == LEPTON_VSYNC_Pin){
 	  //#include "lepton_app.h"
 	  //Lepton_APP_VsyncIrq();
-  }
+  //} //TODO: VSYNC
   NVIC_EnableIRQ(EXTI0_IRQn);
   NVIC_EnableIRQ(EXTI15_10_IRQn);
 }

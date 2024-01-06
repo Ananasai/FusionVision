@@ -18,6 +18,7 @@ bool Circular_buffer_create(sCircularBuffer_t *circ, uint32_t length){
 	circ->buffer = (uint8_t *)calloc(length, sizeof(uint8_t));
 	circ->head = 0;
 	circ->tail = 0;
+	circ->overflow = false;
 	return true;
 }
 
@@ -39,6 +40,9 @@ bool Circular_buffer_push(sCircularBuffer_t *circ, uint8_t in){
 	}
 	*(circ->buffer+circ->head) = in;
 	Advance_pointer(circ->max, &(circ->head));
+	if(circ->head == circ->tail){
+		circ->overflow = true;
+	}
 	return true;
 }
 
