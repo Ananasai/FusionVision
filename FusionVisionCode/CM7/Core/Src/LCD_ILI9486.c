@@ -258,7 +258,7 @@ void ili9486_Init(void)
   LCD_IO_WriteCmd8(ILI9486_SLPOUT);    // Exit Sleep (0x11)
   HAL_Delay(200);
   LCD_IO_WriteCmd8(ILI9486_DISPON);    // Display on (0x29)
-  HAL_Delay(10);
+  HAL_Delay(300);
 }
 
 void ili9486_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
