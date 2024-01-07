@@ -15,6 +15,7 @@
 
 #define R2 25000
 #define VIN 5
+#define RESISTANCE_THRESHOLD 25000
 
 static void Lighting_app_thread(void *argument);
 static void Lighting_job_recAdc(void *payload);
@@ -54,5 +55,6 @@ static void Lighting_app_thread(void *argument){
 static void Lighting_job_recAdc(void *payload){
 	float *adc_val_v = (float *)payload;
 	float R1 = (float)(VIN * R2) / (float)(*adc_val_v) - R2;
-	//debug("Photo resistor: %.2f\r\n", R1);
+	HAL_GPIO_WritePin(IR_LED_PWR_GPIO_Port, IR_LED_PWR_Pin, R1 > RESISTANCE_THRESHOLD ? GPIO_PIN_RESET: GPIO_PIN_SET);
+	debug("Photo resistor voltage and resistance: %.2f %.2f\r\n", *adc_val_v, R1);
 }
