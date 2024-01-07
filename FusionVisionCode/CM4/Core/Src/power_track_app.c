@@ -56,7 +56,10 @@ static void Power_track_app_thread(void *argument){
 
 static void Power_track_job_recAdc(void *payload){
 	float *adc_val_v = (float *)payload;
-	avg_current_ma += *adc_val_v/G*R3/R4/RSHUNT*1000.0f;
+	/* Adjusting for OP-AMP input voltage offset */
+	float adjusted_adc_val = (G+1)*40.0f/1000000.0f+(*adc_val_v)/2.0f; //TODO: why 2?
+	float current = adjusted_adc_val*R3/R4/RSHUNT*1000.0f;
+	avg_current_ma += current;
 	adc_index++;
 	if(adc_index == INFO_INTERVAL){
 		avg_current_ma /= INFO_INTERVAL;
