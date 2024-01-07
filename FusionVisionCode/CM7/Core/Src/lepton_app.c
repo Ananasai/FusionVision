@@ -80,6 +80,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 		return false;
 	}
 	/* Lepton initialisation page 17 */
+	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_SET);
@@ -88,14 +89,19 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_SET);
 	HAL_Delay(1000);
-
+	/* Wait while Lepton boots */
 	while(Lepton_API_CheckBusy() != true){
-		debug("Failed\r\n");
 		HAL_Delay(100);
 	}
-	debug("Resp\r\n");
-
+	debug("Lepton active\r\n");
+	if(Lepton_API_SetGpio() == false){
+		error("Failed set GPIO\r\n");
+	}
 	while(1){};
+
+	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
+	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+	//while(1){};
 	/*
 	Lepton_API_ReadReg(0x2);
 
@@ -124,7 +130,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	debug("OEM Camera Software Revision 0x%x\r\n", Lepton_API_ReadData());
 
 	HAL_Delay(1000);
-	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+
 	//HAL_TIM_Base_Start_IT(&htim3);
 	 */
 
@@ -154,9 +160,6 @@ void Lepton_APP_Run(uint8_t *flag){
 				DEBUG_API_LOG("\r\n", NULL, NULL);
 			}
 		}
-		while(1){};
-
-		return; //TODO: DEBUG
 		if(packet_received){
 			if(circ_buffer.overflow){
 				error("Lepton buffer overflow\r\n");
