@@ -185,7 +185,7 @@ void Lepton_APP_Run(uint8_t *flag){
 			pixel_index = row * SCREEN_WIDTH + collumn;
 			/* Get every other pixel as AGC is on */
 			for(uint16_t i = 4; i < PACKET_DATA_LEN + 4; i += 2){
-				*(image_buffer + pixel_index) = 0xFAFA;//rx_buffer[i];
+				*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
 				pixel_index++;
 			}
 			calculated_packet++;

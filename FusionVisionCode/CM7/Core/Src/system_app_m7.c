@@ -57,6 +57,7 @@ bool System_APP_M7_Start(void){
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
+	HAL_Delay(200);
 	/* Display splash screen */
 	ili9486_DrawRGBImage(0, 0, 480, 320, (uint16_t *)splash_screen);
 	//HAL_Delay(10);
