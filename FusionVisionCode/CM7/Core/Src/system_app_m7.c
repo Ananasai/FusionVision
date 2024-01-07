@@ -60,6 +60,7 @@ bool System_APP_M7_Start(void){
 	HAL_Delay(200);
 	/* Display splash screen */
 	ili9486_DrawRGBImage(0, 0, 480, 320, (uint16_t *)splash_screen);
+	HAL_Delay(200);
 	//HAL_Delay(10);
 	/* Init camera */
 	ov2640_Init(0x60);

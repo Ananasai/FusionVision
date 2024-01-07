@@ -94,9 +94,9 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 		HAL_Delay(100);
 	}
 	debug("Lepton active\r\n");
-	if(Lepton_API_SetGpio() == false){
-		error("Failed set GPIO\r\n");
-	}
+	//if(Lepton_API_SetGpio() == false){
+	//	error("Failed set GPIO\r\n");
+	//}
 	//while(1){};
 	//while(1){};
 	/*
@@ -135,28 +135,28 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 }
 static bool first_run = true;
 void Lepton_APP_Run(uint8_t *flag){
-
 	if(first_run){
 		first_run = false;
 		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
-		HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer, 164);
 	}
 	if(rx_byte_flag){
 		rx_byte_flag = false;
+		first_run = true;
 		bool packet_received = false;
 		/* Received byte */
-		uint8_t circ_byte = 0;
-		while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
-			rx_buffer[rx_buffer_index] = circ_byte;
-			rx_buffer_index++;
-			if(rx_buffer_index == PACKET_DATA_LEN){
-				packet_received = true;
+		//uint8_t circ_byte = 0;
+		//while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
+			//rx_buffer[rx_buffer_index] = circ_byte;
+			//rx_buffer_index++;
+			//if(rx_buffer_index == PACKET_DATA_LEN){
+		packet_received = true;
 				//*flag = 0x01;
 				///* Start reading from zero */
-				rx_buffer_index = 0;
-				break;
-			}
-		}
+				//rx_buffer_index = 0;
+			//	break;
+			//}
+		//}
 		/*
 		DEBUG_API_LOG("PAcket: \r\n", NULL, NULL);
 		for(uint16_t i = 0; i < PACKET_DATA_LEN*50; i++){
@@ -173,6 +173,9 @@ void Lepton_APP_Run(uint8_t *flag){
 				error("Lepton buffer overflow\r\n");
 				circ_buffer.overflow = false;
 			}
+			if((rx_buffer[0] & 0x0F) == 0x0F){
+				return;
+			}
 
 			//TODO: could be different with telemetry enabled
 			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
@@ -185,7 +188,13 @@ void Lepton_APP_Run(uint8_t *flag){
 			pixel_index = row * SCREEN_WIDTH + collumn;
 			/* Get every other pixel as AGC is on */
 			for(uint16_t i = 4; i < PACKET_DATA_LEN + 4; i += 2){
-				*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
+				if(rx_buffer[i] > 0){
+					*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
+				}
+				else{
+					*(image_buffer + pixel_index) = 0x0000;
+				}
+				//*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
 				pixel_index++;
 			}
 			calculated_packet++;
@@ -194,8 +203,7 @@ void Lepton_APP_Run(uint8_t *flag){
 				calculated_packet = 0;
 				if(calculated_segment == 4){
 					calculated_segment = 0;
-					/* Start drawing */
-					first_run = true;
+					/* Start drawing  */
 					*flag = 0x01;
 					//HAL_SPI_Abort_IT(&hspi4);
 					HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
@@ -236,34 +244,19 @@ void Lepton_APP_Run(uint8_t *flag){
 	}
 }
 
-#pragma GCC pop_options
+
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
-    	Circular_buffer_push(&circ_buffer, rx_byte);
+    	//Circular_buffer_push(&circ_buffer, rx_byte);
+    	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
     	rx_byte_flag = true;
     	/* Continue reading */
     	//if(rx_buffer_index >= PACKET_LEN){return;}
-    	if(first_run == false){
-    		HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
-    	}
+    	//if(first_run == false){
+    	//	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+    	//}
     }
-}
-
-// Callback: timer has rolled over
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if (htim == &htim3){
-		//if(test_data_index == sizeof(test_data)){
-			return;
-		//}
-		//rx_byte = test_data[test_data_index];
-		//test_data_index++;
-		//Circular_buffer_push(&circ_buffer, rx_byte);
-		//rx_byte_flag = true;
-		/* Continue reading */
-		//HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
-
-	}
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
@@ -271,7 +264,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		HardFault_Handler(); //TODO: not working
 	}
 }
-
+#pragma GCC pop_options
 /* VSYNC EXTI in buttons file
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
