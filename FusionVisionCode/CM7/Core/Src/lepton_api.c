@@ -18,6 +18,7 @@
 #define DATA_LEN_REG 0x0006
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
+#define STRINGIFY(x) #x
 
 //TODO: figure out unions here
 typedef union uLeptonStatusRegister_t {
@@ -30,6 +31,51 @@ typedef union uLeptonStatusRegister_t {
 		unsigned int error_code : 8;
 	}data;
 }uLeptonStatusRegister_t;
+
+typedef enum eLeptonError_t {
+	LEP_OK = 0, /* Camera ok */
+	LEP_COMM_OK = LEP_OK, /* Camera comm ok (same as LEP_OK) */
+	LEP_ERROR = -1, /* Camera general error */
+	LEP_NOT_READY = -2, /* Camera not ready error */
+	LEP_RANGE_ERROR = -3, /* Camera range error */
+	LEP_CHECKSUM_ERROR = -4, /* Camera checksum error */
+	LEP_BAD_ARG_POINTER_ERROR = -5, /* Camera Bad argument error */
+	LEP_DATA_SIZE_ERROR = -6, /* Camera byte count error */
+	LEP_UNDEFINED_FUNCTION_ERROR = -7, /* Camera undefined function error */
+	LEP_FUNCTION_NOT_SUPPORTED = -8, /* Camera function not yet supported error */
+	LEP_DATA_OUT_OF_RANGE_ERROR = -9, /* Camera input DATA is out of valid range error */
+	LEP_COMMAND_NOT_ALLOWED = -11, /* Camera unable to execute command due to current camera
+	state */
+	/* OTP access errors */
+	LEP_OTP_WRITE_ERROR = -15, /*!< Camera OTP write error */
+	LEP_OTP_READ_ERROR = -16, /* double bit error detected (uncorrectible) */
+	LEP_OTP_NOT_PROGRAMMED_ERROR = -18, /* Flag read as non-zero */
+	/* I2C Errors */
+	LEP_ERROR_I2C_BUS_NOT_READY = -20, /* I2C Bus Error - Bus Not Avaialble */
+	LEP_ERROR_I2C_BUFFER_OVERFLOW = -22, /* I2C Bus Error - Buffer Overflow */
+	LEP_ERROR_I2C_ARBITRATION_LOST = -23, /* I2C Bus Error - Bus Arbitration Lost */
+	LEP_ERROR_I2C_BUS_ERROR = -24, /* I2C Bus Error - General Bus Error */
+	LEP_ERROR_I2C_NACK_RECEIVED = -25, /* I2C Bus Error - NACK Received */
+	LEP_ERROR_I2C_FAIL = -26, /* I2C Bus Error - General Failure */
+	/* Processing Errors */
+	LEP_DIV_ZERO_ERROR = -80, /* Attempted div by zero */
+	/* Comm Errors */
+	LEP_COMM_PORT_NOT_OPEN = -101, /* Comm port not open */
+	LEP_COMM_INVALID_PORT_ERROR = -102, /* Comm port no such port error */
+	LEP_COMM_RANGE_ERROR = -103, /* Comm port range error */
+	LEP_ERROR_CREATING_COMM = -104, /* Error creating comm */
+	LEP_ERROR_STARTING_COMM = -105, /* Error starting comm */
+	LEP_ERROR_CLOSING_COMM = -106, /* Error closing comm */
+	LEP_COMM_CHECKSUM_ERROR = -107, /* Comm checksum error */
+	LEP_COMM_NO_DEV = -108, /* No comm device */
+	LEP_TIMEOUT_ERROR = -109, /* Comm timeout error */
+	LEP_COMM_ERROR_WRITING_COMM = -110, /* Error writing comm */
+	LEP_COMM_ERROR_READING_COMM = -111, /* Error reading comm */
+	LEP_COMM_COUNT_ERROR = -112, /* Comm byte count error */
+	/* Other Errors */
+	LEP_OPERATION_CANCELED = -126, /* Camera operation canceled */
+	LEP_UNDEFINED_ERROR_CODE = -127 /* Undefined error */
+} eLeptonError_t;
 
 typedef enum eLeptonCommandType_t {
 	eLeptonCommandFirst = 0,
@@ -63,17 +109,19 @@ typedef enum eLeptonModuleId_t {
 
 /* Inspiration: https://github.com/groupgets/LeptonModule/blob/master/software/arduino_i2c/Lepton.ino#L210 */
 
-static bool Lepton_API_SetRegister(uint16_t reg){ //Can be used for sending data too
-	uint8_t tx_data[2] = {reg >> 8, reg & 0xFF};
-	return HAL_I2C_Master_Transmit(&hi2c4, LEPTON_ADDRESS, tx_data, 2, 10) == HAL_OK;
+static bool Lepton_API_WriteRegister(uint16_t reg, uint16_t data){
+	uint8_t tx_data[4] = {reg >> 8, reg & 0xFF, data >> 8, data & 0xFF};
+	return HAL_I2C_Master_Transmit(&hi2c4, LEPTON_ADDRESS, tx_data, 4, 10) == HAL_OK;
 }
 
-static bool Lepton_API_ReadRegister(uint16_t *reg){
+static bool Lepton_API_ReadRegister(uint16_t reg, uint16_t *out){
+	uint8_t tx_data[4] = {reg >> 8, reg & 0xFF};
+	HAL_I2C_Master_Transmit(&hi2c4, LEPTON_ADDRESS, tx_data, 2, 10);
 	uint8_t rx_data[2] = {0};
 	if(HAL_I2C_Master_Receive(&hi2c4, LEPTON_ADDRESS, rx_data, 2, 10) != HAL_OK){
 		return false;
 	}
-	*reg = (rx_data[0] << 8) | rx_data[1];
+	*out = (rx_data[0] << 8) | rx_data[1];
 	return true;
 }
 
@@ -82,7 +130,7 @@ static bool Lepton_API_SendCommand(eLeptonCommandType_t command,eLeptonModuleId_
 	while(Lepton_API_CheckBusy() != true){
 
 	}
-	Lepton_API_SetRegister(COMMAND_ID_REG);
+	//Lepton_API_WriteRegister(DATA_LEN_REG, 0x01); //TODO: not needed?
 	uint16_t command_word = 0x0000;
 	/* Set OEM bit */
 	if((module_id == eLeptonModuleOEM) || (module_id == eLeptonModuleRAD)){
@@ -92,7 +140,7 @@ static bool Lepton_API_SendCommand(eLeptonCommandType_t command,eLeptonModuleId_
 	command_word |= ((uint8_t)module_id << 8);
 	command_word |= (command_id << 2);
 	command_word |= (uint8_t)(command);
-	return Lepton_API_SetRegister(command_word);
+	return Lepton_API_WriteRegister(COMMAND_ID_REG, command_word);
 }
 
 static bool Lepton_API_ReadData(){
@@ -101,23 +149,22 @@ static bool Lepton_API_ReadData(){
 
 	}
 	/* Check data length */
-	Lepton_API_SetRegister(DATA_LEN_REG);
 	uint16_t data_length = 0;
-	Lepton_API_ReadRegister(&data_length);
+	Lepton_API_ReadRegister(DATA_LEN_REG, &data_length);
 	debug("Read data length: 0x%x\r\n", data_length);
 	for(uint8_t i = 0; i < data_length; i++){
 		uint16_t temp_data = 0x0000;
-		Lepton_API_ReadRegister(&temp_data);
+		Lepton_API_ReadRegister(DATA_LEN_REG + i + 1, &temp_data); //TODO: WILL NOT WORK BECAUSE NO INCREMENT ON SEPERATE REQUESTS
 		debug("Read data: 0x%x\r\n", temp_data);
 	}
 	return true;
 }
 
 bool Lepton_API_SetGpio(void){
-	//Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleOEM, 0x54);
-	//Lepton_API_ReadData();
-	Lepton_API_SendCommand(eLeptonCommandRun, eLeptonModuleSYS, 0x04 >> 2);
+	Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleSYS, 0x00);
 	Lepton_API_ReadData();
+	//Lepton_API_SendCommand(eLeptonCommandRun, eLeptonModuleSYS, 0x04 >> 2);
+	//Lepton_API_ReadData();
 	//Lepton_API_SendCommand(eLeptonCommandSet, eLeptonModuleOEM, 0x55);
 
 	return true;
@@ -128,9 +175,8 @@ bool Lepton_API_CheckBusy(void){
 		error("Lepton I2C unavailable\r\n");
 		return false;
 	}
-	Lepton_API_SetRegister(STATUS_REG);
 	uint16_t read_val = 0;
-	Lepton_API_ReadRegister(&read_val);
+	Lepton_API_ReadRegister(STATUS_REG, &read_val);
 	if((read_val & 0x01) == 0x01){
 		/* Camera busy */
 		return false;
@@ -142,6 +188,9 @@ bool Lepton_API_CheckBusy(void){
 	else if((read_val & 0x04) == 0x00){
 		/* Boot status unsucesfull */
 		return false;
+	}
+	if((read_val >> 8) != 0x00){
+		error("Lepton repsonse error: 0x%x %d\r\n", read_val >> 8, (int8_t)(read_val >> 8));
 	}
 	return true;
 }

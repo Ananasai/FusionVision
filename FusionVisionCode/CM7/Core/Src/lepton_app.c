@@ -97,10 +97,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	if(Lepton_API_SetGpio() == false){
 		error("Failed set GPIO\r\n");
 	}
-	while(1){};
-
-	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
-	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+	//while(1){};
 	//while(1){};
 	/*
 	Lepton_API_ReadReg(0x2);
@@ -136,8 +133,14 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 
 	return true;
 }
-
+static bool first_run = true;
 void Lepton_APP_Run(uint8_t *flag){
+	return;
+	if(first_run){
+		first_run = false;
+		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
+		HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+	}
 	if(rx_byte_flag){
 		rx_byte_flag = false;
 		bool packet_received = false;
@@ -146,20 +149,23 @@ void Lepton_APP_Run(uint8_t *flag){
 		while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
 			rx_buffer[rx_buffer_index] = circ_byte;
 			rx_buffer_index++;
-			if(rx_buffer_index == PACKET_DATA_LEN*50){
+			if(rx_buffer_index == PACKET_DATA_LEN){
 				packet_received = true;
-				*flag = 0x01;
+				//*flag = 0x01;
 				///* Start reading from zero */
 				rx_buffer_index = 0;
 				break;
 			}
 		}
+		DEBUG_API_LOG("PAcket: \r\n", NULL, NULL);
 		for(uint16_t i = 0; i < PACKET_DATA_LEN*50; i++){
 			DEBUG_API_LOG("0x%x ", NULL, NULL, rx_buffer[i]);
 			if(i % PACKET_DATA_LEN == 0){
 				DEBUG_API_LOG("\r\n", NULL, NULL);
 			}
 		}
+		return;
+
 		if(packet_received){
 			if(circ_buffer.overflow){
 				error("Lepton buffer overflow\r\n");
