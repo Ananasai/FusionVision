@@ -19,7 +19,7 @@
 #define FLAGS_RX 0x01
 #define FLAGS_ALL (FLAGS_RX)
 
-#define CIRC_BUF_LEN 34000
+#define CIRC_BUF_LEN 3200
 #define PACKET_DATA_LEN 160
 #define PACKET_IN_SEGMENT 60
 #define SEGMENT_DATA_LEN (PACKET_DATA_LEN * PACKET_IN_SEGMENT)
@@ -135,7 +135,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 }
 static bool first_run = true;
 void Lepton_APP_Run(uint8_t *flag){
-	return;
+
 	if(first_run){
 		first_run = false;
 		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
@@ -157,6 +157,7 @@ void Lepton_APP_Run(uint8_t *flag){
 				break;
 			}
 		}
+		/*
 		DEBUG_API_LOG("PAcket: \r\n", NULL, NULL);
 		for(uint16_t i = 0; i < PACKET_DATA_LEN*50; i++){
 			DEBUG_API_LOG("0x%x ", NULL, NULL, rx_buffer[i]);
@@ -165,22 +166,54 @@ void Lepton_APP_Run(uint8_t *flag){
 			}
 		}
 		return;
+		*/
 
 		if(packet_received){
 			if(circ_buffer.overflow){
 				error("Lepton buffer overflow\r\n");
 				circ_buffer.overflow = false;
 			}
-			/* Checked discard packet */
-			if((rx_buffer[0] & 0x0F) == 0x0F){
-				curr_packet_index = 0;
-				curr_segment_index = 0;
-				return;
+
+			//TODO: could be different with telemetry enabled
+			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
+			/* Is packet first in row or second */
+			uint32_t magic = 55;
+			packet_left_side = calculated_packet % 2 == 0;
+			uint16_t row = calculated_segment * 30 + (calculated_packet / 2);
+			uint16_t collumn = packet_left_side ? 80 : 0;
+			uint32_t magic2 = 69;
+			pixel_index = row * SCREEN_WIDTH + collumn;
+			/* Get every other pixel as AGC is on */
+			for(uint16_t i = 4; i < PACKET_DATA_LEN + 4; i += 2){
+				*(image_buffer + pixel_index) = 0xFAFA;//rx_buffer[i];
+				pixel_index++;
 			}
+			calculated_packet++;
+			if(calculated_packet == PACKET_IN_SEGMENT){
+				calculated_segment++;
+				calculated_packet = 0;
+				if(calculated_segment == 4){
+					calculated_segment = 0;
+					/* Start drawing */
+					first_run = true;
+					*flag = 0x01;
+					//HAL_SPI_Abort_IT(&hspi4);
+					HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+					HAL_Delay(200);
+					return; //TODO: clear buffer
+				}
+			}
+			return;
+			/* Checked discard packet */
+			//if((rx_buffer[0] & 0x0F) == 0x0F){
+			//	curr_packet_index = 0;
+			//	curr_segment_index = 0;
+			//	error("Discard\r\n");
+			//	return;
+			//}
 			/* Valid packet */
 			uint32_t packet_number = rx_buffer[1];
 			curr_packet_index = packet_number;
-			calculated_packet++;
 			debug("Pack: %d %d\r\n", curr_packet_index, calculated_packet);
 			if((packet_number == 20) || (calculated_packet == 20)){
 				uint32_t segment_number = rx_buffer[0] >> 4;
@@ -188,29 +221,17 @@ void Lepton_APP_Run(uint8_t *flag){
 				if(segment_number == 0){
 					curr_packet_index = 0;
 					curr_segment_index = 0;
+					error("Discard\r\n");
 					return;
 				}
 				curr_segment_index = segment_number - 1;
 				debug("Seg: %d %d\r\n", curr_segment_index, calculated_segment);
 			}
-			//TODO: could be different with telemetry enabled
-			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
-			/* Is packet first in row or second */
-			uint32_t magic = 55;
-			packet_left_side = curr_packet_index % 2 == 0;
-			pixel_index = curr_segment_index * SCREEN_WIDTH * 30;
-			uint32_t magic2 = 69;
-			if(packet_left_side == false){
-				pixel_index += PACKET_PIXEL_AMOUNT;
-			}
-			/* Get every other pixel as AGC is on */
-			for(uint16_t i = 4; i < PACKET_DATA_LEN; i += 2){
-				*(image_buffer + pixel_index) = rx_buffer[i];
-				pixel_index++;
-			}
-			if(curr_packet_index == PACKET_IN_SEGMENT - 1){
-				curr_segment_index++;
-			}
+
+			//if(curr_packet_index == PACKET_IN_SEGMENT - 1){
+			//	curr_segment_index++;
+			//}
+
 		}
 	}
 }
@@ -223,7 +244,9 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     	rx_byte_flag = true;
     	/* Continue reading */
     	//if(rx_buffer_index >= PACKET_LEN){return;}
-    	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+    	if(first_run == false){
+    		HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
+    	}
     }
 }
 
@@ -245,7 +268,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == LEPTON_VSYNC_Pin){
-
+		HardFault_Handler(); //TODO: not working
 	}
 }
 
