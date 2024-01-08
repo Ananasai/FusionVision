@@ -12,14 +12,14 @@
 #include "lepton_api.h"
 
 #pragma GCC push_options
-#pragma GCC optimize ("O0") //TODO: remove this
+#pragma GCC optimize ("O3") //TODO: remove this
 
 #define __DEBUG_FILE_NAME__ "LPT"
 
 #define FLAGS_RX 0x01
 #define FLAGS_ALL (FLAGS_RX)
 
-#define CIRC_BUF_LEN 3200
+#define CIRC_BUF_LEN 164 //TODO: CHANGE
 #define PACKET_DATA_LEN 160
 #define PACKET_IN_SEGMENT 60
 #define SEGMENT_DATA_LEN (PACKET_DATA_LEN * PACKET_IN_SEGMENT)
@@ -55,7 +55,9 @@
 static bool rx_byte_flag = false;
 
 static uint8_t rx_byte = 0x00;
-static uint8_t rx_buffer[CIRC_BUF_LEN] = {0}; //TODO: shorten?
+static uint8_t *rx_buffer; //TODO: shorten?
+static uint8_t rx_buffer1[CIRC_BUF_LEN] = {0}; //TODO: shorten?
+static uint8_t rx_buffer2[CIRC_BUF_LEN] = {0}; //TODO: shorten?
 static uint32_t rx_buffer_index = 0;
 static uint16_t curr_packet_index = 0;
 static uint16_t curr_segment_index = 0;
@@ -134,15 +136,33 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	return true;
 }
 static bool first_run = true;
+static bool use_buffer_1 = true;
 void Lepton_APP_Run(uint8_t *flag){
+	/* For first time transfers after some long period */
 	if(first_run){
 		first_run = false;
 		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer, 164);
+		if(use_buffer_1 == true){
+			HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+		}
+		else{
+			HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
+		}
+
 	}
 	if(rx_byte_flag){
+		rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
+		use_buffer_1 = !use_buffer_1;
+		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
+		if(use_buffer_1 == true){
+			HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+		}
+		else{
+			HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
+		}
+
 		rx_byte_flag = false;
-		first_run = true;
+		//first_run = true;
 		bool packet_received = false;
 		/* Received byte */
 		//uint8_t circ_byte = 0;
@@ -169,10 +189,11 @@ void Lepton_APP_Run(uint8_t *flag){
 		*/
 
 		if(packet_received){
-			if(circ_buffer.overflow){
-				error("Lepton buffer overflow\r\n");
-				circ_buffer.overflow = false;
-			}
+			//if(circ_buffer.overflow){
+			//	error("Lepton buffer overflow\r\n");
+			//	circ_buffer.overflow = false;
+			//}
+			//Check discard
 			if((rx_buffer[0] & 0x0F) == 0x0F){
 				return;
 			}
@@ -189,7 +210,7 @@ void Lepton_APP_Run(uint8_t *flag){
 			/* Get every other pixel as AGC is on */
 			for(uint16_t i = 4; i < PACKET_DATA_LEN + 4; i += 2){
 				if(rx_buffer[i] > 0){
-					*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
+					*(image_buffer + pixel_index) = rx_buffer[i];
 				}
 				else{
 					*(image_buffer + pixel_index) = 0x0000;
@@ -205,41 +226,11 @@ void Lepton_APP_Run(uint8_t *flag){
 					calculated_segment = 0;
 					/* Start drawing  */
 					*flag = 0x01;
-					//HAL_SPI_Abort_IT(&hspi4);
 					HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 					HAL_Delay(200);
 					return; //TODO: clear buffer
 				}
 			}
-			return;
-			/* Checked discard packet */
-			//if((rx_buffer[0] & 0x0F) == 0x0F){
-			//	curr_packet_index = 0;
-			//	curr_segment_index = 0;
-			//	error("Discard\r\n");
-			//	return;
-			//}
-			/* Valid packet */
-			uint32_t packet_number = rx_buffer[1];
-			curr_packet_index = packet_number;
-			debug("Pack: %d %d\r\n", curr_packet_index, calculated_packet);
-			if((packet_number == 20) || (calculated_packet == 20)){
-				uint32_t segment_number = rx_buffer[0] >> 4;
-				/* Check if discard or invalid packet */
-				if(segment_number == 0){
-					curr_packet_index = 0;
-					curr_segment_index = 0;
-					error("Discard\r\n");
-					return;
-				}
-				curr_segment_index = segment_number - 1;
-				debug("Seg: %d %d\r\n", curr_segment_index, calculated_segment);
-			}
-
-			//if(curr_packet_index == PACKET_IN_SEGMENT - 1){
-			//	curr_segment_index++;
-			//}
-
 		}
 	}
 }
