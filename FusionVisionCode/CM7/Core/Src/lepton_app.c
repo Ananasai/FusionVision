@@ -99,40 +99,6 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	//if(Lepton_API_SetGpio() == false){
 	//	error("Failed set GPIO\r\n");
 	//}
-	//while(1){};
-	//while(1){};
-	/*
-	Lepton_API_ReadReg(0x2);
-
-	Lepton_API_SendCommand(SYS, 0x28 >> 2 , GET);
-	debug("SYS Camera Customer Serial Number 0x%x\r\n", Lepton_API_ReadData());
-
-	Lepton_API_SendCommand(SYS, 0x2 , GET);
-	debug("SYS Flir Serial Number 0x%x\r\n", Lepton_API_ReadData());
-
-	Lepton_API_SendCommand(SYS, 0x0C >> 2 , GET);
-	debug("SYS Camera Uptime 0x%x\r\n", Lepton_API_ReadData());
-
-	Lepton_API_SendCommand(SYS, 0x14 >> 2 , GET);
-	debug("SYS Fpa Temperature Kelvin 0x%x\r\n", Lepton_API_ReadData());
-
-	Lepton_API_SendCommand(SYS, 0x10 >> 2 , GET);
-	debug("SYS Aux Temperature Kelvin 0x%x\r\n", Lepton_API_ReadData());
-
-	Lepton_API_SendCommand(OEM, 0x14 >> 2 , GET);
-	debug("OEM Chip Mask Revision 0x%x\r\n", Lepton_API_ReadData());
-
-	//Serial.println("OEM Part Number");
-	//lepton_command(OEM, 0x1C >> 2 , GET);
-	//read_data();
-	Lepton_API_SendCommand(OEM, 0x20 >> 2 , GET);
-	debug("OEM Camera Software Revision 0x%x\r\n", Lepton_API_ReadData());
-
-	HAL_Delay(1000);
-
-	//HAL_TIM_Base_Start_IT(&htim3);
-	 */
-
 	return true;
 }
 static bool first_run = true;
