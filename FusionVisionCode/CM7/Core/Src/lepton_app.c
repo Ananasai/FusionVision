@@ -135,22 +135,32 @@ void Lepton_APP_Run(uint8_t *flag){
 
 		/* Decode data */
 		uint16_t decoded_packet = rx_buffer[1];
-		uint16_t decoded_segment = rx_buffer[0] >> 4;
-		if((decoded_packet == 20) && (decoded_segment == 0)){
-			return;
+		uint16_t decoded_segment = (rx_buffer[0] >> 4) & 0x0F;
+		if(decoded_packet == 20){
+			if(decoded_segment == 0){
+				return;
+			}else{
+				calculated_segment = decoded_segment - 1;
+			}
 		}
 		//TODO: could be different with telemetry enabled
 		//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
 		/* Is packet first in row or second */
 		//debug("Pck: %d\r\n", decoded_packet);
 		packet_left_side = decoded_packet % 2 == 0;
-		uint16_t row = (3 - calculated_segment) * 30 + ((59- decoded_packet) / 2);
-		uint16_t collumn = packet_left_side ? 80 : 0;
+		uint16_t row = ((3 - calculated_segment) * 30 + ((59- decoded_packet) / 2))*1;
+		uint16_t collumn = packet_left_side ? 160 : 0;
 		pixel_index = row * SCREEN_WIDTH + collumn;
 		/* Get every other pixel as AGC is on */
 		for(uint16_t i = PACKET_DATA_LEN + 4; i > 3; i -= 2){
 			*(image_buffer + pixel_index) = rx_buffer[i];
+			//*(image_buffer + pixel_index + 1) = rx_buffer[i];
+			if(row > 1){
+				//*(image_buffer - SCREEN_WIDTH + pixel_index) = rx_buffer[i];
+				//*(image_buffer - SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
+			}
 			//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
+			//pixel_index += 2;
 			pixel_index++;
 		}
 		calculated_packet++;
