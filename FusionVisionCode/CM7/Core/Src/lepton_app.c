@@ -151,6 +151,7 @@ void Lepton_APP_Run(uint8_t *flag){
 
 	}
 	if(rx_byte_flag){
+		rx_byte_flag = false;
 		rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
 		use_buffer_1 = !use_buffer_1;
 		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
@@ -161,77 +162,42 @@ void Lepton_APP_Run(uint8_t *flag){
 			HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
 		}
 
-		rx_byte_flag = false;
-		//first_run = true;
-		bool packet_received = false;
-		/* Received byte */
-		//uint8_t circ_byte = 0;
-		//while(Circular_buffer_pop(&circ_buffer, &circ_byte)) {
-			//rx_buffer[rx_buffer_index] = circ_byte;
-			//rx_buffer_index++;
-			//if(rx_buffer_index == PACKET_DATA_LEN){
-		packet_received = true;
-				//*flag = 0x01;
-				///* Start reading from zero */
-				//rx_buffer_index = 0;
-			//	break;
-			//}
-		//}
-		/*
-		DEBUG_API_LOG("PAcket: \r\n", NULL, NULL);
-		for(uint16_t i = 0; i < PACKET_DATA_LEN*50; i++){
-			DEBUG_API_LOG("0x%x ", NULL, NULL, rx_buffer[i]);
-			if(i % PACKET_DATA_LEN == 0){
-				DEBUG_API_LOG("\r\n", NULL, NULL);
-			}
+		/* Check discard packet*/
+		if((rx_buffer[0] & 0x0F) == 0x0F){
+			return;
 		}
-		return;
-		*/
 
-		if(packet_received){
-			//if(circ_buffer.overflow){
-			//	error("Lepton buffer overflow\r\n");
-			//	circ_buffer.overflow = false;
-			//}
-			/* Check discard packet*/
-			if((rx_buffer[0] & 0x0F) == 0x0F){
-				return;
-			}
-
-			/* Decode data */
-			uint16_t decoded_packet = rx_buffer[1];
-			//TODO: could be different with telemetry enabled
-			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
-			/* Is packet first in row or second */
-			//debug("Pck: %d\r\n", decoded_packet);
-			packet_left_side = decoded_packet % 2 == 0;
-			uint16_t row = (3 - calculated_segment) * 30 + ((59- decoded_packet) / 2);
-			uint16_t collumn = packet_left_side ? 80 : 0;
-			pixel_index = row * SCREEN_WIDTH + collumn;
-			/* Get every other pixel as AGC is on */
-			for(uint16_t i = PACKET_DATA_LEN + 4; i > 3; i -= 2){
-				if(rx_buffer[i] > 0){
-					*(image_buffer + pixel_index) = rx_buffer[i];
-					//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
-				}
-				else{
-					*(image_buffer + pixel_index) = 0x0000;
-				}
-				//*(image_buffer + pixel_index) = rx_buffer[i] >> 3;
-				pixel_index++;
-			}
-			calculated_packet++;
-			if(calculated_packet == PACKET_IN_SEGMENT){
-				calculated_segment++;
-				calculated_packet = 0;
-				if(calculated_segment == 4){
-					calculated_segment = 0;
-					/* Start drawing  */
-					*flag = 0x01;
-					HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-					//HAL_Delay(200);
-					return; //TODO: clear buffer
-				}
+		/* Decode data */
+		uint16_t decoded_packet = rx_buffer[1];
+		uint16_t decoded_segment = rx_buffer[0] >> 4;
+		if((decoded_packet == 20) && (decoded_segment == 0)){
+			return;
+		}
+		//TODO: could be different with telemetry enabled
+		//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
+		/* Is packet first in row or second */
+		//debug("Pck: %d\r\n", decoded_packet);
+		packet_left_side = decoded_packet % 2 == 0;
+		uint16_t row = (3 - calculated_segment) * 30 + ((59- decoded_packet) / 2);
+		uint16_t collumn = packet_left_side ? 80 : 0;
+		pixel_index = row * SCREEN_WIDTH + collumn;
+		/* Get every other pixel as AGC is on */
+		for(uint16_t i = PACKET_DATA_LEN + 4; i > 3; i -= 2){
+			*(image_buffer + pixel_index) = rx_buffer[i];
+			//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
+			pixel_index++;
+		}
+		calculated_packet++;
+		if(calculated_packet == PACKET_IN_SEGMENT){
+			calculated_segment++;
+			calculated_packet = 0;
+			if(calculated_segment == 4){
+				calculated_segment = 0;
+				/* Start drawing  */
+				*flag = 0x01;
+				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+				//HAL_Delay(200);
+				return; //TODO: clear buffer
 			}
 		}
 	}
