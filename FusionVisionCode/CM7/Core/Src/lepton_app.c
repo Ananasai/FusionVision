@@ -193,24 +193,26 @@ void Lepton_APP_Run(uint8_t *flag){
 			//	error("Lepton buffer overflow\r\n");
 			//	circ_buffer.overflow = false;
 			//}
-			//Check discard
+			/* Check discard packet*/
 			if((rx_buffer[0] & 0x0F) == 0x0F){
 				return;
 			}
 
+			/* Decode data */
+			uint16_t decoded_packet = rx_buffer[1];
 			//TODO: could be different with telemetry enabled
 			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
 			/* Is packet first in row or second */
-			uint32_t magic = 55;
+			//debug("Pck: %d\r\n", decoded_packet);
 			packet_left_side = calculated_packet % 2 == 0;
-			uint16_t row = calculated_segment * 30 + (calculated_packet / 2);
+			uint16_t row = (3 - calculated_segment) * 30 + ((59- calculated_packet) / 2);
 			uint16_t collumn = packet_left_side ? 80 : 0;
-			uint32_t magic2 = 69;
 			pixel_index = row * SCREEN_WIDTH + collumn;
 			/* Get every other pixel as AGC is on */
-			for(uint16_t i = 4; i < PACKET_DATA_LEN + 4; i += 2){
+			for(uint16_t i = PACKET_DATA_LEN + 4; i  > 4; i -= 2){
 				if(rx_buffer[i] > 0){
 					*(image_buffer + pixel_index) = rx_buffer[i];
+					//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
 				}
 				else{
 					*(image_buffer + pixel_index) = 0x0000;
@@ -227,7 +229,7 @@ void Lepton_APP_Run(uint8_t *flag){
 					/* Start drawing  */
 					*flag = 0x01;
 					HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-					HAL_Delay(200);
+					//HAL_Delay(200);
 					return; //TODO: clear buffer
 				}
 			}
