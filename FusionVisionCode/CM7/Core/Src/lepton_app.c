@@ -204,8 +204,8 @@ void Lepton_APP_Run(uint8_t *flag){
 			//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
 			/* Is packet first in row or second */
 			//debug("Pck: %d\r\n", decoded_packet);
-			packet_left_side = calculated_packet % 2 == 0;
-			uint16_t row = (3 - calculated_segment) * 30 + ((59- calculated_packet) / 2);
+			packet_left_side = decoded_packet % 2 == 0;
+			uint16_t row = (3 - calculated_segment) * 30 + ((59- decoded_packet) / 2);
 			uint16_t collumn = packet_left_side ? 80 : 0;
 			pixel_index = row * SCREEN_WIDTH + collumn;
 			/* Get every other pixel as AGC is on */
