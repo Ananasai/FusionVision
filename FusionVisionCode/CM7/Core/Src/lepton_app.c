@@ -68,7 +68,6 @@ static bool packet_left_side = false;
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
-
 static void Lepton_APP_StartReceive(void){
 	static bool use_buffer_1 = true;
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
@@ -157,8 +156,6 @@ void Lepton_APP_Run(uint8_t *flag){
 				*(image_buffer - SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
 				*(image_buffer - SCREEN_WIDTH + pixel_index + 2) = rx_buffer[i];
 			}
-			//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
-			//pixel_index += 2;
 			pixel_index += 3;
 		}
 		calculated_packet++;
@@ -170,36 +167,23 @@ void Lepton_APP_Run(uint8_t *flag){
 				/* Start drawing  */
 				*flag = 0x01;
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-				//HAL_Delay(200);
-				return; //TODO: clear buffer
+				return;
 			}
 		}
 	}
 }
 
-
-
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
-    	//Circular_buffer_push(&circ_buffer, rx_byte);
     	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
     	rx_byte_flag = true;
-    	/* Continue reading */
-    	//if(rx_buffer_index >= PACKET_LEN){return;}
-    	//if(first_run == false){
-    	//	HAL_SPI_Receive_IT(&hspi4, &rx_byte, 1);
-    	//}
     }
 }
 
+/* Sadly VSYNC not configurable */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == LEPTON_VSYNC_Pin){
 		HardFault_Handler(); //TODO: not working
 	}
 }
 #pragma GCC pop_options
-/* VSYNC EXTI in buttons file
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-
-}
-*/
