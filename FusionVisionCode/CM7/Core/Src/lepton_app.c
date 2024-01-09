@@ -68,6 +68,20 @@ static bool packet_left_side = false;
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
+
+static void Lepton_APP_StartReceive(void){
+	static bool use_buffer_1 = true;
+	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
+	if(use_buffer_1 == true){
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+	}
+	else{
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
+	}
+	rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
+	use_buffer_1 = !use_buffer_1;
+}
+
 bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	if(new_image_buffer == NULL){
 		return false;
@@ -92,37 +106,17 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 		HAL_Delay(100);
 	}
 	debug("Lepton active\r\n");
+	Lepton_APP_StartReceive();
 	//if(Lepton_API_SetGpio() == false){
 	//	error("Failed set GPIO\r\n");
 	//}
 	return true;
 }
-static bool first_run = true;
-static bool use_buffer_1 = true;
+
 void Lepton_APP_Run(uint8_t *flag){
-	/* For first time transfers after some long period */
-	if(first_run){
-		first_run = false;
-		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
-		if(use_buffer_1 == true){
-			HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
-		}
-		else{
-			HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
-		}
-	}
 	if(rx_byte_flag){
 		rx_byte_flag = false;
-		rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
-		use_buffer_1 = !use_buffer_1;
-		HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
-		if(use_buffer_1 == true){
-			HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
-		}
-		else{
-			HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
-		}
-
+		Lepton_APP_StartReceive();
 		/* Check discard packet*/
 		if((rx_buffer[0] & 0x0F) == 0x0F){
 			return;
@@ -162,11 +156,6 @@ void Lepton_APP_Run(uint8_t *flag){
 				*(image_buffer - SCREEN_WIDTH + pixel_index) = rx_buffer[i];
 				*(image_buffer - SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
 				*(image_buffer - SCREEN_WIDTH + pixel_index + 2) = rx_buffer[i];
-				if(row % 2 == 0){
-					*(image_buffer - 2*SCREEN_WIDTH + pixel_index) = rx_buffer[i];
-					*(image_buffer - 2*SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
-					*(image_buffer - 2*SCREEN_WIDTH + pixel_index + 2) = rx_buffer[i];
-				}
 			}
 			//*(image_buffer + pixel_index) = (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x3C00) + (rx_buffer[i] | (rx_buffer[i-1] << 8) & 0x03E0) + ((rx_buffer[i] | rx_buffer[i-1] << 8) & 0x001F);
 			//pixel_index += 2;
