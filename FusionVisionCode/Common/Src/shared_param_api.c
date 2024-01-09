@@ -15,7 +15,8 @@ static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamScreenState, "Screen", sizeof(uint32_t), eScreenStatePassthrough, eScreenStateFirst, eScreenStateLast),
 	NEW_PARAM(eSharedParamScreenOptim, "Optimisation", sizeof(uint32_t), eScreenOptimNone, eScreenOptimFirst, eScreenOptimLast),
 	NEW_PARAM(eSharedParamEdgeAlgorithm, "Algorithm", sizeof(uint32_t), eEdgeAlgorithmSobel, eEdgeAlgorithmFirst, eEdgeAlgorithmLast),
-	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100)
+	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100),
+	NEW_PARAM(eSharedParamIrLighting, "Lighting", sizeof(uint32_t), 0, 0, 1),
 };
 
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
@@ -62,7 +63,7 @@ bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in){
 		return false;
 	}
 	/* Indicate to M7 that new visual configuration written */
-	if(param > eSharedParamFirst){
+	if(param >= eSharedParamFirst){
 		Sync_API_TakeSemaphore(eSemaphoreUiUpdate);
 		Sync_API_ReleaseSemaphore(eSemaphoreUiUpdate);
 	}
