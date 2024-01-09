@@ -134,6 +134,8 @@ void Lepton_APP_Run(uint8_t *flag){
 		if(decoded_packet == 20){
 			if(decoded_segment == 0){
 				return;
+			} else if(decoded_segment > 4){
+				return;
 			}else{
 				//calculated_segment = decoded_segment - 1; //Sometime gives 200+
 			}

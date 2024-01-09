@@ -79,6 +79,10 @@ bool System_APP_M7_Run(void){
 	if(lepton_flag == 0x01){
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 		lepton_flag = 0;
+		if(printout_flag){
+					Printout();
+					printout_flag = false;
+				}
 	}
 	return true;
 	/* Event on full frame received from DCMI  */
