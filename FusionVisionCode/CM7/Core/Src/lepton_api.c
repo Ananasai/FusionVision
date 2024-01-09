@@ -152,6 +152,9 @@ typedef enum eLeptonModuleId_t {
 /* Inspiration: https://github.com/groupgets/LeptonModule/blob/master/software/arduino_i2c/Lepton.ino#L210 */
 
 static bool Lepton_API_WriteRegister(uint16_t reg, uint16_t data){
+	while(Lepton_API_CheckBusy() != true){
+
+	}
 	uint8_t tx_data[4] = {reg >> 8, reg & 0xFF, data >> 8, data & 0xFF};
 	return HAL_I2C_Master_Transmit(&hi2c4, LEPTON_ADDRESS, tx_data, 4, 10) == HAL_OK;
 }
@@ -203,7 +206,7 @@ static bool Lepton_API_ReadData(){
 	}
 	return true;
 }
-
+//TODO: is not working?
 bool Lepton_API_SetGpio(void){
 	Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleOEM, 0x54);
 	Lepton_API_ReadData();
@@ -213,6 +216,19 @@ bool Lepton_API_SetGpio(void){
 	Lepton_API_SendCommand(eLeptonCommandSet, eLeptonModuleOEM, 0x54);
 
 	Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleOEM, 0x54);
+	Lepton_API_ReadData();
+	return true;
+}
+
+bool Lepton_API_EnableAGC(void){
+	Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleAGC, 0x00);
+	Lepton_API_ReadData();
+
+	Lepton_API_WriteRegister(DATA_LEN_REG, 0x0001);
+	Lepton_API_WriteRegister(DATA0_REG, 0x0001);
+	Lepton_API_SendCommand(eLeptonCommandSet, eLeptonModuleAGC, 0x00);
+
+	Lepton_API_SendCommand(eLeptonCommandGet, eLeptonModuleAGC, 0x00);
 	Lepton_API_ReadData();
 	return true;
 }

@@ -104,11 +104,18 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	while(Lepton_API_CheckBusy() != true){
 		HAL_Delay(100);
 	}
+
+	if(Lepton_API_EnableAGC() == false){
+		error("Failed set AGC\r\n");
+	}
+
 	debug("Lepton active\r\n");
+
 	Lepton_APP_StartReceive();
 	//if(Lepton_API_SetGpio() == false){
 	//	error("Failed set GPIO\r\n");
 	//}
+
 	return true;
 }
 
@@ -143,7 +150,7 @@ void Lepton_APP_Run(uint8_t *flag){
 		uint16_t collumn = packet_left_side ? 240 : 0; /* 240 - middle of screen, 3*80*/
 		pixel_index = row * SCREEN_WIDTH + collumn;
 		/* Get every other pixel as AGC is on */
-		for(uint16_t i = PACKET_DATA_LEN + 4; i > 3; i -= 2){
+		for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 			if(pixel_index > 480*320){
 				error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn, calculated_segment, decoded_packet);
 				continue;

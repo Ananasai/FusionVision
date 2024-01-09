@@ -15,6 +15,7 @@ extern I2C_HandleTypeDef hi2c4;
 
 bool Lepton_API_CheckBusy(void);
 bool Lepton_API_SetGpio(void);
+bool Lepton_API_EnableAGC(void);
 
 
 #endif /* INC_LEPTON_API_H_ */
