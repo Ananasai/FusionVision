@@ -69,16 +69,18 @@ static bool packet_left_side = false;
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
+static uint8_t packet_numbers[60] = {0};
+
 static void Lepton_APP_StartReceive(void){
 	static bool use_buffer_1 = true;
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
 	if(use_buffer_1 == true){
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
-	}
-	else{
 		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
 	}
-	rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
+	else{
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+	}
+	rx_buffer = use_buffer_1 ? rx_buffer2 : rx_buffer1;
 	use_buffer_1 = !use_buffer_1;
 }
 
@@ -100,7 +102,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_SET);
-	HAL_Delay(100);
+	HAL_Delay(1000);
 	/* Wait while Lepton boots */
 	//while(Lepton_API_CheckBusy() != true){
 	//	HAL_Delay(100);
@@ -120,6 +122,9 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	return true;
 }
 
+static uint16_t last_decoded_packet = 0;
+static uint16_t zero_amount = 0;
+
 void Lepton_APP_Run(uint8_t *flag){
 	if(rx_byte_flag){
 		rx_byte_flag = false;
@@ -128,22 +133,44 @@ void Lepton_APP_Run(uint8_t *flag){
 		if((rx_buffer[0] & 0x0F) == 0x0F){
 			return;
 		}
-
 		/* Decode data */
 		uint16_t decoded_packet = rx_buffer[1];
 		uint16_t decoded_segment = (rx_buffer[0] >> 4) & 0x0F;
 		if(decoded_packet == 20){
 			if(decoded_segment == 0){
-				return;
+				//return;
 			} else if(decoded_segment > 4){
-				return;
+				//return;
 			}else{
 				//calculated_segment = decoded_segment - 1; //Sometime gives 200+
 			}
 		}
-		if(decoded_packet > 60){
+		if(decoded_packet >= 60){
 			return;
 		}
+		if(decoded_packet == 0){
+			zero_amount++;
+			if(zero_amount > 100){
+				zero_amount = 0;
+				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+				DEBUG_API_LOG("RESET\r\n", NULL, NULL);
+				HAL_Delay(1000);
+			}
+		}else{
+			zero_amount = 0;
+		}
+		DEBUG_API_LOG("%d %d\r\n", NULL, NULL, decoded_packet, decoded_segment);
+		return;
+
+
+
+		if(decoded_packet != last_decoded_packet + 1){
+			last_decoded_packet = 0;
+			return;
+		}
+		last_decoded_packet = decoded_packet;
+
+		packet_numbers[calculated_packet] = decoded_packet;
 		//TODO: could be different with telemetry enabled
 		//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
 		/* Is packet first in row or second */
@@ -174,11 +201,16 @@ void Lepton_APP_Run(uint8_t *flag){
 			calculated_segment++;
 			calculated_packet = 0;
 			if(calculated_segment == 4){
+				last_decoded_packet = 0;
+				//debug("Packets: \r\n");
+				for(uint8_t i = 0; i < 60; i++){
+					//debug("%d\r\n", packet_numbers[i]);
+				}
 				calculated_segment = 0;
 				/* Start drawing  */
 				debug("Done\r\n");
-				*flag = 0x01;
-				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+				//*flag = 0x01;
+				//HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 				return;
 			}
 		}

@@ -53,7 +53,7 @@ bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
 	IMG_PROCESSING_APP_Init(image_buffer);
-	Lepton_APP_Start(image_buffer);
+
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
@@ -68,6 +68,7 @@ bool System_APP_M7_Start(void){
 	Diagnostics_APP_Start();
 	Diagnostics_APP_RecordStart(eDiagEventFrame);
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
+	Lepton_APP_Start(image_buffer);
 	/* Start camera conversion */
 	first_vsync = true;
 	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
