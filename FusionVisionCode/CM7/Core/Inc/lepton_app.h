@@ -13,8 +13,8 @@
 #include <stdint.h>
 
 extern SPI_HandleTypeDef hspi4;
-extern TIM_HandleTypeDef htim3;
 extern I2C_HandleTypeDef hi2c4;
+extern TIM_HandleTypeDef htim4;
 
 void Lepton_APP_VsyncIrq(void);
 bool Lepton_APP_Start(uint16_t *new_image_buffer);

@@ -53,6 +53,7 @@
  * RESET_L - active low reset
  * */
 static bool rx_byte_flag = false;
+static bool continue_rx_flag = false;
 
 static uint8_t *rx_buffer;
 static uint8_t rx_buffer1[CIRC_BUF_LEN] = {0}; //TODO: shorten?
@@ -99,15 +100,15 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(LEPTON_RST_GPIO_Port, LEPTON_RST_Pin, GPIO_PIN_SET);
-	HAL_Delay(1000);
+	HAL_Delay(100);
 	/* Wait while Lepton boots */
-	while(Lepton_API_CheckBusy() != true){
-		HAL_Delay(100);
-	}
+	//while(Lepton_API_CheckBusy() != true){
+	//	HAL_Delay(100);
+	//}
 
-	if(Lepton_API_EnableAGC() == false){
-		error("Failed set AGC\r\n");
-	}
+	//if(Lepton_API_EnableAGC() == false){
+	//	error("Failed set AGC\r\n");
+	//}
 
 	debug("Lepton active\r\n");
 
@@ -148,8 +149,8 @@ void Lepton_APP_Run(uint8_t *flag){
 		/* Is packet first in row or second */
 		//debug("Pck: %d\r\n", decoded_packet);
 		packet_left_side = decoded_packet % 2 == 0;
-		uint16_t row = ((3 - calculated_segment) * 30 + ((59- decoded_packet) / 2))*2;
-		uint16_t collumn = packet_left_side ? 240 : 0; /* 240 - middle of screen, 3*80*/
+		uint16_t row = ((3 - calculated_segment) * 30 + ((59- decoded_packet) / 2));//*2;
+		uint16_t collumn = packet_left_side ? 80 : 0; /* 240 - middle of screen, 3*80*/
 		pixel_index = row * SCREEN_WIDTH + collumn;
 		/* Get every other pixel as AGC is on */
 		for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
@@ -158,14 +159,15 @@ void Lepton_APP_Run(uint8_t *flag){
 				continue;
 			}
 			*(image_buffer + pixel_index) = rx_buffer[i];
-			*(image_buffer + pixel_index + 1) = rx_buffer[i];
-			*(image_buffer + pixel_index + 2) = rx_buffer[i];
-			if(row > 1){
-				*(image_buffer - SCREEN_WIDTH + pixel_index) = rx_buffer[i];
-				*(image_buffer - SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
-				*(image_buffer - SCREEN_WIDTH + pixel_index + 2) = rx_buffer[i];
-			}
-			pixel_index += 3;
+			//*(image_buffer + pixel_index + 1) = rx_buffer[i];
+			//*(image_buffer + pixel_index + 2) = rx_buffer[i];
+			//if(row > 1){
+				//*(image_buffer - SCREEN_WIDTH + pixel_index) = rx_buffer[i];
+				//*(image_buffer - SCREEN_WIDTH + pixel_index + 1) = rx_buffer[i];
+				//*(image_buffer - SCREEN_WIDTH + pixel_index + 2) = rx_buffer[i];
+			//}
+			//pixel_index += 3;
+			pixel_index += 1;
 		}
 		calculated_packet++;
 		if(calculated_packet == PACKET_IN_SEGMENT){
@@ -174,11 +176,20 @@ void Lepton_APP_Run(uint8_t *flag){
 			if(calculated_segment == 4){
 				calculated_segment = 0;
 				/* Start drawing  */
+				debug("Done\r\n");
 				*flag = 0x01;
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 				return;
 			}
 		}
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
+	if(htim == &htim4){
+		//debug("a\r\n");
+		//Lepton_APP_StartReceive();
+		continue_rx_flag = true;
 	}
 }
 
