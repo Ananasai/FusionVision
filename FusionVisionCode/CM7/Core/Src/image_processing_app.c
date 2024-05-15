@@ -10,7 +10,6 @@
 #include "image_processing_app.h"
 #include "shared_param_api.h"
 #include "debug_api.h"
-#include <arm_math.h>
 #include <stdlib.h>
 
 #define __DEBUG_FILE_NAME__ "PROC"
