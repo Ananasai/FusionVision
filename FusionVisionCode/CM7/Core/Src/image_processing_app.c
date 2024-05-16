@@ -10,16 +10,15 @@
 #include "image_processing_app.h"
 #include "shared_param_api.h"
 #include "debug_api.h"
-#include <arm_math.h>
 #include <stdlib.h>
 
 #define __DEBUG_FILE_NAME__ "PROC"
 
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 10
+#define SCREEN_HEIGHT 10
 
-#define COMPUTE_WIDTH 480
-#define COMPUTE_HEIGHT 320
+#define COMPUTE_WIDTH 10
+#define COMPUTE_HEIGHT 10
 
 #define EDGE_COLOUR 0xDD62
 

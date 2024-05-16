@@ -22,7 +22,7 @@
 static void Printout_IRQ(void);
 static bool Printout(void);
 
-static uint16_t image_buffer[480*320] = {0};
+static uint16_t image_buffer[10*10] = {0};
 
 static bool frame_event_flag = false;
 static bool frame_line_event_flag = false;

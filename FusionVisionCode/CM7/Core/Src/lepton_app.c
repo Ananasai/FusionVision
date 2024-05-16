@@ -27,8 +27,8 @@
 #define PACKET_PIXEL_AMOUNT 80
 #define SEGMENT_PIXEL_AMOUNT (PACKET_PIXEL_AMOUNT * PACKET_IN_SEGMENT)
 
-#define FRAME_WIDTH 160
-#define FRAME_HEIGHT 120
+#define FRAME_WIDTH 10
+#define FRAME_HEIGHT 10
 
 /* DATASHEET: https://cdn.sparkfun.com/assets/f/6/3/4/c/Lepton_Engineering_Datasheet_Rev200.pdf */
 /* I2C registers: https://cdn.sparkfun.com/assets/0/6/d/2/e/16465-FLIRLepton-SoftwareIDD.pdf */
@@ -69,17 +69,39 @@ static bool packet_left_side = false;
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
+#define all_packets_amount 3000
+static uint8_t all_received_data[164*all_packets_amount] = {0};
+static uint32_t all_received_data_idx = 0;
+
+
 static void Lepton_APP_StartReceive(void){
-	static bool use_buffer_1 = true;
+	//static bool use_buffer_1 = true;
+	if(all_received_data_idx == all_packets_amount*164) {
+		//Printout
+		for(uint16_t y = 0; y < all_packets_amount; y++){
+			for(uint16_t x = 0; x < 164; x++){
+				DEBUG_API_LOG("%d,", NULL, NULL, all_received_data[y * 164 + x]);
+//				if(x % 1 == 0){
+//					DEBUG_API_LOG("\r\n", NULL, NULL);
+//				}
+			}
+			DEBUG_API_LOG("\r\n", NULL, NULL);
+		}
+		while(1) {};
+	}
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
+	HAL_SPI_Receive_DMA(&hspi4, all_received_data + all_received_data_idx, 164);
+	all_received_data_idx += 164;
+	/*
 	if(use_buffer_1 == true){
 		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
 	}
 	else{
 		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
 	}
-	rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
-	use_buffer_1 = !use_buffer_1;
+	*/
+	//rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
+	//use_buffer_1 = !use_buffer_1;
 }
 
 bool Lepton_APP_Start(uint16_t *new_image_buffer){
@@ -121,9 +143,11 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 }
 
 void Lepton_APP_Run(uint8_t *flag){
+
 	if(rx_byte_flag){
 		rx_byte_flag = false;
 		Lepton_APP_StartReceive();
+		return;
 		/* Check discard packet*/
 		if((rx_buffer[0] & 0x0F) == 0x0F){
 			return;
