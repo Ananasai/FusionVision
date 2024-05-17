@@ -140,9 +140,17 @@ static inline void DrawPixel(uint8_t segment, uint8_t packet, uint8_t pixel_idx)
 	uint8_t line = 122 - (30 * segment) - ((uint8_t)(packet / 2));
 	uint8_t collumn_start = (packet % 2) == 0 ? 80 : 0;
 	*(image_buffer + line * SCREEN_WIDTH + collumn_start + (80 - pixel_idx)) = 0xFFFF;
-
 }
 
+typedef enum eLaptonParsingState {
+	eLeptonParsingStateFirst = 0,
+	eLeptonParsingStateWaiting = eLeptonParsingStateFirst,      /*Before parsing segment */
+	eLeptonParsingStateValidSegment,                            /* Correct segment received */
+	eLeptonParsingStateInvalidSegment,                          /* Invalid segment if TTT = 0 */
+	eLeptonParsingStateLast
+}eLaptonParsingState_t;
+
+eLaptonParsingState_t current_parsing_state = eLeptonParsingStateWaiting;
 uint16_t decoded_segment = 0;
 void Lepton_APP_Run(uint8_t *flag){
 	if(rx_byte_flag){
@@ -170,56 +178,20 @@ void Lepton_APP_Run(uint8_t *flag){
 			return;
 		}
 
-
-		//
-		//TODO: could be different with telemetry enabled
-		//uint16_t pixel_index = curr_segment_index * SEGMENT_PIXEL_AMOUNT + curr_packet_index * PACKET_PIXEL_AMOUNT;
-		/* Is packet first in row or second */
-
-		/*
-		 * DrawLine(1, 0);
-			DrawLine(1, 2);
-			DrawLine(1, 5);
-			DrawLine(2, 0);
-			DrawLine(3, 0);
-			DrawLine(4, 0);
-			DrawLine(4, 59);
-			DrawPixel(4, 58, 0);
-			uint8_t colour_buffer[160] = {0};
-			memset(colour_buffer, 0xFF, 80);
-			memset(colour_buffer + 80, 0x11, 80);
-			DrawLineBuffer(4, 56, colour_buffer);
-		 */
-		//DrawLineBuffer(calculated_segment, decoded_packet, rx_buffer + 2);
-		/*
-		 * segment--;
-			uint8_t line = 120 - (30 * segment) - ((uint8_t)(packet / 2));
-			uint8_t collumn_start = (packet % 2) == 0 ? 80 : 0;
-			for(uint8_t i = 0; i < 80; i++) {
-				//uint16_t colour = *(line_buffer + i*2) + *(line_buffer + i*2 + 1) * 256;
-				uint16_t colour = *(line_buffer + i*2) >> 3;
-				*(image_buffer + (80 - i) + line * SCREEN_WIDTH + collumn_start) = colour;
+		if(decoded_segment != 0) {
+			uint16_t row = 119 - (30 * calculated_segment) - ((uint8_t)(decoded_packet / 2));
+			uint16_t collumn_start = decoded_packet % 2 == 0 ? 80 : 0;
+			uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
+			for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
+				if(pixel_index > 480*320){
+					error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, calculated_segment, decoded_packet);
+					continue;
+				}
+				*(image_buffer + pixel_index) = rx_buffer[i];
+				pixel_index += 1;
 			}
-		 * */
-		uint16_t row = 119 - (30 * calculated_segment) - ((uint8_t)(decoded_packet / 2));
-		uint16_t collumn_start = decoded_packet % 2 == 0 ? 80 : 0;
-		uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
-
-//		for(uint16_t i = 0; i < 80; i++) {
-//			*(image_buffer + pixel_index + (80 - i)) = rx_buffer[2 + i*2];
-//		}
-
-		for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
-			if(pixel_index > 480*320){
-				error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, calculated_segment, decoded_packet);
-				continue;
-			}
-			if(decoded_segment == 0) {
-				continue;
-			}
-			*(image_buffer + pixel_index) = rx_buffer[i];
-			pixel_index += 1;
 		}
+
 
 		calculated_packet++;
 		if(calculated_packet == PACKET_IN_SEGMENT){
