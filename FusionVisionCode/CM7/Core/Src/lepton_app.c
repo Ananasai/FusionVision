@@ -90,6 +90,20 @@ static void Lepton_APP_StartReceive(void){
 	use_buffer_1 = !use_buffer_1;
 }
 
+static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
+	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
+	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
+	uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
+	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
+		if(pixel_index > 480*320){
+			error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, segment, packet);
+			continue;
+		}
+		*(image_buffer + pixel_index) = buffer[i];
+		pixel_index += 1;
+	}
+}
+
 bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	if(new_image_buffer == NULL){
 		return false;
@@ -123,6 +137,9 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	return true;
 }
 
+uint8_t start_buffer[PACKET_FULL_LEN * 20] = {0};
+uint8_t start_buffer_idx = 0;
+
 uint16_t decoded_segment = 0;
 void Lepton_APP_Run(uint8_t *flag){
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketOverflow)) {
@@ -151,31 +168,34 @@ void Lepton_APP_Run(uint8_t *flag){
 				decoded_segment = 0;
 				return;
 			} else {
-				debug("Seg: %hu\r\n", decoded_segment);
+				/* Valid segment */
+				debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
+				/* Display last 20 packets */
+				for(uint8_t i = 19; i > 0; i--) {
+					uint8_t index = ((start_buffer_idx - i) + 20) % 20;
+					//uint8_t index = ((start_buffer_idx - i) + 20) % 20;
+					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + index * PACKET_FULL_LEN, decoded_segment, i);
+				}
 				//calculated_segment = decoded_segment - 1; //Sometime gives 200+
 			}
+		} else if (decoded_packet < 20) {
+			//TODO: copy only decoded data?
+			memcpy(start_buffer + start_buffer_idx * PACKET_FULL_LEN, rx_buffer, PACKET_FULL_LEN);
+			start_buffer_idx++;
+			start_buffer_idx %= 20;
 		}
 		if(decoded_packet >= 60){
 			return;
 		}
 
 		if(decoded_segment != 0) {
-			uint16_t row = 119 - (30 * (decoded_segment-1)) - ((uint8_t)(decoded_packet / 2));
-			uint16_t collumn_start = decoded_packet % 2 == 0 ? 80 : 0;
-			uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
-			for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
-				if(pixel_index > 480*320){
-					error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, decoded_segment-1, decoded_packet);
-					continue;
-				}
-				*(image_buffer + pixel_index) = rx_buffer[i];
-				pixel_index += 1;
-			}
+			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
 		}
 
 
 		calculated_packet++;
 		if(calculated_packet == PACKET_IN_SEGMENT){
+			start_buffer_idx = 0;
 			decoded_segment = 0;
 			calculated_segment++;
 			calculated_packet = 0;
