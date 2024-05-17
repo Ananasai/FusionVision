@@ -16,10 +16,8 @@
 
 #define __DEBUG_FILE_NAME__ "LPT"
 
-#define FLAGS_RX 0x01
-#define FLAGS_ALL (FLAGS_RX)
 
-#define CIRC_BUF_LEN 164 //TODO: CHANGE
+#define PACKET_FULL_LEN 164
 #define PACKET_DATA_LEN 160
 #define PACKET_IN_SEGMENT 60
 #define SEGMENT_DATA_LEN (PACKET_DATA_LEN * PACKET_IN_SEGMENT)
@@ -29,6 +27,22 @@
 
 #define FRAME_WIDTH 160
 #define FRAME_HEIGHT 120
+
+// Macro to set a flag
+#define SET_FLAG(variable, flag)    ((variable) |= (1U << (flag)))
+
+// Macro to clear a flag
+#define CLEAR_FLAG(variable, flag)  ((variable) &= ~(1U << (flag)))
+
+// Macro to read a flag (returns 1 if the flag is set, 0 otherwise)
+#define READ_FLAG(variable, flag)   (((variable) >> (flag)) & 1U)
+
+typedef enum eLeptonFlag {
+	eLeptonFlagFirst = 0,
+	eLeptonFlagPacketOverflow,
+	eLeptonFlagPacketReceived,
+	eLeptonFlagLast
+}eLeptonFlag_t;
 
 /* DATASHEET: https://cdn.sparkfun.com/assets/f/6/3/4/c/Lepton_Engineering_Datasheet_Rev200.pdf */
 /* I2C registers: https://cdn.sparkfun.com/assets/0/6/d/2/e/16465-FLIRLepton-SoftwareIDD.pdf */
@@ -51,14 +65,12 @@
  * PWR_DWN_L - active low shutdown
  * RESET_L - active low reset
  * */
-static bool rx_byte_flag = false;
-static bool continue_rx_flag = false;
+
+static uint8_t lepton_flags = 0x00;
 
 static uint8_t *rx_buffer;
-static uint8_t rx_buffer1[CIRC_BUF_LEN] = {0};
-static uint8_t rx_buffer2[CIRC_BUF_LEN] = {0};
-
-static sCircularBuffer_t circ_buffer;
+static uint8_t rx_buffer1[PACKET_FULL_LEN] = {0};
+static uint8_t rx_buffer2[PACKET_FULL_LEN] = {0};
 
 static uint16_t *image_buffer = {0};
 
@@ -83,10 +95,6 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 		return false;
 	}
 	image_buffer = new_image_buffer;
-	if(Circular_buffer_create(&circ_buffer, CIRC_BUF_LEN) == false){
-		error("Creating ciruclar buffer\r\n");
-		return false;
-	}
 	/* Lepton initialisation page 17 */
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_RESET);
@@ -115,46 +123,17 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	return true;
 }
 
-static inline void DrawLine(uint8_t segment, uint8_t packet) {
-	segment--;
-	uint8_t line = 122 - (30 * segment) - ((uint8_t)(packet / 2));
-	uint8_t collumn_start = (packet % 2) == 0 ? 80 : 0;
-	for(uint8_t i = 0; i < 80; i++) {
-		*(image_buffer + i + line * SCREEN_WIDTH + collumn_start) = 0xFFFF;
-	}
-}
-
-static inline void DrawLineBuffer(uint8_t segment, uint8_t packet, uint8_t *line_buffer) {
-	segment--;
-	uint8_t line = 122 - (30 * segment) - ((uint8_t)(packet / 2));
-	uint8_t collumn_start = (packet % 2) == 0 ? 80 : 0;
-	for(uint8_t i = 0; i < 80; i++) {
-		//uint16_t colour = *(line_buffer + i*2) + *(line_buffer + i*2 + 1) * 256;
-		uint16_t colour = *(line_buffer + i*2) >> 3;
-		*(image_buffer + (80 - i) + line * SCREEN_WIDTH + collumn_start) = colour;
-	}
-}
-
-static inline void DrawPixel(uint8_t segment, uint8_t packet, uint8_t pixel_idx) {
-	segment--;
-	uint8_t line = 122 - (30 * segment) - ((uint8_t)(packet / 2));
-	uint8_t collumn_start = (packet % 2) == 0 ? 80 : 0;
-	*(image_buffer + line * SCREEN_WIDTH + collumn_start + (80 - pixel_idx)) = 0xFFFF;
-}
-
-typedef enum eLaptonParsingState {
-	eLeptonParsingStateFirst = 0,
-	eLeptonParsingStateWaiting = eLeptonParsingStateFirst,      /*Before parsing segment */
-	eLeptonParsingStateValidSegment,                            /* Correct segment received */
-	eLeptonParsingStateInvalidSegment,                          /* Invalid segment if TTT = 0 */
-	eLeptonParsingStateLast
-}eLaptonParsingState_t;
-
-eLaptonParsingState_t current_parsing_state = eLeptonParsingStateWaiting;
 uint16_t decoded_segment = 0;
 void Lepton_APP_Run(uint8_t *flag){
-	if(rx_byte_flag){
-		rx_byte_flag = false;
+	if(READ_FLAG(lepton_flags, eLeptonFlagPacketOverflow)) {
+		/* Packet reading overflow */
+		error("Lepton reading overflow\r\n");
+		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
+		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
+
+	}
+	if(READ_FLAG(lepton_flags, eLeptonFlagPacketReceived)){
+		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
 		Lepton_APP_StartReceive();
 		/* Check discard packet*/
 		if((rx_buffer[0] & 0x0F) == 0x0F){
@@ -166,10 +145,12 @@ void Lepton_APP_Run(uint8_t *flag){
 		if(decoded_packet == 20){
 			decoded_segment = (rx_buffer[0] >> 4) & 0x0F;
 			if(decoded_segment == 0){
+				/* Whole frame invalid */
 				return;
 			} else if(decoded_segment > 4){
+				decoded_segment = 0;
 				return;
-			}else{
+			} else {
 				debug("Seg: %hu\r\n", decoded_segment);
 				//calculated_segment = decoded_segment - 1; //Sometime gives 200+
 			}
@@ -179,12 +160,12 @@ void Lepton_APP_Run(uint8_t *flag){
 		}
 
 		if(decoded_segment != 0) {
-			uint16_t row = 119 - (30 * calculated_segment) - ((uint8_t)(decoded_packet / 2));
+			uint16_t row = 119 - (30 * (decoded_segment-1)) - ((uint8_t)(decoded_packet / 2));
 			uint16_t collumn_start = decoded_packet % 2 == 0 ? 80 : 0;
 			uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
 			for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 				if(pixel_index > 480*320){
-					error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, calculated_segment, decoded_packet);
+					error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, decoded_segment-1, decoded_packet);
 					continue;
 				}
 				*(image_buffer + pixel_index) = rx_buffer[i];
@@ -210,28 +191,29 @@ void Lepton_APP_Run(uint8_t *flag){
 	}
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
-	if(htim == &htim4){
-		//debug("a\r\n");
-		//Lepton_APP_StartReceive();
-		continue_rx_flag = true;
-	}
-}
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
+//	if(htim == &htim4){
+//		//debug("a\r\n");
+//		//Lepton_APP_StartReceive();
+//		continue_rx_flag = true;
+//	}
+//}
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
     	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-    	if(rx_byte_flag == true) {
-    		HardFault_Handler();
+    	if(READ_FLAG(lepton_flags, eLeptonFlagPacketReceived)) {
+    		SET_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
+    	} else {
+    		SET_FLAG(lepton_flags, eLeptonFlagPacketReceived);
     	}
-    	rx_byte_flag = true;
     }
 }
 
 /* Sadly VSYNC not configurable */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin == LEPTON_VSYNC_Pin){
-		HardFault_Handler(); //TODO: not working
-	}
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+//	if(GPIO_Pin == LEPTON_VSYNC_Pin){
+//		HardFault_Handler(); //TODO: not working
+//	}
+//}
 //#pragma GCC pop_options
