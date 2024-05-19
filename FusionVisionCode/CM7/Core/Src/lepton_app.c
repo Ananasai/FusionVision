@@ -29,6 +29,8 @@
 #define LEPTON_FRAME_WIDTH 160
 #define LEPTON_FRAME_HEIGHT 120
 
+#define CIRC_BUF_PACKET_LEN 20
+
 // Macro to set a flag
 #define SET_FLAG(variable, flag)    ((variable) |= (1U << (flag)))
 
@@ -42,6 +44,7 @@ typedef enum eLeptonFlag {
 	eLeptonFlagFirst = 0,
 	eLeptonFlagPacketOverflow,
 	eLeptonFlagPacketReceived,
+	eLeptonFlagLostSynchronization,
 	eLeptonFlagLast
 }eLeptonFlag_t;
 
@@ -78,7 +81,13 @@ static uint16_t *image_buffer = {0};
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
-static void Lepton_APP_StartReceive(void){
+static void Lepton_APP_ResetWatchdog(void) {
+	HAL_TIM_Base_Stop_IT(&htim4);
+	htim4.Instance->CNT = 0;
+	HAL_TIM_Base_Start_IT(&htim4);
+}
+
+static void Lepton_APP_StartReceive(void) {
 	static bool use_buffer_1 = true;
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
 	if(use_buffer_1 == true){
@@ -105,6 +114,12 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 		*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
+}
+
+static void Letpon_APP_Resync(void) {
+	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+	HAL_Delay(200);
+	Lepton_APP_ResetWatchdog();
 }
 
 bool Lepton_APP_Start(uint16_t *new_image_buffer){
@@ -134,6 +149,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	debug("Lepton active\r\n");
 
 	Lepton_APP_StartReceive();
+	Lepton_APP_ResetWatchdog();
 	//if(Lepton_API_SetGpio() == false){
 	//	error("Failed set GPIO\r\n");
 	//}
@@ -141,17 +157,28 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 }
 
 //TODO: use start buffer for all rx_buffer
-uint8_t start_buffer[PACKET_FULL_LEN * 20] = {0};
-uint8_t start_buffer_idx = 0;
+/* Circular buffer for receiving packets */
+uint8_t circ_buffer[PACKET_FULL_LEN * CIRC_BUF_PACKET_LEN] = {0};
+uint8_t circ_buffer_index = 0;
 
 uint16_t decoded_segment = 0;
 void Lepton_APP_Run(uint8_t *flag){
+	if(READ_FLAG(lepton_flags, eLeptonFlagLostSynchronization)) {
+		/* Restores synchronization if no new frame is generated in 1s period */
+		error("Lepton lost synchronization\r\n");
+		CLEAR_FLAG(lepton_flags, eLeptonFlagLostSynchronization);
+		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
+		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
+		Letpon_APP_Resync();
+		Lepton_APP_StartReceive();
+	}
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketOverflow)) {
 		/* Packet reading overflow */
 		error("Lepton reading overflow\r\n");
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
-
+		Letpon_APP_Resync();
+		Lepton_APP_StartReceive();
 	}
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketReceived)){
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
@@ -174,14 +201,15 @@ void Lepton_APP_Run(uint8_t *flag){
 			} else {
 				/* Valid segment */
 				//debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
+				calculated_packet = 20;
 				/* Display last 20 packets */
 				uint8_t packet_index = 0;
-				for(uint8_t i = start_buffer_idx; i < 20; i++) {
-					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+				for(uint8_t i = circ_buffer_index; i < CIRC_BUF_PACKET_LEN; i++) {
+					Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
 					packet_index++;
 				}
-				for(uint8_t i = 0; i < start_buffer_idx; i++) {
-					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+				for(uint8_t i = 0; i < circ_buffer_index; i++) {
+					Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
 					packet_index++;
 				}
 			}
@@ -189,8 +217,8 @@ void Lepton_APP_Run(uint8_t *flag){
 			/* Received packet without knowing from which segment */
 			/* Save to circular buffer for further use */
 			//TODO: copy only decoded data?
-			memcpy(start_buffer + start_buffer_idx * PACKET_FULL_LEN, rx_buffer, PACKET_FULL_LEN);
-			start_buffer_idx = (start_buffer_idx + 1) % 20;
+			memcpy(circ_buffer + circ_buffer_index * PACKET_FULL_LEN, rx_buffer, PACKET_FULL_LEN);
+			circ_buffer_index = (circ_buffer_index + 1) % CIRC_BUF_PACKET_LEN;
 		} else if (decoded_packet >= 60){
 			return;
 		}
@@ -199,42 +227,40 @@ void Lepton_APP_Run(uint8_t *flag){
 			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
 		}
 
-
-//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
-//			debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-//			if(decoded_segment == 4) {
-//				*flag = 0x01;
-//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-//			}
-//			decoded_segment = 0;
-//		}
-
 		calculated_packet++;
 		if(calculated_packet == PACKET_IN_SEGMENT){
 			//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-
 			calculated_segment++;
 			calculated_packet = 0;
-			if(calculated_segment == 4){
+			if(calculated_segment == 4 + 1){
 				//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-				calculated_segment = 0;
+				calculated_segment = 1;
 				/* Start drawing  */
 				//debug("Done\r\n");
 				*flag = 0x01;
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+				Lepton_APP_ResetWatchdog();
 			}
 			decoded_segment = 0;
 		}
+
+		//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
+		//			debug("P %u s %u\r\n", decoded_packet, decoded_segment);
+		//			if(decoded_segment == 4) {
+		//				*flag = 0x01;
+		//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+		//			}
+		//			decoded_segment = 0;
+		//		}
 	}
 }
 
-//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
-//	if(htim == &htim4){
-//		//debug("a\r\n");
-//		//Lepton_APP_StartReceive();
-//		continue_rx_flag = true;
-//	}
-//}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
+	if(htim == &htim4){
+		/* Lost synchronization timer */
+		SET_FLAG(lepton_flags, eLeptonFlagLostSynchronization);
+	}
+}
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
