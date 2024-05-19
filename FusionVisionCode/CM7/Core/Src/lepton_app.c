@@ -12,12 +12,12 @@
 #include "lepton_api.h"
 #include "shared_mem_api.h"
 #include <string.h>
+#include "common.h"
 
 //#pragma GCC push_options
 //#pragma GCC optimize ("O3") //TODO: remove this
 
 #define __DEBUG_FILE_NAME__ "LPT"
-
 
 #define PACKET_FULL_LEN 164
 #define PACKET_DATA_LEN 160
@@ -31,15 +31,6 @@
 #define LEPTON_FRAME_HEIGHT 120
 
 #define CIRC_BUF_PACKET_LEN 20
-
-// Macro to set a flag
-#define SET_FLAG(variable, flag)    ((variable) |= (1U << (flag)))
-
-// Macro to clear a flag
-#define CLEAR_FLAG(variable, flag)  ((variable) &= ~(1U << (flag)))
-
-// Macro to read a flag (returns 1 if the flag is set, 0 otherwise)
-#define READ_FLAG(variable, flag)   (((variable) >> (flag)) & 1U)
 
 typedef enum eLeptonFlag {
 	eLeptonFlagFirst = 0,
