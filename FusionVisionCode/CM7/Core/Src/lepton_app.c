@@ -10,6 +10,7 @@
 #include "circular_buffer.h"
 #include "fonts.h"
 #include "lepton_api.h"
+#include <string.h>
 
 //#pragma GCC push_options
 //#pragma GCC optimize ("O3") //TODO: remove this
@@ -25,8 +26,8 @@
 #define PACKET_PIXEL_AMOUNT 80
 #define SEGMENT_PIXEL_AMOUNT (PACKET_PIXEL_AMOUNT * PACKET_IN_SEGMENT)
 
-#define FRAME_WIDTH 160
-#define FRAME_HEIGHT 120
+#define LEPTON_FRAME_WIDTH 160
+#define LEPTON_FRAME_HEIGHT 120
 
 // Macro to set a flag
 #define SET_FLAG(variable, flag)    ((variable) |= (1U << (flag)))
@@ -97,9 +98,11 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 		if(pixel_index > 480*320){
 			error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, segment, packet);
-			continue;
+			return;
 		}
-		*(image_buffer + pixel_index) = buffer[i];
+		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
+		uint16_t full_value = (buffer[i] << 8) | buffer[i-1];
+		*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
 }
@@ -137,6 +140,7 @@ bool Lepton_APP_Start(uint16_t *new_image_buffer){
 	return true;
 }
 
+//TODO: use start buffer for all rx_buffer
 uint8_t start_buffer[PACKET_FULL_LEN * 20] = {0};
 uint8_t start_buffer_idx = 0;
 
@@ -169,22 +173,25 @@ void Lepton_APP_Run(uint8_t *flag){
 				return;
 			} else {
 				/* Valid segment */
-				debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
+				//debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
 				/* Display last 20 packets */
-				for(uint8_t i = 19; i > 0; i--) {
-					uint8_t index = ((start_buffer_idx - i) + 20) % 20;
-					//uint8_t index = ((start_buffer_idx - i) + 20) % 20;
-					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + index * PACKET_FULL_LEN, decoded_segment, i);
+				uint8_t packet_index = 0;
+				for(uint8_t i = start_buffer_idx; i < 20; i++) {
+					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+					packet_index++;
 				}
-				//calculated_segment = decoded_segment - 1; //Sometime gives 200+
+				for(uint8_t i = 0; i < start_buffer_idx; i++) {
+					Lepton_APP_DecodeAndDrawFromBuffer(start_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+					packet_index++;
+				}
 			}
 		} else if (decoded_packet < 20) {
+			/* Received packet without knowing from which segment */
+			/* Save to circular buffer for further use */
 			//TODO: copy only decoded data?
 			memcpy(start_buffer + start_buffer_idx * PACKET_FULL_LEN, rx_buffer, PACKET_FULL_LEN);
-			start_buffer_idx++;
-			start_buffer_idx %= 20;
-		}
-		if(decoded_packet >= 60){
+			start_buffer_idx = (start_buffer_idx + 1) % 20;
+		} else if (decoded_packet >= 60){
 			return;
 		}
 
@@ -193,20 +200,30 @@ void Lepton_APP_Run(uint8_t *flag){
 		}
 
 
+//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
+//			debug("P %u s %u\r\n", decoded_packet, decoded_segment);
+//			if(decoded_segment == 4) {
+//				*flag = 0x01;
+//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+//			}
+//			decoded_segment = 0;
+//		}
+
 		calculated_packet++;
 		if(calculated_packet == PACKET_IN_SEGMENT){
-			start_buffer_idx = 0;
-			decoded_segment = 0;
+			//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
+
 			calculated_segment++;
 			calculated_packet = 0;
 			if(calculated_segment == 4){
+				//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
 				calculated_segment = 0;
 				/* Start drawing  */
 				//debug("Done\r\n");
 				*flag = 0x01;
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-				return;
 			}
+			decoded_segment = 0;
 		}
 	}
 }
