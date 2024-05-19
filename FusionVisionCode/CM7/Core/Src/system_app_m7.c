@@ -77,6 +77,7 @@ static uint8_t lepton_flag = 0x0;
 bool System_APP_M7_Run(void){
 	Lepton_APP_Run(&lepton_flag);
 	if(lepton_flag == 0x01){
+		IMG_PROCESSING_APP_DrawTermo(image_buffer);
 		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
 		lepton_flag = 0;
 		if(printout_flag){

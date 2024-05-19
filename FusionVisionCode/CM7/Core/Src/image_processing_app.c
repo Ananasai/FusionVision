@@ -131,4 +131,16 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 	return true;
 }
 
+bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
+	#include "shared_mem_api.h"
+	for(uint8_t y = 0; y < 120; y++) {
+		for(uint8_t x = 0; x < 160; x++) {
+			uint32_t termo_pixel_coord = y * 160 + x;
+			uint32_t image_buffer_coord = y * 480 + x;
+			*(image_buffer + image_buffer_coord) = *(uint8_t *)(SHARED_TERMO_BUF_START + termo_pixel_coord);
+		}
+	}
+	return true;
+}
+
 #pragma GCC pop_options

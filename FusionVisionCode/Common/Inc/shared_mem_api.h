@@ -16,6 +16,8 @@
 #define SHARED_MEM_START 0x38000000
 #define SHARED_MEM_LEN 0x0000FFFF
 
+#define SHARED_TERMO_BUF_START (SHARED_MEM_START + 100)
+
 
 bool Shared_mem_API_Read(uint32_t address, volatile void *out, size_t length);
 bool Shared_mem_API_Write(uint32_t address, volatile const void *data, size_t length);

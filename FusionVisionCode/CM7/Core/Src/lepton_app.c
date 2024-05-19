@@ -10,6 +10,7 @@
 #include "circular_buffer.h"
 #include "fonts.h"
 #include "lepton_api.h"
+#include "shared_mem_api.h"
 #include <string.h>
 
 //#pragma GCC push_options
@@ -103,15 +104,16 @@ static void Lepton_APP_StartReceive(void) {
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
 	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
-	uint32_t pixel_index = row * SCREEN_WIDTH + collumn_start;
+	uint32_t pixel_index = row * 160 + collumn_start;
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
-		if(pixel_index > 480*320){
+		if(pixel_index > 120*160){
 			error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, segment, packet);
 			return;
 		}
 		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
 		uint16_t full_value = (buffer[i] << 8) | buffer[i-1];
-		*(image_buffer + pixel_index) = full_value >> 6;
+		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = full_value >> 6;
+		//*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
 }
@@ -224,7 +226,10 @@ void Lepton_APP_Run(uint8_t *flag){
 		}
 
 		if(decoded_segment != 0) {
-			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
+			//if(decoded_packet != 59 && decoded_packet != 58) {
+				Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
+			//}
+
 		}
 
 		calculated_packet++;
@@ -244,14 +249,16 @@ void Lepton_APP_Run(uint8_t *flag){
 			decoded_segment = 0;
 		}
 
-		//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
-		//			debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-		//			if(decoded_segment == 4) {
-		//				*flag = 0x01;
-		//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-		//			}
-		//			decoded_segment = 0;
-		//		}
+//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
+//			//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
+//			if(decoded_segment == 4) {
+//				*flag = 0x01;
+//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
+//				Lepton_APP_ResetWatchdog();
+//				decoded_segment = 0;
+//			}
+//
+//		}
 	}
 }
 
