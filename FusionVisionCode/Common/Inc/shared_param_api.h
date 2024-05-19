@@ -22,6 +22,7 @@ typedef enum eSharedParamEnum {
 	eSharedParamEdgeAlgorithm,
 	eSharedParamBatteryLevel,
 	eSharedParamTermoState,
+	eSharedParamTermoThreshold,
 	eSharedParamLast
 }eSharedParamEnum_t;
 

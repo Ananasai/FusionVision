@@ -68,8 +68,6 @@ static uint8_t *rx_buffer;
 static uint8_t rx_buffer1[PACKET_FULL_LEN] = {0};
 static uint8_t rx_buffer2[PACKET_FULL_LEN] = {0};
 
-static uint16_t *image_buffer = {0};
-
 static uint8_t calculated_segment = 0;
 static uint8_t calculated_packet = 0;
 
@@ -115,11 +113,7 @@ static void Letpon_APP_Resync(void) {
 	Lepton_APP_ResetWatchdog();
 }
 
-bool Lepton_APP_Start(uint16_t *new_image_buffer){
-	if(new_image_buffer == NULL){
-		return false;
-	}
-	image_buffer = new_image_buffer;
+bool Lepton_APP_Start(void){
 	/* Lepton initialisation page 17 */
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_RESET);
@@ -155,7 +149,7 @@ uint8_t circ_buffer[PACKET_FULL_LEN * CIRC_BUF_PACKET_LEN] = {0};
 uint8_t circ_buffer_index = 0;
 
 uint16_t decoded_segment = 0;
-void Lepton_APP_Run(uint8_t *flag){
+void Lepton_APP_Run(void){
 	if(READ_FLAG(lepton_flags, eLeptonFlagLostSynchronization)) {
 		/* Restores synchronization if no new frame is generated in 1s period */
 		error("Lepton lost synchronization\r\n");
@@ -233,7 +227,7 @@ void Lepton_APP_Run(uint8_t *flag){
 				calculated_segment = 1;
 				/* Start drawing  */
 				//debug("Done\r\n");
-				*flag = 0x01;
+				//*flag = 0x01;
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 				Lepton_APP_ResetWatchdog();
 			}

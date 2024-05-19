@@ -17,7 +17,7 @@ extern I2C_HandleTypeDef hi2c4;
 extern TIM_HandleTypeDef htim4;
 
 void Lepton_APP_VsyncIrq(void);
-bool Lepton_APP_Start(uint16_t *new_image_buffer);
-void Lepton_APP_Run(uint8_t *flag);
+bool Lepton_APP_Start(void);
+void Lepton_APP_Run(void);
 
 #endif /* INC_LEPTON_APP_H_ */

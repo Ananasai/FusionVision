@@ -6,3 +6,6 @@
 
 #define LCD_WIDTH 480
 #define LCD_HEIGTH 320
+
+#define TERMO_RAW_WIDTH 160
+#define TERMO_RAW_HEIGTH 120

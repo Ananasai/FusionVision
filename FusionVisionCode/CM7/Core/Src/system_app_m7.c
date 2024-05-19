@@ -59,8 +59,8 @@ bool System_APP_M7_PreInit(void){
 bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
-	IMG_PROCESSING_APP_Init(image_buffer);
-	Lepton_APP_Start(image_buffer);
+	IMG_PROCESSING_APP_Init();
+	Lepton_APP_Start();
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
@@ -77,26 +77,17 @@ bool System_APP_M7_Start(void){
 	Diagnostics_APP_RecordStart(eDiagEventCamera);
 	/* Start camera conversion */
 	first_vsync = true;
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
+	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)image_buffer, 480*320/2);
 	return true;
 }
-static uint8_t lepton_flag = 0x0;
+
 bool System_APP_M7_Run(void){
-	Lepton_APP_Run(&lepton_flag);
-	if(lepton_flag == 0x01){
-		IMG_PROCESSING_APP_DrawTermo(image_buffer);
-		ili9486_DrawRGBImage(0, 0, 480, 320, image_buffer);
-		lepton_flag = 0;
-		if(READ_FLAG(system_flags, eSystemFlagPrintout)){
-			CLEAR_FLAG(system_flags, eSystemFlagPrintout);
-			Printout();
-		}
-	}
-	return true;
+	Lepton_APP_Run();
 	/* Event on full frame received from DCMI  */
 	if(READ_FLAG(system_flags, eSystemFlagFrameEvent)) {
 		CLEAR_FLAG(system_flags, eSystemFlagFrameEvent);
 		Diagnostics_APP_RecordStart(eDiagEventDisplay);
+		IMG_PROCESSING_APP_DrawTermo(image_buffer); //TODO: move
 		UI_APP_DrawAll();
 		//ili9486_SetDisplayWindow(0, 0, 480, 320);
 		//LCD_IO_WriteCmd16(0x2C);
@@ -111,10 +102,6 @@ bool System_APP_M7_Run(void){
 		Diagnostics_APP_RecordEnd(eDiagEventDisplay);
 		Diagnostics_APP_RecordEnd(eDiagEventFrame);
 		/* Printout whole frame if callback received */
-		if(READ_FLAG(system_flags, eSystemFlagPrintout)){
-			Printout();
-			CLEAR_FLAG(system_flags, eSystemFlagPrintout);
-		}
 		Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
 		Diagnostics_APP_RecordStart(eDiagEventFrame);
 		Diagnostics_APP_RecordStart(eDiagEventCamera);
@@ -134,6 +121,10 @@ bool System_APP_M7_Run(void){
 			Diagnostics_APP_RecordEnd(eDiagEventProcessing);
 		}
 		CLEAR_FLAG(system_flags, eSystemFlagLineEvent);
+	}
+	if(READ_FLAG(system_flags, eSystemFlagPrintout)){
+		CLEAR_FLAG(system_flags, eSystemFlagPrintout);
+		Printout();
 	}
 	return true;
 }
