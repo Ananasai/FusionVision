@@ -16,8 +16,8 @@ static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamScreenOptim, "Optimisation", sizeof(uint32_t), eScreenOptimNone, eScreenOptimFirst, eScreenOptimLast),
 	NEW_PARAM(eSharedParamEdgeAlgorithm, "Algorithm", sizeof(uint32_t), eEdgeAlgorithmSobel, eEdgeAlgorithmFirst, eEdgeAlgorithmLast),
 	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100),
-	NEW_PARAM(eSharedParamTermoState, "Termo", sizeof(uint32_t), eTermoStatePassthrough, eTermoStateFirst, eTermoStateLast),
-	NEW_PARAM(eSharedParamTermoThreshold, "Termo threshold", sizeof(uint32_t), 200, 0, 9999)
+	NEW_PARAM(eSharedParamTermoState, "Termo", sizeof(uint32_t), eTermoStateEdge, eTermoStateFirst, eTermoStateLast),
+	NEW_PARAM(eSharedParamTermoThreshold, "Termo threshold", sizeof(uint32_t), 100, 0, 9999)
 	//NEW_PARAM(eSharedParamIrLighting, "Lighting", sizeof(uint32_t), 0, 0, 1),
 };
 

@@ -25,7 +25,6 @@ bool Led_APP_Run(void){
 }
 
 void Blink_Timer_Callback(void){
-	debug("RUN\r\n");
 	HAL_GPIO_TogglePin(SCREEN_LED_GPIO_Port, SCREEN_LED_Pin);
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 }

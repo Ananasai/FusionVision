@@ -178,9 +178,9 @@ bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
 		} break;
 		case eTermoStateEdge: {
 			uint32_t edge_algorithm = eEdgeAlgorithmSobel;
-			uint32_t edge_threshold = 0;
-			Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
-			Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
+			uint32_t edge_threshold = 10;
+			//Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
+			//Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
 			DisplayContours(image_buffer, (uint8_t *)(SHARED_TERMO_BUF_START), TERMO_RAW_WIDTH, TERMO_RAW_HEIGTH, edge_algorithm, edge_threshold);
 		} break;
 		default: {
