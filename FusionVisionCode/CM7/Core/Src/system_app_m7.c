@@ -122,6 +122,7 @@ bool System_APP_M7_Run(void){
 		}
 		CLEAR_FLAG(system_flags, eSystemFlagLineEvent);
 	}
+	/* Printout image buffer using UART */
 	if(READ_FLAG(system_flags, eSystemFlagPrintout)){
 		CLEAR_FLAG(system_flags, eSystemFlagPrintout);
 		Printout();

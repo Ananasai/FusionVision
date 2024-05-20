@@ -79,37 +79,33 @@ static inline void ConvertGrayscale(uint16_t *image_buffer, uint8_t *grayscale_b
 
 static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_buffer, uint16_t grayscale_width, uint16_t grayscale_heigth, eEdgeAlgorithm_t edge_algorithm, uint32_t threshold) {
 	/* Convert image buffer to grayscale and consequentially perform desired edge algorithm */
-	for(uint16_t y = 1; y < grayscale_heigth; y += 1){
-		for(uint16_t x = 1; x < grayscale_width; x += 1){
+	for(uint16_t y = 2; y < grayscale_heigth - 2; y += 1){ //TODO: make 2 dynamic
+		for(uint16_t x = 2; x < grayscale_width - 2; x += 1){
 			/* Perform edge detection */
-			/* Only start at line two and leave empty border around for 3x3 grid algorithm*/
-			if((y > 2) && (x > 1) && (x < grayscale_heigth - 1) && (y < grayscale_width - 2)){
-			//if((y > 2) && (x > 1) && (x < 479)){
-				uint32_t sum = 0;
-				/* Apply desired edge algorithm */
-				switch(edge_algorithm){
-					case eEdgeAlgorithmRoberts: {
-						sum = abs(Roberts_Conv_Gx(grayscale_buffer, grayscale_width, x, y-1)) + abs(Roberts_Conv_Gy(grayscale_buffer, grayscale_width, x, y-1));
-					}break;
-					case eEdgeAlgorithmSobel: {
-						sum = abs(Sobel_Conv_Gx(grayscale_buffer, grayscale_width, x, y-1)) + abs(Sobel_Conv_Gy(grayscale_buffer, grayscale_width, x, y-1));
-					}break;
-					default:{
-						error("Invalid edge algorithm\r\n");
-					} return;
-				}
-				if(sum > threshold){
-					//TODO: fix workaround for lepton smaller view
-					if(grayscale_width == TERMO_RAW_WIDTH) {
-						PIXEL(image_buffer, x*3, y*2-1) = EDGE_COLOUR;
-						PIXEL(image_buffer, x*3+1, y*2-1) = EDGE_COLOUR;
-						PIXEL(image_buffer, x*3+2, y*2-1) = EDGE_COLOUR;
-						PIXEL(image_buffer, x*3, y*2) = EDGE_COLOUR;
-						PIXEL(image_buffer, x*3+1, y*2) = EDGE_COLOUR;
-						PIXEL(image_buffer, x*3+2, y*2) = EDGE_COLOUR;
-					} else {
-						PIXEL(image_buffer, x, y-1) = EDGE_COLOUR;
-					}
+			uint32_t sum = 0;
+			/* Apply desired edge algorithm */
+			switch(edge_algorithm){
+				case eEdgeAlgorithmRoberts: {
+					sum = abs(Roberts_Conv_Gx(grayscale_buffer, grayscale_width, x, y-1)) + abs(Roberts_Conv_Gy(grayscale_buffer, grayscale_width, x, y-1));
+				}break;
+				case eEdgeAlgorithmSobel: {
+					sum = abs(Sobel_Conv_Gx(grayscale_buffer, grayscale_width, x, y-1)) + abs(Sobel_Conv_Gy(grayscale_buffer, grayscale_width, x, y-1));
+				}break;
+				default:{
+					error("Invalid edge algorithm\r\n");
+				} return;
+			}
+			if(sum > threshold){
+				//TODO: fix workaround for lepton smaller view
+				if(grayscale_width == TERMO_RAW_WIDTH) {
+					PIXEL(image_buffer, x*3, y*2-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, x*3+1, y*2-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, x*3+2, y*2-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, x*3, y*2) = EDGE_COLOUR;
+					PIXEL(image_buffer, x*3+1, y*2) = EDGE_COLOUR;
+					PIXEL(image_buffer, x*3+2, y*2) = EDGE_COLOUR;
+				} else {
+					PIXEL(image_buffer, x, y-1) = EDGE_COLOUR;
 				}
 			}
 		}
@@ -182,8 +178,8 @@ bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
 		} break;
 		case eTermoStateEdge: {
 			uint32_t edge_algorithm = eEdgeAlgorithmSobel;
-			Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
 			uint32_t edge_threshold = 0;
+			Shared_param_API_Read(eSharedParamEdgeAlgorithm, &edge_algorithm);
 			Shared_param_API_Read(eSharedParamEdgeThreshold, &edge_threshold);
 			DisplayContours(image_buffer, (uint8_t *)(SHARED_TERMO_BUF_START), TERMO_RAW_WIDTH, TERMO_RAW_HEIGTH, edge_algorithm, edge_threshold);
 		} break;

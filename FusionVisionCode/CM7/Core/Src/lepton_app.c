@@ -22,13 +22,6 @@
 #define PACKET_FULL_LEN 164
 #define PACKET_DATA_LEN 160
 #define PACKET_IN_SEGMENT 60
-#define SEGMENT_DATA_LEN (PACKET_DATA_LEN * PACKET_IN_SEGMENT)
-
-#define PACKET_PIXEL_AMOUNT 80
-#define SEGMENT_PIXEL_AMOUNT (PACKET_PIXEL_AMOUNT * PACKET_IN_SEGMENT)
-
-#define LEPTON_FRAME_WIDTH 160
-#define LEPTON_FRAME_HEIGHT 120
 
 #define CIRC_BUF_PACKET_LEN 20
 
@@ -67,9 +60,6 @@ static uint8_t lepton_flags = 0x00;
 static uint8_t *rx_buffer;
 static uint8_t rx_buffer1[PACKET_FULL_LEN] = {0};
 static uint8_t rx_buffer2[PACKET_FULL_LEN] = {0};
-
-static uint8_t calculated_segment = 0;
-static uint8_t calculated_packet = 0;
 
 static void Lepton_APP_ResetWatchdog(void) {
 	HAL_TIM_Base_Stop_IT(&htim4);
@@ -188,7 +178,6 @@ void Lepton_APP_Run(void){
 			} else {
 				/* Valid segment */
 				//debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
-				calculated_packet = 20;
 				/* Display last 20 packets */
 				uint8_t packet_index = 0;
 				for(uint8_t i = circ_buffer_index; i < CIRC_BUF_PACKET_LEN; i++) {
@@ -211,39 +200,17 @@ void Lepton_APP_Run(void){
 		}
 
 		if(decoded_segment != 0) {
-			//if(decoded_packet != 59 && decoded_packet != 58) {
-				Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
-			//}
-
+			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
 		}
 
-		calculated_packet++;
-		if(calculated_packet == PACKET_IN_SEGMENT){
-			//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-			calculated_segment++;
-			calculated_packet = 0;
-			if(calculated_segment == 4 + 1){
-				//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-				calculated_segment = 1;
-				/* Start drawing  */
-				//debug("Done\r\n");
-				//*flag = 0x01;
+		if(decoded_packet == PACKET_IN_SEGMENT - 2){
+			if(decoded_segment == 4){
+				/* Can start drawing */
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 				Lepton_APP_ResetWatchdog();
 			}
 			decoded_segment = 0;
 		}
-
-//		if(decoded_packet == PACKET_IN_SEGMENT - 1) {
-//			//debug("P %u s %u\r\n", decoded_packet, decoded_segment);
-//			if(decoded_segment == 4) {
-//				*flag = 0x01;
-//				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-//				Lepton_APP_ResetWatchdog();
-//				decoded_segment = 0;
-//			}
-//
-//		}
 	}
 }
 
