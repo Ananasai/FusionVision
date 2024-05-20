@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 bool Button_APP_Start(void);
+bool Button_APP_Run(void);
 
 
 #endif /* INC_BUTTON_APP_H_ */

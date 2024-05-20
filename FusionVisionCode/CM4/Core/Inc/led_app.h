@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
-bool led_APP_Start(void);
+bool Led_APP_Start(void);
+bool Led_APP_Run(void);
 
 #endif /* INC_LED_APP_H_ */

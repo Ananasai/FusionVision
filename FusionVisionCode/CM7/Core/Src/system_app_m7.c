@@ -137,7 +137,7 @@ static void Printout_IRQ(void){
 static bool Printout(void){
 	for(uint16_t y = 0; y < LCD_HEIGTH; y++){
 		for(uint16_t x = 0; x < LCD_WIDTH; x++){
-			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * 480));
+			DEBUG_API_LOG("%d,", NULL, NULL, *(image_buffer + x + y * LCD_WIDTH));
 			if(x % 120 == 0){
 				DEBUG_API_LOG("\r\n", NULL, NULL);
 			}
