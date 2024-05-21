@@ -1,10 +1,3 @@
-/*
- * lepton_app.c
- *
- *  Created on: Dec 30, 2023
- *      Author: simon
- */
-
 #include "lepton_app.h"
 #include "debug_api.h"
 #include "circular_buffer.h"
@@ -85,6 +78,7 @@ static uint32_t min_captured_temperature = 0xFF;
 static uint32_t max_captured_temperature = 0;
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
+	row -= 4 - segment;
 	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
 	uint32_t pixel_index = row * 160 + collumn_start;
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){

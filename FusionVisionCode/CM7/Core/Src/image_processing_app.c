@@ -113,10 +113,12 @@ static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_bu
 }
 
 static inline void DisplayTermo(uint16_t *image_buffer, uint32_t threshold) {
+	uint32_t display_offset_y = (LCD_HEIGTH - TERMO_RAW_HEIGTH*2) / 2;
+	uint32_t display_offset_x = 0;
 	for(uint8_t y = 0; y < TERMO_RAW_HEIGTH; y++) {
 		for(uint8_t x = 0; x < TERMO_RAW_WIDTH; x++) {
 			uint32_t termo_pixel_coord = y * TERMO_RAW_WIDTH + x;
-			uint32_t image_buffer_coord = y*2 * LCD_WIDTH + x*3;
+			uint32_t image_buffer_coord = (y*2 + display_offset_y) * LCD_WIDTH + (x*3 + display_offset_x);
 			uint8_t termo_colour = *(uint8_t *)(SHARED_TERMO_BUF_START + termo_pixel_coord);
 			/* Ignore values below threshold */
 			if(termo_colour < threshold) {
