@@ -11,6 +11,7 @@
 #include "fonts.h"
 #include "lepton_api.h"
 #include "shared_mem_api.h"
+#include "shared_param_api.h"
 #include <string.h>
 #include "common.h"
 
@@ -80,18 +81,25 @@ static void Lepton_APP_StartReceive(void) {
 	use_buffer_1 = !use_buffer_1;
 }
 
+static uint32_t min_captured_temperature = 0xFF;
+static uint32_t max_captured_temperature = 0;
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
 	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
 	uint32_t pixel_index = row * 160 + collumn_start;
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
-		if(pixel_index > 120*160){
-			error("OUT OF BOUNDS row: %d, col %d, seg %d, pack %d\r\n", row, collumn_start, segment, packet);
-			return;
-		}
 		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
 		uint16_t full_value = (buffer[i] << 8) | buffer[i-1];
-		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = full_value >> 6;
+		uint8_t reduced_value = full_value >> 6;
+		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = reduced_value;
+		if((segment != 58) && (segment != 59) && (reduced_value != 0)) {
+			if(reduced_value > max_captured_temperature) {
+				max_captured_temperature = reduced_value;
+			}
+			else if(reduced_value < min_captured_temperature) {
+				min_captured_temperature = reduced_value;
+			}
+		}
 		//*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
@@ -103,7 +111,7 @@ static void Letpon_APP_Resync(void) {
 	Lepton_APP_ResetWatchdog();
 }
 
-bool Lepton_APP_Start(void){
+bool Lepton_APP_Start(void) {
 	/* Lepton initialisation page 17 */
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LEPTON_PWR_GPIO_Port, LEPTON_PWR_Pin, GPIO_PIN_RESET);
@@ -210,6 +218,17 @@ void Lepton_APP_Run(void){
 				Lepton_APP_ResetWatchdog();
 			}
 			decoded_segment = 0;
+			/* Save min/max temperature of the frame */
+			if(min_captured_temperature == 0xFF) {
+				min_captured_temperature = 1;
+			}
+			if(max_captured_temperature == 0 || max_captured_temperature == 255) {
+				max_captured_temperature = 0xFF-10; //TODO test
+			}
+			Shared_param_API_Write(eSharedParamMinCapturedTemperature, &min_captured_temperature);
+			Shared_param_API_Write(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
+			min_captured_temperature = 0xFF;
+			max_captured_temperature = 0;
 		}
 	}
 }

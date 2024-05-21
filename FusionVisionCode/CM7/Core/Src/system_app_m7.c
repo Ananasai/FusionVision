@@ -1,9 +1,4 @@
-/*
- * system_app_m7.c
- *
- *  Created on: Nov 16, 2023
- *      Author: simon
- */
+
 #include "system_app_m7.h"
 #include "Camera_OV2640.h"
 #include "LCD_ILI9486.h"

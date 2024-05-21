@@ -163,12 +163,17 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 }
 
 bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
-	uint32_t termo_state = eTermoStateFirst;
-	Shared_param_API_Read(eSharedParamTermoState, &termo_state);
-
+	uint32_t termo_state = eTermoStatePassthrough;
+	//Shared_param_API_Read(eSharedParamTermoState, &termo_state);
 	switch(termo_state) {
 		case eTermoStatePassthrough: {
-			DisplayTermo(image_buffer, 0);
+			uint32_t min_captured_temperature = 0;
+			uint32_t max_captured_temperature = 0;
+			Shared_param_API_Read(eSharedParamMinCapturedTemperature, &min_captured_temperature);
+			Shared_param_API_Read(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
+			uint32_t threshold = max_captured_temperature - 10;
+			DisplayTermo(image_buffer, threshold);
+			debug("%u %u\r\n", min_captured_temperature, max_captured_temperature);
 		} break;
 		case eTermoStateThreshold: {
 			uint32_t termo_threshold = 0;
