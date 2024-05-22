@@ -19,8 +19,9 @@ static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100),
 	NEW_PARAM(eSharedParamTermoState, "Termo", sizeof(uint32_t), eTermoStateEdge, eTermoStateFirst, eTermoStateLast),
 	NEW_PARAM(eSharedParamTermoThreshold, "Termo threshold", sizeof(uint32_t), 100, 0, 9999),
-	NEW_PARAM(eSharedParamMinCapturedTemperature, "Termo min", sizeof(uint32_t), 0xFF, 0, 0xFF),
-	NEW_PARAM(eSharedParamMaxCapturedTemperature, "Termo max", sizeof(uint32_t), 0, 0, 0xFF),
+	NEW_PARAM(eSharedParamMinCapturedTemperature, "Termo min", sizeof(uint32_t), 0xFFFF, 0, 0xFFFF),
+	NEW_PARAM(eSharedParamMaxCapturedTemperature, "Termo max", sizeof(uint32_t), 0, 0, 0xFFFF),
+	NEW_PARAM(eSharedParamAvgCapturedTemperature, "Termo avg", sizeof(uint32_t), 0, 0, 0xFFFF),
 	//NEW_PARAM(eSharedParamIrLighting, "Lighting", sizeof(uint32_t), 0, 0, 1),
 };
 

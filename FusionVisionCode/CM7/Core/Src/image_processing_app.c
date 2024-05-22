@@ -119,7 +119,7 @@ static inline void DisplayTermo(uint16_t *image_buffer, uint32_t threshold) {
 		for(uint8_t x = 0; x < TERMO_RAW_WIDTH; x++) {
 			uint32_t termo_pixel_coord = y * TERMO_RAW_WIDTH + x;
 			uint32_t image_buffer_coord = (y*2 + display_offset_y) * LCD_WIDTH + (x*3 + display_offset_x);
-			uint8_t termo_colour = *(uint8_t *)(SHARED_TERMO_BUF_START + termo_pixel_coord);
+			uint16_t termo_colour = *(uint8_t *)(SHARED_TERMO_BUF_START + termo_pixel_coord);
 			/* Ignore values below threshold */
 			if(termo_colour < threshold) {
 				continue;
@@ -171,11 +171,13 @@ bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
 		case eTermoStatePassthrough: {
 			uint32_t min_captured_temperature = 0;
 			uint32_t max_captured_temperature = 0;
+			uint32_t avg_captured_temperature = 0;
 			Shared_param_API_Read(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Read(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
-			uint32_t threshold = max_captured_temperature - 10;
+			Shared_param_API_Read(eSharedParamAvgCapturedTemperature, &avg_captured_temperature);
+			uint32_t threshold = avg_captured_temperature + 1;
 			DisplayTermo(image_buffer, threshold);
-			debug("%u %u\r\n", min_captured_temperature, max_captured_temperature);
+			debug("%u %u %u\r\n", min_captured_temperature, max_captured_temperature, avg_captured_temperature);
 		} break;
 		case eTermoStateThreshold: {
 			uint32_t termo_threshold = 0;

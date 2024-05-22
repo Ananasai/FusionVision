@@ -25,6 +25,7 @@ typedef enum eSharedParamEnum {
 	eSharedParamTermoThreshold,
 	eSharedParamMinCapturedTemperature,
 	eSharedParamMaxCapturedTemperature,
+	eSharedParamAvgCapturedTemperature,
 	eSharedParamLast
 }eSharedParamEnum_t;
 

@@ -74,10 +74,16 @@ static void Lepton_APP_StartReceive(void) {
 	use_buffer_1 = !use_buffer_1;
 }
 
-static uint32_t min_captured_temperature = 0xFF;
-static uint32_t max_captured_temperature = 0;
-static uint32_t last_min_captured_temperature = 0xFF;
-static uint32_t last_max_captured_temperature = 0;
+#define DEFAULT_MIN_TEMPERATURE 0xFF
+#define DEFAULT_MAX_TEMPERATURE 0
+
+static uint32_t average_captured_temperature = 0;
+static uint32_t average_captured_temperature_amount = 0;
+static uint32_t min_captured_temperature = DEFAULT_MIN_TEMPERATURE;
+static uint32_t max_captured_temperature = DEFAULT_MAX_TEMPERATURE;
+static uint32_t last_min_captured_temperature = DEFAULT_MIN_TEMPERATURE;
+static uint32_t last_max_captured_temperature = DEFAULT_MAX_TEMPERATURE;
+static uint32_t last_average_captured_temperature = 0;
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
 	row -= 4 - segment;
@@ -85,9 +91,11 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 	uint32_t pixel_index = row * 160 + collumn_start;
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
-		uint16_t full_value = (buffer[i] << 8) | buffer[i-1];
+		uint16_t full_value = (buffer[i] << 8) | buffer[i+1];
 		uint8_t reduced_value = full_value >> 6;
 		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = reduced_value;
+		average_captured_temperature += reduced_value;
+		average_captured_temperature_amount++;
 		if((segment != 58) && (segment != 59) && (reduced_value != 0)) {
 			if(reduced_value > max_captured_temperature) {
 				max_captured_temperature = reduced_value;
@@ -126,7 +134,8 @@ bool Lepton_APP_Start(void) {
 	//if(Lepton_API_EnableAGC() == false){
 	//	error("Failed set AGC\r\n");
 	//}
-
+	/* TODO: clear buffer before start, breaks lepton for some reason */
+	//memset((uint8_t *)(SHARED_TERMO_BUF_START), 0x00, TERMO_RAW_HEIGTH * TERMO_RAW_WIDTH / 2);
 	debug("Lepton active\r\n");
 
 	Lepton_APP_StartReceive();
@@ -215,18 +224,27 @@ void Lepton_APP_Run(void){
 			}
 			decoded_segment = 0;
 			/* Save min/max temperature of the frame */
-			if(min_captured_temperature == 0xFF) {
+			if(min_captured_temperature == DEFAULT_MIN_TEMPERATURE) {
 				min_captured_temperature = last_min_captured_temperature;
 			}
-			if(max_captured_temperature == 0 || max_captured_temperature == 255) {
+			if((max_captured_temperature == DEFAULT_MAX_TEMPERATURE) || (max_captured_temperature == DEFAULT_MIN_TEMPERATURE)) {
 				max_captured_temperature = last_max_captured_temperature;
 			}
 			last_max_captured_temperature = max_captured_temperature;
 			last_min_captured_temperature = min_captured_temperature;
+			average_captured_temperature = average_captured_temperature / average_captured_temperature_amount;
+			if(average_captured_temperature == 0) {
+				average_captured_temperature = last_average_captured_temperature;
+			}
+			last_average_captured_temperature = average_captured_temperature;
+			//debug("Avg amount %u\r\n", average_captured_temperature_amount);
 			Shared_param_API_Write(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Write(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
-			min_captured_temperature = 0xFF;
-			max_captured_temperature = 0;
+			Shared_param_API_Write(eSharedParamAvgCapturedTemperature, &average_captured_temperature);
+			min_captured_temperature = DEFAULT_MIN_TEMPERATURE;
+			max_captured_temperature = DEFAULT_MAX_TEMPERATURE;
+			average_captured_temperature = 0;
+			average_captured_temperature_amount = 0;
 		}
 	}
 }
