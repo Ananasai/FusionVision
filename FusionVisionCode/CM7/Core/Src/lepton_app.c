@@ -76,6 +76,8 @@ static void Lepton_APP_StartReceive(void) {
 
 static uint32_t min_captured_temperature = 0xFF;
 static uint32_t max_captured_temperature = 0;
+static uint32_t last_min_captured_temperature = 0xFF;
+static uint32_t last_max_captured_temperature = 0;
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
 	row -= 4 - segment;
@@ -214,11 +216,13 @@ void Lepton_APP_Run(void){
 			decoded_segment = 0;
 			/* Save min/max temperature of the frame */
 			if(min_captured_temperature == 0xFF) {
-				min_captured_temperature = 1;
+				min_captured_temperature = last_min_captured_temperature;
 			}
 			if(max_captured_temperature == 0 || max_captured_temperature == 255) {
-				max_captured_temperature = 0xFF-10; //TODO test
+				max_captured_temperature = last_max_captured_temperature;
 			}
+			last_max_captured_temperature = max_captured_temperature;
+			last_min_captured_temperature = min_captured_temperature;
 			Shared_param_API_Write(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Write(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
 			min_captured_temperature = 0xFF;
