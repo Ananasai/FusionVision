@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef enum eSharedParamEnum_t {
+typedef enum eSharedParamEnum {
 	eSharedParamFirst = 0,
 	eSharedParamEdgeThreshold = eSharedParamFirst,
 	eSharedParamActiveUiPanelIndex,
@@ -21,17 +21,22 @@ typedef enum eSharedParamEnum_t {
 	eSharedParamScreenOptim,
 	eSharedParamEdgeAlgorithm,
 	eSharedParamBatteryLevel,
+	eSharedParamTermoState,
+	eSharedParamTermoThreshold,
+	eSharedParamMinCapturedTemperature,
+	eSharedParamMaxCapturedTemperature,
+	eSharedParamAvgCapturedTemperature,
 	eSharedParamLast
 }eSharedParamEnum_t;
 
-typedef enum eScreenState_t {
+typedef enum eScreenState {
 	eScreenStateFirst = 0,
 	eScreenStatePassthrough = eScreenStateFirst,
 	eScreenStateProcessed,
 	eScreenStateLast
 }eScreenState_t;
 
-typedef enum eScreenOptim_t {
+typedef enum eScreenOptim {
 	eScreenOptimFirst = 0,
 	eScreenOptimNone = eScreenOptimFirst,
 	eScreenOptimInterlacedProcessing,
@@ -39,12 +44,21 @@ typedef enum eScreenOptim_t {
 	eScreenOptimLast
 }eScreenOptim_t;
 
-typedef enum eEdgeAlgorithm_t {
+typedef enum eEdgeAlgorithm {
 	eEdgeAlgorithmFirst = 0,
 	eEdgeAlgorithmSobel = eEdgeAlgorithmFirst,
 	eEdgeAlgorithmRoberts,
 	eEdgeAlgorithmLast
 }eEdgeAlgorithm_t;
+
+typedef enum eTermoState {
+	eTermoStateFirst = 0,
+	eTermoStateDisabled = eTermoStateFirst,
+	eTermoStateAutoThreshold,
+	eTermoStateThreshold,
+	eTermoStateEdge,
+	eTermoStateLast
+}eTermoState_t;
 
 typedef struct sSharedParam_t{
 	char *name;

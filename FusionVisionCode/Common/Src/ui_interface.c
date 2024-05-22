@@ -99,12 +99,12 @@ static const sUiPanel_t thermal_settings_panel = {
 	.children = (sUiElementType_t[]) {
 		LABEL("Thermal",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
 		LABEL("settings",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
-		LABEL("WIP",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
-		LABEL("WIP",  0, 0, eFont11x18, eHorizontalAlignmentCenter),
+		PARAM_CHANGE_BUTTON("Method", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamTermoState),
+		PARAM_CHANGE_BUTTON("Threshold", 0, 0, eFont11x18, eHorizontalAlignmentCenter, eSharedParamTermoThreshold),
 		NAV_BUTTON("Back", 0, 0, eFont11x18, eHorizontalAlignmentCenter, ePanelMainMenu),
 	},
 	.children_amount = 5,
-	.selectable = 1,
+	.selectable = 3,
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
@@ -176,6 +176,15 @@ static const sParamValTextDesc_t param_value_text[eSharedParamLast] = {
 			[eEdgeAlgorithmRoberts] = "Roberts"
 		}
 	},
+	[eSharedParamTermoState] = {
+			.count = 2,
+			.texts = {
+				[eTermoStateDisabled] = "Disabled",
+				[eTermoStateAutoThreshold] = "Auto",
+				[eTermoStateThreshold] = "Threshold",
+				[eTermoStateEdge] = "Edge",
+			}
+		},
 };
 
 static uint32_t current_active_button_index = 0;

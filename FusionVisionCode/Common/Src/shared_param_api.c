@@ -2,6 +2,7 @@
 #include "shared_mem_api.h"
 #include "sync_api.h"
 #include <string.h>
+#include <limits.h>
 
 #define NEW_PARAM(_enum, _name, _size, _default, _min, _max) [_enum] = {.name = _name, .size = _size, .default_val = _default, .max = _max, .min = _min}
 
@@ -9,13 +10,18 @@
 
     //TODO: cache resources if they were not modified
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
-	NEW_PARAM(eSharedParamEdgeThreshold, "Edge", sizeof(uint32_t), 5, 0, 1000),
+	NEW_PARAM(eSharedParamEdgeThreshold, "Edge", sizeof(uint32_t), 1500, 0, 10000),
 	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0, 0, 999),
 	NEW_PARAM(eSharedParamActiveUiButtonIndex, "UI button index", sizeof(uint32_t), 0, 0, 999),
 	NEW_PARAM(eSharedParamScreenState, "Screen", sizeof(uint32_t), eScreenStatePassthrough, eScreenStateFirst, eScreenStateLast),
 	NEW_PARAM(eSharedParamScreenOptim, "Optimisation", sizeof(uint32_t), eScreenOptimNone, eScreenOptimFirst, eScreenOptimLast),
 	NEW_PARAM(eSharedParamEdgeAlgorithm, "Algorithm", sizeof(uint32_t), eEdgeAlgorithmSobel, eEdgeAlgorithmFirst, eEdgeAlgorithmLast),
 	NEW_PARAM(eSharedParamBatteryLevel, "Battery", sizeof(uint32_t), 69, 0, 100),
+	NEW_PARAM(eSharedParamTermoState, "Termo", sizeof(uint32_t), eTermoStateDisabled, eTermoStateFirst, eTermoStateLast),
+	NEW_PARAM(eSharedParamTermoThreshold, "Termo threshold", sizeof(uint32_t), 230, 0, 9999),
+	NEW_PARAM(eSharedParamMinCapturedTemperature, "Termo min", sizeof(uint32_t), 0xFFFF, 0, 0xFFFF),
+	NEW_PARAM(eSharedParamMaxCapturedTemperature, "Termo max", sizeof(uint32_t), 0, 0, 0xFFFF),
+	NEW_PARAM(eSharedParamAvgCapturedTemperature, "Termo avg", sizeof(uint32_t), 0, 0, 0xFFFF),
 	//NEW_PARAM(eSharedParamIrLighting, "Lighting", sizeof(uint32_t), 0, 0, 1),
 };
 

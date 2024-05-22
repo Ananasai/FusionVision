@@ -144,7 +144,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-static void       DCMI_DMAHalfXferCplt(DMA_HandleTypeDef *hdma);
 static void       DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma);
 static void       DCMI_DMAError(DMA_HandleTypeDef *hdma);
 
@@ -383,7 +382,6 @@ HAL_StatusTypeDef HAL_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_Mo
 
   /* Set the DMA memory0 conversion complete callback */
   hdcmi->DMA_Handle->XferCpltCallback = DCMI_DMAXferCplt;
-  hdcmi->DMA_Handle->XferHalfCpltCallback = DCMI_DMAHalfXferCplt;
 
   /* Set the DMA error callback */
   hdcmi->DMA_Handle->XferErrorCallback = DCMI_DMAError;
@@ -1187,21 +1185,6 @@ static void DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
       hdcmi->State = HAL_DCMI_STATE_READY;
     }
   }
-}
-
-__weak void HAL_DCMI_HalfFrameEventCallback(void)
-{
-
-  /* NOTE : This function Should not be modified, when the callback is needed,
-            the HAL_DCMI_MspDeInit could be implemented in the user file
-   */
-}
-
-static void DCMI_DMAHalfXferCplt(DMA_HandleTypeDef *hdma)
-{
-
-	HAL_DCMI_HalfFrameEventCallback();
-	return;
 }
 
 /**
