@@ -94,9 +94,9 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 		uint16_t full_value = (buffer[i] << 8) | buffer[i+1];
 		uint8_t reduced_value = full_value >> 6;
 		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = reduced_value;
-		average_captured_temperature += reduced_value;
-		average_captured_temperature_amount++;
 		if((segment != 58) && (segment != 59) && (reduced_value != 0)) {
+			average_captured_temperature += reduced_value;
+			average_captured_temperature_amount++;
 			if(reduced_value > max_captured_temperature) {
 				max_captured_temperature = reduced_value;
 			}
@@ -111,7 +111,7 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 
 static void Letpon_APP_Resync(void) {
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
-	HAL_Delay(200);
+	HAL_Delay(500);
 	Lepton_APP_ResetWatchdog();
 }
 

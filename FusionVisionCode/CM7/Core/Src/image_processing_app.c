@@ -26,6 +26,9 @@
 
 static uint8_t grayscale_buffer[LCD_HEIGTH*LCD_WIDTH] = {0};
 
+static uint32_t display_offset_y = (LCD_HEIGTH - TERMO_RAW_HEIGTH*2) / 2;
+static uint32_t display_offset_x = 0;
+
 bool IMG_PROCESSING_APP_Init(){
 
 	return true;
@@ -79,8 +82,8 @@ static inline void ConvertGrayscale(uint16_t *image_buffer, uint8_t *grayscale_b
 
 static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_buffer, uint16_t grayscale_width, uint16_t grayscale_heigth, eEdgeAlgorithm_t edge_algorithm, uint32_t threshold) {
 	/* Convert image buffer to grayscale and consequentially perform desired edge algorithm */
-	for(uint16_t y = 2; y < grayscale_heigth - 2; y += 1){ //TODO: make 2 dynamic
-		for(uint16_t x = 2; x < grayscale_width - 2; x += 1){
+	for(uint16_t y = 3; y < grayscale_heigth - 3; y += 1){ //TODO: make 2 dynamic
+		for(uint16_t x = 3; x < grayscale_width - 3; x += 1){
 			/* Perform edge detection */
 			uint32_t sum = 0;
 			/* Apply desired edge algorithm */
@@ -98,13 +101,13 @@ static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_bu
 			if(sum > threshold){
 				//TODO: fix workaround for lepton smaller view
 				if(grayscale_width == TERMO_RAW_WIDTH) {
-					PIXEL(image_buffer, x*3, y*2-1) = EDGE_COLOUR;
-					PIXEL(image_buffer, x*3+1, y*2-1) = EDGE_COLOUR;
-					PIXEL(image_buffer, x*3+2, y*2-1) = EDGE_COLOUR;
-					PIXEL(image_buffer, x*3, y*2) = EDGE_COLOUR;
-					PIXEL(image_buffer, x*3+1, y*2) = EDGE_COLOUR;
-					PIXEL(image_buffer, x*3+2, y*2) = EDGE_COLOUR;
-				} else {
+					PIXEL(image_buffer, (x*3+display_offset_x), (y*2+display_offset_y)-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, (x*3+display_offset_x)+1, (y*2+display_offset_y)-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, (x*3+display_offset_x)+2, (y*2+display_offset_y)-1) = EDGE_COLOUR;
+					PIXEL(image_buffer, (x*3+display_offset_x), (y*2+display_offset_y)) = EDGE_COLOUR;
+					PIXEL(image_buffer, (x*3+display_offset_x)+1, (y*2+display_offset_y)) = EDGE_COLOUR;
+					PIXEL(image_buffer, (x*3+display_offset_x)+2, (y*2+display_offset_y)) = EDGE_COLOUR;
+} else {
 					PIXEL(image_buffer, x, y-1) = EDGE_COLOUR;
 				}
 			}
@@ -113,24 +116,21 @@ static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_bu
 }
 
 static inline void DisplayTermo(uint16_t *image_buffer, uint32_t threshold) {
-	uint32_t display_offset_y = (LCD_HEIGTH - TERMO_RAW_HEIGTH*2) / 2;
-	uint32_t display_offset_x = 0;
 	for(uint8_t y = 0; y < TERMO_RAW_HEIGTH; y++) {
 		for(uint8_t x = 0; x < TERMO_RAW_WIDTH; x++) {
 			uint32_t termo_pixel_coord = y * TERMO_RAW_WIDTH + x;
-			uint32_t image_buffer_coord = (y*2 + display_offset_y) * LCD_WIDTH + (x*3 + display_offset_x);
 			uint16_t termo_colour = *(uint8_t *)(SHARED_TERMO_BUF_START + termo_pixel_coord);
 			/* Ignore values below threshold */
 			if(termo_colour < threshold) {
 				continue;
 			}
-			*(image_buffer + image_buffer_coord) = termo_colour;
 			/* Extend by 3x2 grid */
-			*(image_buffer + image_buffer_coord + 1) = termo_colour;
-			*(image_buffer + image_buffer_coord + 2) = termo_colour;
-			*(image_buffer + image_buffer_coord + LCD_WIDTH) = termo_colour;
-			*(image_buffer + image_buffer_coord + LCD_WIDTH + 1) = termo_colour;
-			*(image_buffer + image_buffer_coord + LCD_WIDTH + 2) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x), (y*2+display_offset_y)-1) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x)+1, (y*2+display_offset_y)-1) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x)+2, (y*2+display_offset_y)-1) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x), (y*2+display_offset_y)) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x)+1, (y*2+display_offset_y)) = termo_colour;
+			PIXEL(image_buffer, (x*3 + display_offset_x)+2, (y*2+display_offset_y)) = termo_colour;
 		}
 	}
 }
@@ -165,17 +165,17 @@ bool IMG_PROCESSING_APP_Compute(uint16_t *image_buffer){
 }
 
 bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
-	uint32_t termo_state = eTermoStatePassthrough;
-	//Shared_param_API_Read(eSharedParamTermoState, &termo_state);
+	uint32_t termo_state = eTermoStateAutoThreshold;
+	Shared_param_API_Read(eSharedParamTermoState, &termo_state);
 	switch(termo_state) {
-		case eTermoStatePassthrough: {
+		case eTermoStateAutoThreshold: {
 			uint32_t min_captured_temperature = 0;
 			uint32_t max_captured_temperature = 0;
 			uint32_t avg_captured_temperature = 0;
 			Shared_param_API_Read(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Read(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
 			Shared_param_API_Read(eSharedParamAvgCapturedTemperature, &avg_captured_temperature);
-			uint32_t threshold = avg_captured_temperature + 1;
+			uint32_t threshold = avg_captured_temperature + (max_captured_temperature - avg_captured_temperature)/2;
 			DisplayTermo(image_buffer, threshold);
 			debug("%u %u %u\r\n", min_captured_temperature, max_captured_temperature, avg_captured_temperature);
 		} break;

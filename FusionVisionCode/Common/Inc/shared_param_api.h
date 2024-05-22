@@ -54,7 +54,7 @@ typedef enum eEdgeAlgorithm {
 typedef enum eTermoState {
 	eTermoStateFirst = 0,
 	eTermoStateDisabled = eTermoStateFirst,
-	eTermoStatePassthrough,
+	eTermoStateAutoThreshold,
 	eTermoStateThreshold,
 	eTermoStateEdge,
 	eTermoStateLast
