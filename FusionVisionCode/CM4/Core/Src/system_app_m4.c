@@ -18,6 +18,7 @@
 //#include "lepton_app.h"
 #include <stdbool.h>
 #include "string_common.h"
+#include "lepton_app.h"
 
 /* Both core debugging: https://www.st.com/resource/en/application_note/dm00629855-getting-started-with-projects-based-on-dualcore-stm32h7-microcontrollers-in-stm32cubeide-stmicroelectronics.pdf */
 
@@ -69,11 +70,13 @@ bool System_APP_M4_Start(void){
 		}
 		(*const_app_lut[i].init_func)();
 	}
+	Lepton_APP_Start();
 	debug("Init done\r\n");
 	return true;
 }
 
 bool System_APP_M4_Run(void){
+	Lepton_APP_Run();
 	for(uint8_t i = 0; i < ARRAY_SIZE(const_app_lut); i++){
 		/* Execute initialise function of every app*/
 		if(const_app_lut[i].run_func == NULL){

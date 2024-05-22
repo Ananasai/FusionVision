@@ -1,4 +1,3 @@
-
 #include "system_app_m7.h"
 #include "Camera_OV2640.h"
 #include "LCD_ILI9486.h"
@@ -8,7 +7,6 @@
 #include "sync_api.h"
 #include "shared_param_api.h"
 #include "diagnostics_app.h"
-#include "lepton_app.h"
 #include "fonts.h"
 #include <string.h>
 #include "common.h"
@@ -55,7 +53,7 @@ bool System_APP_M7_Start(void){
 	Debug_API_Start(huart3);
 	UI_APP_Init(image_buffer);
 	IMG_PROCESSING_APP_Init();
-	Lepton_APP_Start();
+
 	Sync_API_ActivateSemaphoreIrq(eSemaphorePrintout, Printout_IRQ);
 	/* Init screen */
 	ili9486_Init();
@@ -77,7 +75,6 @@ bool System_APP_M7_Start(void){
 }
 
 bool System_APP_M7_Run(void){
-	Lepton_APP_Run();
 	/* Event on full frame received from DCMI  */
 	if(READ_FLAG(system_flags, eSystemFlagFrameEvent)) {
 		CLEAR_FLAG(system_flags, eSystemFlagFrameEvent);

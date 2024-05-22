@@ -1,18 +1,10 @@
-/*
- * image_processing_app.c
- *
- *  Created on: Dec 17, 2023
- *      Author: simon
- */
-#pragma GCC push_options
-#pragma GCC optimize ("O3")
-
 #include "image_processing_app.h"
 #include "shared_param_api.h"
 #include "debug_api.h"
 #include <stdlib.h>
 #include "shared_mem_api.h"
 #include "common.h"
+#include "sync_api.h"
 
 #define __DEBUG_FILE_NAME__ "PROC"
 
@@ -115,6 +107,7 @@ static inline void DisplayContours(uint16_t *image_buffer, uint8_t *grayscale_bu
 static inline void DisplayTermo(uint16_t *image_buffer, uint32_t threshold) {
 	uint32_t display_offset_y = (LCD_HEIGTH - TERMO_RAW_HEIGTH*2) / 2;
 	uint32_t display_offset_x = 0;
+	Sync_API_WaitSemaphore(eSemaphoreLepton);
 	for(uint8_t y = 0; y < TERMO_RAW_HEIGTH; y++) {
 		for(uint8_t x = 0; x < TERMO_RAW_WIDTH; x++) {
 			uint32_t termo_pixel_coord = y * TERMO_RAW_WIDTH + x;
@@ -133,6 +126,7 @@ static inline void DisplayTermo(uint16_t *image_buffer, uint32_t threshold) {
 			*(image_buffer + image_buffer_coord + LCD_WIDTH + 2) = termo_colour;
 		}
 	}
+	Sync_API_ReleaseSemaphore(eSemaphoreLepton);
 }
 
 /* ARM DSP LIB https://community.st.com/t5/stm32-mcus/configuring-dsp-libraries-on-stm32cubeide/ta-p/49637 */
@@ -173,9 +167,10 @@ bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
 			uint32_t max_captured_temperature = 0;
 			Shared_param_API_Read(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Read(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
-			uint32_t threshold = max_captured_temperature - 10;
+			uint32_t threshold = max_captured_temperature <= 10 ? 0 : max_captured_temperature - 10;
+			threshold = 0;
 			DisplayTermo(image_buffer, threshold);
-			debug("%u %u\r\n", min_captured_temperature, max_captured_temperature);
+			//debug("%u %u\r\n", min_captured_temperature, max_captured_temperature);
 		} break;
 		case eTermoStateThreshold: {
 			uint32_t termo_threshold = 0;
@@ -196,5 +191,3 @@ bool IMG_PROCESSING_APP_DrawTermo(uint16_t *image_buffer){
 	}
 	return true;
 }
-
-#pragma GCC pop_options

@@ -69,6 +69,12 @@ void Error_Handler(void);
 #define ADC_CURRENT_GPIO_Port GPIOA
 #define BTN_3_Pin GPIO_PIN_15
 #define BTN_3_GPIO_Port GPIOF
+#define LEPTON_VSYNC_Pin GPIO_PIN_13
+#define LEPTON_VSYNC_GPIO_Port GPIOE
+#define LEPTON_RST_Pin GPIO_PIN_14
+#define LEPTON_RST_GPIO_Port GPIOE
+#define LEPTON_PWR_Pin GPIO_PIN_15
+#define LEPTON_PWR_GPIO_Port GPIOE
 #define BTN_2_Pin GPIO_PIN_10
 #define BTN_2_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_14
@@ -77,6 +83,8 @@ void Error_Handler(void);
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
+#define SPI4_CS_Pin GPIO_PIN_7
+#define SPI4_CS_GPIO_Port GPIOD
 #define BTN_1_Pin GPIO_PIN_0
 #define BTN_1_GPIO_Port GPIOE
 #define LD2_Pin GPIO_PIN_1

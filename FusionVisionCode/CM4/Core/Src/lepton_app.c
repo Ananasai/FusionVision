@@ -2,14 +2,12 @@
 #include "debug_api.h"
 #include "circular_buffer.h"
 #include "fonts.h"
-#include "lepton_api.h"
+//#include "lepton_api.h"
 #include "shared_mem_api.h"
 #include "shared_param_api.h"
 #include <string.h>
 #include "common.h"
-
-//#pragma GCC push_options
-//#pragma GCC optimize ("O3") //TODO: remove this
+#include "sync_api.h"
 
 #define __DEBUG_FILE_NAME__ "LPT"
 
@@ -65,10 +63,10 @@ static void Lepton_APP_StartReceive(void) {
 	static bool use_buffer_1 = true;
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
 	if(use_buffer_1 == true){
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, PACKET_FULL_LEN);
 	}
 	else{
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, PACKET_FULL_LEN);
 	}
 	rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
 	use_buffer_1 = !use_buffer_1;
@@ -81,6 +79,7 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 	row -= 4 - segment;
 	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
 	uint32_t pixel_index = row * 160 + collumn_start;
+	Sync_API_WaitSemaphore(eSemaphoreLepton);
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
 		uint16_t full_value = (buffer[i] << 8) | buffer[i-1];
@@ -94,9 +93,9 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 				min_captured_temperature = reduced_value;
 			}
 		}
-		//*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
+	Sync_API_ReleaseSemaphore(eSemaphoreLepton);
 }
 
 static void Letpon_APP_Resync(void) {
@@ -124,7 +123,9 @@ bool Lepton_APP_Start(void) {
 	//if(Lepton_API_EnableAGC() == false){
 	//	error("Failed set AGC\r\n");
 	//}
-
+	/* Clear out shared buffer */
+	memset((uint8_t *)(SHARED_TERMO_BUF_START), 0x00, TERMO_RAW_HEIGTH * TERMO_RAW_WIDTH);
+	memset((uint8_t *)(SHARED_TERMO_BUF_START), 0xFF, 80);
 	debug("Lepton active\r\n");
 
 	Lepton_APP_StartReceive();
@@ -161,6 +162,7 @@ void Lepton_APP_Run(void){
 	}
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketReceived)){
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
+		//debug("%u\r\n", rx_buffer[0]);
 		Lepton_APP_StartReceive();
 		/* Check discard packet*/
 		if((rx_buffer[0] & 0x0F) == 0x0F){
@@ -183,11 +185,11 @@ void Lepton_APP_Run(void){
 				/* Display last 20 packets */
 				uint8_t packet_index = 0;
 				for(uint8_t i = circ_buffer_index; i < CIRC_BUF_PACKET_LEN; i++) {
-					Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+					//Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
 					packet_index++;
 				}
 				for(uint8_t i = 0; i < circ_buffer_index; i++) {
-					Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
+					//Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
 					packet_index++;
 				}
 			}
@@ -204,7 +206,6 @@ void Lepton_APP_Run(void){
 		if(decoded_segment != 0) {
 			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
 		}
-
 		if(decoded_packet == PACKET_IN_SEGMENT - 2){
 			if(decoded_segment == 4){
 				/* Can start drawing */
@@ -223,6 +224,7 @@ void Lepton_APP_Run(void){
 			Shared_param_API_Write(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
 			min_captured_temperature = 0xFF;
 			max_captured_temperature = 0;
+			//debug("Done\r\n");
 		}
 	}
 }
@@ -230,7 +232,7 @@ void Lepton_APP_Run(void){
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim == &htim4){
 		/* Lost synchronization timer */
-		SET_FLAG(lepton_flags, eLeptonFlagLostSynchronization);
+		//SET_FLAG(lepton_flags, eLeptonFlagLostSynchronization);
 	}
 }
 
@@ -251,4 +253,3 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
 //		HardFault_Handler(); //TODO: not working
 //	}
 //}
-//#pragma GCC pop_options

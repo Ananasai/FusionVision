@@ -18,6 +18,7 @@ typedef enum eSemaphore_t {
 	eSemaphoreButton,
 	eSemaphoreUiUpdate,
 	eSemaphorePrintout,
+	eSemaphoreLepton,
 	eSemaphoreLast
 }eSemaphore_t;
 
