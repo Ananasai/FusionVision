@@ -1,10 +1,3 @@
-/*
- * sync_api.h
- *
- *  Created on: Nov 16, 2023
- *      Author: simon
- */
-
 #ifndef INC_SYNC_API_H_
 #define INC_SYNC_API_H_
 

@@ -8,43 +8,63 @@
 #define PROCESS_ID 1
 #endif
 
+/*
+ * Array of callbacks to semaphore take IRQs. //TODO: make several callbacks available.
+ */
 void (*semaphore_callback_lut[eSemaphoreLast])(void) = {0};
 
-
-bool Sync_API_WaitSemaphore(eSemaphore_t sem){
-	//while(HAL_HSEM_IsSemTaken(sem) == 1){ //TODO: not working
-
-	//}
+/*
+ * Wait forever for semaphore to be free.
+ */
+bool Sync_API_WaitSemaphore(eSemaphore_t sem){ //TODO; implement timeout?
 	while(HAL_HSEM_Take(sem, PROCESS_ID) != HAL_OK){
 
 	}
 	return true;
 }
 
+/*
+ * Take semaphore.
+ * Returns true if taken succesfully.
+ */
 bool Sync_API_TakeSemaphore(eSemaphore_t sem){
 	return HAL_HSEM_Take(sem, PROCESS_ID) == HAL_OK ? true : false;
 }
 
+/*
+ * Releases taken semaphore.
+ */
 bool Sync_API_ReleaseSemaphore(eSemaphore_t sem){
 	HAL_HSEM_Release(sem, PROCESS_ID);
 	return true;
 }
 
+/*
+ * Releases all semaphores of the current core.
+ */
 bool Sync_API_ReleaseSemaphoreAll(void){
 	HAL_HSEM_ReleaseAll(0xFFFF, PROCESS_ID);
 	return true;
 }
 
+/*
+ * Register a callback if a specific semaphore is released.
+ * Currently only one callback is supported.
+ */
 bool Sync_API_ActivateSemaphoreIrq(eSemaphore_t sem, void (*new_callback)(void)){
 	semaphore_callback_lut[sem] = new_callback;
 	HAL_HSEM_ActivateNotification(0x1 << sem);
 	return true;
 }
 
-/* HSEM released IRQ, call desired callback*/
+/*
+ * Semaphore released IRQ.
+ */
 void HAL_HSEM_FreeCallback(uint32_t sem_mask){
+	/* Check which semaphore was released */
 	for(uint8_t i = 0; i < eSemaphoreLast; i++){
 		if(((sem_mask >> i) & 0x01) == 0x01){
+			/* i semaphore released - call callback if one is defined */
 			if(semaphore_callback_lut[i] == NULL){
 				break;
 			}
@@ -52,7 +72,7 @@ void HAL_HSEM_FreeCallback(uint32_t sem_mask){
 			break;
 		}
 	}
-	/* Reeactivate semaphore irq */
+	/* Reeactivate semaphore IRQ */
 	HAL_HSEM_ActivateNotification(sem_mask);
 }
 

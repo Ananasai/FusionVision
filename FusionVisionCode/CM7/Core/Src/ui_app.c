@@ -1,9 +1,3 @@
-/*
- * ui_app.c
- *
- *  Created on: Dec 16, 2023
- *      Author: simon
- */
 #include "ui_app.h"
 #include "ui_element_driver.h"
 #include "debug_api.h"
@@ -37,6 +31,9 @@ static uint32_t curr_active_ui_button = 0;
 static uint32_t last_ui_update_time = 0;
 static bool last_ui_update_flag = true;
 
+/*
+ * Start function.
+ */
 bool UI_APP_Init(uint16_t *new_image_buffer){
 	if(new_image_buffer == NULL){
 		return false;
@@ -45,20 +42,26 @@ bool UI_APP_Init(uint16_t *new_image_buffer){
 	return Sync_API_ActivateSemaphoreIrq(eSemaphoreUiUpdate, &UI_Updated);
 }
 
+/*
+ * Draw Ui to image_buffer
+ */
 bool UI_APP_DrawAll(void){
-	UI_Interface_UpdateLabels(hrtc);
 	const sUiPanel_t *curr_panel;
+	uint32_t curr_time = HAL_GetTick();
+	UI_Interface_UpdateLabels(hrtc);
+	/* Draw the constant visible panel - time and battery indicator. */
 	UI_Interface_GetConstantPanel(&curr_panel);
 	for(size_t i = 0; i < curr_panel->children_amount; i++){
 		UI_DRIVER_DrawString(curr_panel->children[i].x, curr_panel->children[i].y, image_buffer, *curr_panel->children[i].element.label->string, *curr_panel->children[i].param, false);
 	}
-	uint32_t curr_time = HAL_GetTick();
+	/* Draw MENU UI */
+	/* Only draw menu UI if last action was no later than UI_UPDATE_TIMEOUT */
 	if(curr_time - last_ui_update_time < UI_UPDATE_TIMEOUT){
 		/* Draw menu if active */
 		if(UI_Interface_GetCurrentPanel(&curr_panel) == false){
 			return false;
 		}
-		/* Get new variables if UI changed */
+		/* Get new active UI button if it was changed */
 		if(last_ui_update_flag){
 			Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &curr_active_ui_button);
 			last_ui_update_flag = false;
@@ -70,13 +73,15 @@ bool UI_APP_DrawAll(void){
 			panel_y = curr_panel->y;
 		} else{
 			//TODO: add protections
-			panel_y = SCREEN_HEIGHT - (SCREEN_HEIGHT - curr_panel->children_amount * curr_panel->spacing_y) / 2 - curr_panel->spacing_y;
+			panel_y = LCD_HEIGTH - (LCD_HEIGTH - curr_panel->children_amount * curr_panel->spacing_y) / 2 - curr_panel->spacing_y;
 		}
+		/* Calculate horizontal alignment of menu panel */
 		if(curr_panel->hor_align == eHorizontalAlignmentNone){
 			panel_x = curr_panel->x;
 		} else{
 			panel_x = curr_panel->x; //TODO: change
 		}
+		/* Draw all current active panel intems (buttons, labels ...) */
 		uint32_t selectable_i = 0;
 		for(size_t i = 0; i < curr_panel->children_amount; i++){
 			switch(curr_panel->children[i].type){
@@ -99,7 +104,9 @@ bool UI_APP_DrawAll(void){
 	return true;
 }
 
-/* Ui update event on semaphore release, record time*/
+/*
+ * Selected button/parameter was changed - update all UI.
+ */
 static void UI_Updated(void){
 	last_ui_update_time = HAL_GetTick();
 	last_ui_update_flag = true;

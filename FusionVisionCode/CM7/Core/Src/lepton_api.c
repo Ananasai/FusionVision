@@ -1,10 +1,3 @@
-/*
- * lepton_api.c
- *
- *  Created on: Jan 6, 2024
- *      Author: simon
- */
-
 #include "lepton_api.h"
 #include "debug_api.h"
 #include <stdlib.h>

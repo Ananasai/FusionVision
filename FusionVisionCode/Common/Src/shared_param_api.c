@@ -3,12 +3,14 @@
 #include "sync_api.h"
 #include <string.h>
 #include <limits.h>
+#include "common.h"
 
 #define NEW_PARAM(_enum, _name, _size, _default, _min, _max) [_enum] = {.name = _name, .size = _size, .default_val = _default, .max = _max, .min = _min}
 
-#define ARR_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
-
-    //TODO: cache resources if they were not modified
+/*
+ * LUT for storing parameters that are written into shared memory.
+ * Saves their name, max/min/default value ranges
+ */
 static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	NEW_PARAM(eSharedParamEdgeThreshold, "Edge", sizeof(uint32_t), 1500, 0, 10000),
 	NEW_PARAM(eSharedParamActiveUiPanelIndex, "UI panel index", sizeof(uint32_t), 0, 0, 999),
@@ -25,12 +27,17 @@ static const sSharedParam_t shared_param_lut[eSharedParamLast] = {
 	//NEW_PARAM(eSharedParamIrLighting, "Lighting", sizeof(uint32_t), 0, 0, 1),
 };
 
+/*
+ * Stores calculated shared parameters memory space offsets.
+ */
 static uint32_t shared_param_address_lut[eSharedParamLast] = { 0 };
 
-/* Init shared parameter addresses in shared SRAM region */
+/*
+ * Init shared parameter addresses in shared SRAM region.
+ */
 bool Shared_param_API_Init(void){
 	uint32_t last_address = SHARED_MEM_START;
-	for(eSharedParamEnum_t param = 0; param < ARR_LENGTH(shared_param_lut); param++){
+	for(eSharedParamEnum_t param = 0; param < ARRAY_SIZE(shared_param_lut); param++){
 		shared_param_address_lut[param] = last_address;
 		last_address += shared_param_lut[param].size;
 		if(last_address >= SHARED_MEM_START + SHARED_MEM_LEN){
@@ -46,6 +53,9 @@ bool Shared_param_API_Init(void){
 	return true;
 }
 
+/*
+ * Gets name of shared parameter.
+ */
 bool Shared_param_API_GetDesc(eSharedParamEnum_t param, sSharedParam_t *out){
 	if(param >= eSharedParamLast){
 		return false;
@@ -54,6 +64,9 @@ bool Shared_param_API_GetDesc(eSharedParamEnum_t param, sSharedParam_t *out){
 	return true;
 }
 
+/*
+ * Reads the value of shared parameter.
+ */
 bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){ //TODO: could implement caching
 	if(param >= eSharedParamLast){
 		return false;
@@ -61,6 +74,9 @@ bool Shared_param_API_Read(eSharedParamEnum_t param, volatile void* out){ //TODO
 	return Shared_mem_API_Read(shared_param_address_lut[param], (volatile void *)out, shared_param_lut[param].size);
 }
 
+/*
+ * Writes value of shared parameter.
+ */
 bool Shared_param_API_Write(eSharedParamEnum_t param, volatile uint32_t* in){
 	if((param >= eSharedParamLast) || (in == NULL)){
 		return false;

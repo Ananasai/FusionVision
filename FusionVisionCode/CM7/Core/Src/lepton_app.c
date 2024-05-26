@@ -8,9 +8,6 @@
 #include <string.h>
 #include "common.h"
 
-//#pragma GCC push_options
-//#pragma GCC optimize ("O3") //TODO: remove this
-
 #define __DEBUG_FILE_NAME__ "LPT"
 
 #define PACKET_FULL_LEN 164
@@ -18,6 +15,9 @@
 #define PACKET_IN_SEGMENT 60
 
 #define CIRC_BUF_PACKET_LEN 20
+
+#define DEFAULT_MIN_TEMPERATURE 0xFF
+#define DEFAULT_MAX_TEMPERATURE 0
 
 typedef enum eLeptonFlag {
 	eLeptonFlagFirst = 0,
@@ -51,32 +51,45 @@ typedef enum eLeptonFlag {
 
 static uint8_t lepton_flags = 0x00;
 
+/*
+ * SPI receive buffers.
+ * Using two buffers "rx_buffer1" and "rx_buffer2" so that when on is filled
+ * another can be used to immediately receive without overriding the first ones data.
+ * rx_buffer pointer indicates the current valid data buffer for decoding.
+ */
 static uint8_t *rx_buffer;
 static uint8_t rx_buffer1[PACKET_FULL_LEN] = {0};
 static uint8_t rx_buffer2[PACKET_FULL_LEN] = {0};
 
+/*
+ * Resets "watchdog" timer.
+ */
 static void Lepton_APP_ResetWatchdog(void) {
 	HAL_TIM_Base_Stop_IT(&htim4);
 	htim4.Instance->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim4);
 }
 
-static void Lepton_APP_StartReceive(void) {
+/*
+ * Start receiving SPI data into one of the buffers.
+ */
+static void Lepton_APP_StartReceive(void) { //TODO: stop DMA if there is one active
 	static bool use_buffer_1 = true;
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_RESET);
 	if(use_buffer_1 == true){
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, 164);
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer1, PACKET_FULL_LEN);
 	}
 	else{
-		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, 164);
+		HAL_SPI_Receive_DMA(&hspi4, rx_buffer2, PACKET_FULL_LEN);
 	}
 	rx_buffer = use_buffer_1 ? rx_buffer1 : rx_buffer2;
 	use_buffer_1 = !use_buffer_1;
 }
 
-#define DEFAULT_MIN_TEMPERATURE 0xFF
-#define DEFAULT_MAX_TEMPERATURE 0
-
+/*
+ * Variables for keeping the min/max captured temperature in the frame as
+ * telemetry mode is not working.
+ */
 static uint32_t average_captured_temperature = 0;
 static uint32_t average_captured_temperature_amount = 0;
 static uint32_t min_captured_temperature = DEFAULT_MIN_TEMPERATURE;
@@ -84,16 +97,23 @@ static uint32_t max_captured_temperature = DEFAULT_MAX_TEMPERATURE;
 static uint32_t last_min_captured_temperature = DEFAULT_MIN_TEMPERATURE;
 static uint32_t last_max_captured_temperature = DEFAULT_MAX_TEMPERATURE;
 static uint32_t last_average_captured_temperature = 0;
+/*
+ * Decode full 164 bytes of received data and draw the decoded bytes to lepton image buffer.
+ */
 static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment, uint8_t packet) {
+	/* Calculates packet coordinates from packet and segment IDs */
 	uint16_t row = 119 - (30 * (segment-1)) - ((uint8_t)(packet / 2));
 	row -= 4 - segment;
 	uint16_t collumn_start = packet % 2 == 0 ? 80 : 0;
 	uint32_t pixel_index = row * 160 + collumn_start;
+	/* Draw all pixels starting with the last one */
 	for(uint16_t i = PACKET_DATA_LEN + 2; i > 3; i -= 2){
 		/* RAW14 - MSB in buffer[i], LSB in buffer[i-1] */
 		uint16_t full_value = (buffer[i] << 8) | buffer[i+1];
+		/* Save only 8bits into lepton buffer as we are very space limited */
 		uint8_t reduced_value = full_value >> 6;
 		*(uint8_t *)(SHARED_TERMO_BUF_START + pixel_index) = reduced_value;
+		/* Don't draw the not working 58 and 59 segments */
 		if((segment != 58) && (segment != 59) && (reduced_value != 0)) {
 			average_captured_temperature += reduced_value;
 			average_captured_temperature_amount++;
@@ -104,17 +124,22 @@ static void Lepton_APP_DecodeAndDrawFromBuffer(uint8_t *buffer, uint8_t segment,
 				min_captured_temperature = reduced_value;
 			}
 		}
-		//*(image_buffer + pixel_index) = full_value >> 6;
 		pixel_index += 1;
 	}
 }
 
+/*
+ * Start resync according to documentation.
+ */
 static void Letpon_APP_Resync(void) {
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 	HAL_Delay(500);
 	Lepton_APP_ResetWatchdog();
 }
 
+/*
+ * Start function.
+ */
 bool Lepton_APP_Start(void) {
 	/* Lepton initialisation page 17 */
 	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
@@ -150,27 +175,35 @@ bool Lepton_APP_Start(void) {
 /* Circular buffer for receiving packets */
 uint8_t circ_buffer[PACKET_FULL_LEN * CIRC_BUF_PACKET_LEN] = {0};
 uint8_t circ_buffer_index = 0;
-
+/*
+ * Currently decoded segment, if 0 - invalid.
+ */
 uint16_t decoded_segment = 0;
+
+/*
+ * Run function executed every cycle.
+ */
 void Lepton_APP_Run(void){
 	if(READ_FLAG(lepton_flags, eLeptonFlagLostSynchronization)) {
-		/* Restores synchronization if no new frame is generated in 1s period */
+		/* Restores synchronization if no new frame was generated in 1s period */
 		error("Lepton lost synchronization\r\n");
+		Letpon_APP_Resync();
+		/* Start receiving again after resync */
 		CLEAR_FLAG(lepton_flags, eLeptonFlagLostSynchronization);
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
-		Letpon_APP_Resync();
 		Lepton_APP_StartReceive();
 	}
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketOverflow)) {
-		/* Packet reading overflow */
+		/* Packet reading overflow - resync */
 		error("Lepton reading overflow\r\n");
+		Letpon_APP_Resync();
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketOverflow);
-		Letpon_APP_Resync();
 		Lepton_APP_StartReceive();
 	}
 	if(READ_FLAG(lepton_flags, eLeptonFlagPacketReceived)){
+		/* packet was received and is stored in rx_buffer */
 		CLEAR_FLAG(lepton_flags, eLeptonFlagPacketReceived);
 		Lepton_APP_StartReceive();
 		/* Check discard packet*/
@@ -178,7 +211,7 @@ void Lepton_APP_Run(void){
 			return;
 		}
 
-		/* Decode data */
+		/* Try decode segment number */
 		uint16_t decoded_packet = rx_buffer[1];
 		if(decoded_packet == 20){
 			decoded_segment = (rx_buffer[0] >> 4) & 0x0F;
@@ -186,12 +219,11 @@ void Lepton_APP_Run(void){
 				/* Whole frame invalid */
 				return;
 			} else if(decoded_segment > 4){
+				/* Invalid segment as only 4 are supported */
 				decoded_segment = 0;
 				return;
 			} else {
-				/* Valid segment */
-				//debug("Seg: %hu %hu \r\n", decoded_segment, start_buffer_idx);
-				/* Display last 20 packets */
+				/* Valid segment received, display the last 20 packets stored in circ_buffer */
 				uint8_t packet_index = 0;
 				for(uint8_t i = circ_buffer_index; i < CIRC_BUF_PACKET_LEN; i++) {
 					Lepton_APP_DecodeAndDrawFromBuffer(circ_buffer + i * PACKET_FULL_LEN, decoded_segment, packet_index);
@@ -204,26 +236,27 @@ void Lepton_APP_Run(void){
 			}
 		} else if (decoded_packet < 20) {
 			/* Received packet without knowing from which segment */
-			/* Save to circular buffer for further use */
+			/* Save to circular buffer for further use after segment is received */
 			//TODO: copy only decoded data?
 			memcpy(circ_buffer + circ_buffer_index * PACKET_FULL_LEN, rx_buffer, PACKET_FULL_LEN);
 			circ_buffer_index = (circ_buffer_index + 1) % CIRC_BUF_PACKET_LEN;
 		} else if (decoded_packet >= 60){
+			/* invalid received packet */
 			return;
 		}
-
+		/* Decode and draw data from received buffer if current segment is valid */
 		if(decoded_segment != 0) {
 			Lepton_APP_DecodeAndDrawFromBuffer(rx_buffer, decoded_segment, decoded_packet);
 		}
-
+		/* Check if whoel frame was received */
 		if(decoded_packet == PACKET_IN_SEGMENT - 2){
 			if(decoded_segment == 4){
-				/* Can start drawing */
+				/* Whole frame received - reset watchdog */
 				HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
 				Lepton_APP_ResetWatchdog();
 			}
 			decoded_segment = 0;
-			/* Save min/max temperature of the frame */
+			/* Calculate min/max/avg value of the frame */
 			if(min_captured_temperature == DEFAULT_MIN_TEMPERATURE) {
 				min_captured_temperature = last_min_captured_temperature;
 			}
@@ -237,7 +270,7 @@ void Lepton_APP_Run(void){
 				average_captured_temperature = last_average_captured_temperature;
 			}
 			last_average_captured_temperature = average_captured_temperature;
-			//debug("Avg amount %u\r\n", average_captured_temperature_amount);
+			/* Save min/max/avg value to shared buffer */
 			Shared_param_API_Write(eSharedParamMinCapturedTemperature, &min_captured_temperature);
 			Shared_param_API_Write(eSharedParamMaxCapturedTemperature, &max_captured_temperature);
 			Shared_param_API_Write(eSharedParamAvgCapturedTemperature, &average_captured_temperature);
@@ -249,6 +282,10 @@ void Lepton_APP_Run(void){
 	}
 }
 
+/*
+ * lepton watchdog timer IRQ - watchdog is active and no new frames received in time period.
+ * Need to resync Lepton.
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim == &htim4){
 		/* Lost synchronization timer */
@@ -256,6 +293,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	}
 }
 
+/*
+ * SPI receive callback for full 164 byte frame.
+ */
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     if(hspi == &hspi4){
     	HAL_GPIO_WritePin(SPI4_CS_GPIO_Port, SPI4_CS_Pin, GPIO_PIN_SET);
@@ -266,11 +306,3 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef * hspi){
     	}
     }
 }
-
-/* Sadly VSYNC not configurable */
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-//	if(GPIO_Pin == LEPTON_VSYNC_Pin){
-//		HardFault_Handler(); //TODO: not working
-//	}
-//}
-//#pragma GCC pop_options

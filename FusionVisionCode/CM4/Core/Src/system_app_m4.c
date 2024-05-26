@@ -30,7 +30,9 @@ typedef struct sAppDesc_t {
 	bool (*run_func)(void);
 }sAppDesc_t;
 
-/* ADD new apps here */
+/*
+ * List of all apps to run.
+ */
 typedef enum eAppEnum_t {
 	eAppFirst = 0,
 	eAppLed = eAppFirst,
@@ -44,6 +46,9 @@ typedef enum eAppEnum_t {
 	eAppLast /* MUST BE LEFT LAST */
 }eAppEnum_t;
 
+/*
+ * Table of apps, their names and init/run function pointers.
+ */
 static const sAppDesc_t const_app_lut[] = {
 	APP_DESC(eAppLed, "LED", &Led_APP_Start, &Led_APP_Run),
 	APP_DESC(eAppButton, "BUTTON", &Button_APP_Start, &Button_APP_Run),
@@ -55,12 +60,15 @@ static const sAppDesc_t const_app_lut[] = {
 	//APP_DESC(eAppLepton, "LEPTON", &Lepton_APP_Start)
 };
 
-/* RTOS CMSIS V2 documentation: https://www.keil.com/pack/doc/CMSIS/RTOS2/html/rtos_api2.html */
+/*
+ * Start function - initialises all apps by calling the run functions.
+ */
 bool System_APP_M4_Start(void){
+	/* Start DEBUG uart */
 	Debug_API_Start(huart3);
 	debug("Init starting\r\n");
 	Shared_param_API_Init();
-//	Job_API_InitAll();
+	/* Init all apps by looping thru app lut */
 	for(uint8_t i = 0; i < ARRAY_SIZE(const_app_lut); i++){
 		/* Execute initialise function of every app*/
 		if(const_app_lut[i].init_func == NULL){
@@ -73,9 +81,13 @@ bool System_APP_M4_Start(void){
 	return true;
 }
 
+/*
+ * Run function that executes every cycle.
+ */
 bool System_APP_M4_Run(void){
+	/* Loop thru app lut */
 	for(uint8_t i = 0; i < ARRAY_SIZE(const_app_lut); i++){
-		/* Execute initialise function of every app*/
+		/* Execute initialise function of every app */
 		if(const_app_lut[i].run_func == NULL){
 			continue;
 		}

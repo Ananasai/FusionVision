@@ -1,17 +1,8 @@
-/*
- * fons.h
- *
- *  Created on: Dec 15, 2023
- *      Author: simon
- */
-
 #ifndef INC_FONTS_H_
 #define INC_FONTS_H_
 
 #include <stdint.h>
-
-#define SCREEN_HEIGHT 320
-#define SCREEN_WIDTH 480
+#include "common.h"
 
 /* SPECIAL SYMBOLS ONLY ON 11x18 FONT */ //TODO: maybe use special ui elements instead of ascii?
 #define BATTERY_ICON_FULL_LEFT '\x7F'
@@ -58,7 +49,7 @@ typedef struct sFontDesc_t {
 	const uint16_t *table;
 }sFontDesc_t;
 
-extern const uint16_t splash_screen[153600];
+extern const uint16_t splash_screen[LCD_WIDTH*LCD_HEIGTH];
 extern const sFontDesc_t font_lut[eFontLast];
 
 #endif /* INC_FONTS_H_ */

@@ -1,10 +1,3 @@
-/*
- * debug_api.h
- *
- *  Created on: Nov 16, 2023
- *      Author: simon
- */
-
 #ifndef INC_STRING_COMMON_H_
 #define INC_STRING_COMMON_H_
 

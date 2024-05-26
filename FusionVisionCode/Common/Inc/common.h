@@ -9,3 +9,5 @@
 
 #define TERMO_RAW_WIDTH 160
 #define TERMO_RAW_HEIGTH (120 - 4) /* TODO: figure out why 58 and 59 packets are bad */
+
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))

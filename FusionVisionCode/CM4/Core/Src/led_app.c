@@ -10,20 +10,29 @@ void Blink_Timer_Callback(void);
 static uint32_t last_time = 0;
 static uint32_t new_time = 0;
 
+/*
+ * Start function, not used.
+ */
 bool Led_APP_Start(void){
 
 	return true;
 }
 
+/*
+ * Run every cycle, do LED callback every BLINK_TIMER_PERIOD.
+ */
 bool Led_APP_Run(void){
 	new_time = HAL_GetTick();
-	if(new_time - last_time > 100) {
+	if(new_time - last_time > BLINK_TIMER_PERIOD) {
 		last_time = new_time;
 		Blink_Timer_Callback();
 	}
 	return true;
 }
 
+/*
+ * LED callback executed every BLINK_TIMER_PERIOD.
+ */
 void Blink_Timer_Callback(void){
 	HAL_GPIO_TogglePin(SCREEN_LED_GPIO_Port, SCREEN_LED_Pin);
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);

@@ -1,9 +1,3 @@
-///*
-// * serial_app.c
-// *
-// *  Created on: Dec 28, 2023
-// *      Author: simon
-// */
 //#include "serial_app.h"
 //#include "debug_api.h"
 //#include "circular_buffer.h"
@@ -26,14 +20,6 @@
 //static uint8_t rx_byte = 0;
 //static uint8_t delimiter_index = 0;
 //
-//static const osThreadAttr_t serial_thread_attr = {
-//	.name = "SERIAL",
-//	.priority = osPriorityAboveNormal
-//};
-//
-//static const osEventFlagsAttr_t serial_flags_attr = {
-//	.name = "SERIAL"
-//};
 //
 //static osThreadId_t serial_thread_id = NULL;
 //static osEventFlagsId_t serial_flags_id = NULL;
@@ -43,6 +29,9 @@
 //static void Serial_Thread(void *arg);
 //static bool Serial_Match_CMD(const sSerialCommandTable_t *cmd_table, sString_t incoming);
 //
+/*
+ * Start function, initialises circular buffer.
+ */
 //bool Serial_APP_Start(void){
 //	if(Circular_buffer_create(&circular_buffer, CIRC_BUF_MAX) == false){
 //		error("Creating circular buffer\r\n");
@@ -61,6 +50,9 @@
 //	return true;
 //}
 //
+/*
+ * Run that is executed every cycle.
+ */
 //static void Serial_Thread(void *arg){
 //	uint32_t flags = 0;
 //	/* Start UART RX */
@@ -101,6 +93,10 @@
 //	}
 //}
 //
+/*
+ * Check if new command is in cmd_table and execute it.
+ * Return true if found mathc.
+ */
 //static bool Serial_Match_CMD(const sSerialCommandTable_t *cmd_table, sString_t incoming){
 //	for(uint32_t cmd = 0; cmd < cmd_table->length; cmd++){
 //		const sSerialCommand_t *current_cmd = cmd_table->commands + cmd;
@@ -118,6 +114,9 @@
 //	return false;
 //}
 //
+/*
+ * UART RX callback, pushes new byte to circular buffer.
+ */
 //void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){ //TODO: handle cyclic buffer overflow
 //	Circular_buffer_push(&circular_buffer, rx_byte);
 //	osEventFlagsSet(serial_flags_id, FLAGS_RX);

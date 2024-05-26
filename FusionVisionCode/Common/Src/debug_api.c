@@ -1,10 +1,3 @@
-/*
- * debug_api.c
- *
- *  Created on: Nov 16, 2023
- *      Author: simon
- */
-
 #include "debug_api.h"
 #include <string.h>
 #include <stdio.h>
@@ -27,6 +20,7 @@ bool Debug_API_Start(UART_HandleTypeDef huart){
 	return true;
 }
 
+//TODO: check max message length
 void DEBUG_API_LOG (char *message, char *info_string, char *error_string, ...) {
     if (message == NULL) {
         return;

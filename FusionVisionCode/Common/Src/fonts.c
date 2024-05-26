@@ -1,10 +1,3 @@
-/*
- * fonts.c
- *
- *  Created on: Dec 15, 2023
- *      Author: simon
- */
-
 #include "fonts.h"
 
 //From: https://github.com/afiskon/stm32-ssd1306/blob/master/ssd1306/ssd1306_fonts.c

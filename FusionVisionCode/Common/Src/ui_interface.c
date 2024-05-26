@@ -21,7 +21,7 @@ typedef struct sPanelNavDesc_t {
 #define NAV_BUTTON(_name, _x, _y, _font, _align, _target) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}, .callback = UI_NavButtonPressed, .argument = &(uint32_t){_target}}}
 #define PARAM_CHANGE_BUTTON(_name, _x, _y, _font, _align, _target) {.type = eUiElementTypeButton, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.button = &(sUiButton_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}, .callback = UI_ParamChangeButtonPressed, .argument = &(eSharedParamEnum_t){_target}}}
 #define LABEL(_name, _x, _y, _font, _align) {.type = eUiElementTypeLabel, .x = _x, .y = _y, .param = &(sTextParam_t){.font = _font, .alignment = _align}, .element.label = &(sUiLabel_t){.string = &(sString_t){.text = _name, .length = sizeof(_name)}}}
-#define PANEL(_panel, _parent) {.panel = _panel, .parent = _parent, .last_btn = 0}
+#define PANEL(_panel, _parent) [_parent] = {.panel = _panel, .parent = _parent, .last_btn = 0}
 
 static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t press);
 static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press);
@@ -33,7 +33,9 @@ static char current_param_value_text[20] = "DEFAULT";
 static char time_text[20] = "66.66.66";
 static char battery_icon_text[3] = "000";
 
-/* Main menu panel */
+/*
+ * Main menu panel description.
+ */
 static const sUiPanel_t main_menu_panel = {
 	.x = 60,
 	.y = 270,
@@ -51,7 +53,9 @@ static const sUiPanel_t main_menu_panel = {
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
-/* Video parameter menu */
+/*
+ * Video settings panel description.
+ */
 static const sUiPanel_t video_settings_panel = {
 	.x = 60,
 	.y = 270,
@@ -70,7 +74,9 @@ static const sUiPanel_t video_settings_panel = {
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
-/* Video parameter menu */
+/*
+ * Edge settings panel description.
+ */
 static const sUiPanel_t edge_settings_panel = {
 	.x = 60,
 	.y = 270,
@@ -89,7 +95,9 @@ static const sUiPanel_t edge_settings_panel = {
 	.btn_callback = &UI_NavigationalButtonCallback
 };
 
-/* Video parameter menu */
+/*
+ * Thermal settings panel description.
+ */
 static const sUiPanel_t thermal_settings_panel = {
 	.x = 60,
 	.y = 270,
@@ -109,7 +117,9 @@ static const sUiPanel_t thermal_settings_panel = {
 };
 
 
-/* Default menu for changing parameters */
+/*
+ * Default panel for changing shared_parameters description.
+ */
 static const sUiPanel_t param_change_default_panel = {
 	.x = 60,
 	.y = 270,
@@ -125,7 +135,9 @@ static const sUiPanel_t param_change_default_panel = {
 	.btn_callback = &UI_ParamChangeButtonCallback
 };
 
-/* Constant visible menu with RTC and TM */
+/*
+ * Constant panel description with timer and power indicator.
+ */
 static const sUiPanel_t constant_menu = {
 	.x = 60,
 	.y = 175,
@@ -141,12 +153,15 @@ static const sUiPanel_t constant_menu = {
 	.selectable = 0
 };
 
+/*
+ * LUT for storing all possible UI panels.
+ */
 static sPanelNavDesc_t panel_lut[ePanelLast] = {
-	[ePanelMainMenu] = PANEL(&main_menu_panel, ePanelMainMenu),
-	[ePanelVideoSettings] = PANEL(&video_settings_panel, ePanelMainMenu),
-	[ePanelEdgeSettings] = PANEL(&edge_settings_panel, ePanelMainMenu),
-	[ePanelThermalSettings] = PANEL(&thermal_settings_panel, ePanelMainMenu),
-	[ePanelParamChangeDefault] = PANEL(&param_change_default_panel, ePanelVideoSettings) //TODO: back button will not work on correct panel
+	PANEL(&main_menu_panel, ePanelMainMenu),
+	PANEL(&video_settings_panel, ePanelMainMenu),
+	PANEL(&edge_settings_panel, ePanelMainMenu),
+	PANEL(&thermal_settings_panel, ePanelMainMenu),
+	PANEL(&param_change_default_panel, ePanelVideoSettings)
 };
 
 typedef struct sParamValTextDesc_t {
@@ -154,7 +169,9 @@ typedef struct sParamValTextDesc_t {
 	char *texts[10]; //TODO: could overflow if more than 10
 }sParamValTextDesc_t;
 
-/* LUT for dynamic parameter change value text */
+/*
+ * LUT for dynamic parameter change value text.
+ */
 static const sParamValTextDesc_t param_value_text[eSharedParamLast] = {
 	[eSharedParamScreenState] = {
 		.count = 2,
@@ -193,17 +210,26 @@ static uint32_t current_active_panel_index = 0;
 static uint32_t current_param = eSharedParamFirst;
 static uint32_t current_param_back_btn = 0;
 
+/*
+ * Gets currently activated panel pointer.
+ */
 bool UI_Interface_GetCurrentPanel(const sUiPanel_t **out){
 	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
 	*out = panel_lut[current_active_panel_index].panel;
 	return true;
 }
 
+/*
+ * Gets pointer to constant timer/battery indicator panel.
+ */
 bool UI_Interface_GetConstantPanel(const sUiPanel_t **out){
 	*out = &constant_menu;
 	return true;
 }
 
+/*
+ * Up/Down/Ok button pressed on device. Navigate
+ */
 static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t press){
 	if((btn >= eButtonLast) || (press >= eButtonPressLast)){
 		return;
@@ -211,6 +237,7 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 	const sUiPanel_t *curr_panel = panel_lut[current_active_panel_index].panel;
 	switch(btn){
 		case eButtonUp: {
+			/* Up button pressed - navigate up */
 			if(current_active_button_index == 0){
 				current_active_button_index = curr_panel->selectable - 1;
 			}
@@ -221,12 +248,15 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			break;
 		}
 		case eButtonOk: {
+			/* OK button pressed - activate the currently selected button */
 			uint32_t selectable = 0;
+			/* Calculate which button was pressed */
 			for(uint32_t i = 0; i < panel_lut[current_active_panel_index].panel->children_amount; i++){
 				if(panel_lut[current_active_panel_index].panel->children[i].type == eUiElementTypeButton){
 					if(selectable == current_active_button_index){
-						/* Found required button */
+						/* Found selected button */
 						panel_lut[current_active_panel_index].last_btn = selectable;
+						/* Activate selected element */
 						switch(panel_lut[current_active_panel_index].panel->children[i].type){
 							case eUiElementTypeButton: {
 								const sUiButton_t *button = panel_lut[current_active_panel_index].panel->children[i].element.button;
@@ -249,6 +279,7 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 			break;
 		}
 		case eButtonDown: {
+			/* Down button pressed - navigate down */
 			if(current_active_button_index == curr_panel->selectable - 1){
 				current_active_button_index = 0;
 			}
@@ -264,6 +295,10 @@ static void UI_NavigationalButtonCallback(eButtonType_t btn, eButtonPress_t pres
 	}
 }
 
+/*
+ * Any device button was pressed on a panel.
+ * Activate its nav button callback.
+ */
 void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press){
 	if(panel_lut[current_active_panel_index].panel->btn_callback == NULL){
 		error("Invalid current panel\r\n");
@@ -272,7 +307,9 @@ void UI_Interface_ButtonPressed(eButtonType_t btn, eButtonPress_t press){
 	(*panel_lut[current_active_panel_index].panel->btn_callback)(btn, press);
 }
 
-/* Defines nav button logic -> opening new panel */
+/*
+ * Defines navigation button (back/open new panel) logic.
+ */
 static void UI_NavButtonPressed(eButtonPress_t press, const void *argument){
 	ePanel_t *target_panel = (ePanel_t *)argument;
 	current_active_button_index = 0;
@@ -281,7 +318,9 @@ static void UI_NavButtonPressed(eButtonPress_t press, const void *argument){
 	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_active_button_index);
 }
 
-/* Defines param button logic -> opening param change default panel */
+/*
+ * Defines parameter button logic - opens a default change parameter panel.
+ */
 static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argument){
 	current_param_back_btn = current_active_button_index;
 	eSharedParamEnum_t *new_param = (eSharedParamEnum_t *)argument;
@@ -293,7 +332,9 @@ static void UI_ParamChangeButtonPressed(eButtonPress_t press, const void *argume
 	Shared_param_API_Write(eSharedParamActiveUiButtonIndex, &current_param);
 }
 
-/* Defines what up/down/ok buttons do in parameter change panels */
+/*
+ * Defines what up/down/ok buttons do in parameter change default panels.
+ */
 static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press){
 	if((btn >= eButtonLast) || (press >= eButtonPressLast)){
 		return;
@@ -304,15 +345,17 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 	Shared_param_API_GetDesc(current_param, &current_param_desc);
 	switch(btn){
 		case eButtonUp: {
+			/* Up button pressed - increase parameter value */
 			if(current_param_val == current_param_desc.max - 1){
 				current_param_val = current_param_desc.min;
 			}else{
 				current_param_val++;
 			}
-			Shared_param_API_Write(current_param, &current_param_val); //TODO: ONLY uint32_t supported
+			Shared_param_API_Write(current_param, &current_param_val);
 			break;
 		}
 		case eButtonOk: {
+			/* OK button pressed - leave current panel and return to the last one opened */
 			sPanelNavDesc_t last_panel = panel_lut[current_active_panel_index];
 			current_active_button_index = panel_lut[last_panel.parent].last_btn;
 			current_active_panel_index = last_panel.parent;
@@ -321,6 +364,7 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 			break;
 		}
 		case eButtonDown: {
+			/* Down button pressed - decrease parameter value */
 			if(current_param_val > current_param_desc.min){
 				current_param_val--;
 			}
@@ -337,31 +381,34 @@ static void UI_ParamChangeButtonCallback(eButtonType_t btn, eButtonPress_t press
 }
 
 #ifdef CORE_CM7
+/*
+ * Only on M7 core dynamically update text of UI elements.
+ */
 bool UI_Interface_UpdateLabels(RTC_HandleTypeDef hrtc){ //TODO: could simplify into loop or lut?
+	/* Update currently shown shared_parameter if one is selected */
 	Shared_param_API_Read(eSharedParamActiveUiPanelIndex, &current_active_panel_index);
-	/* Current selected value */
 	if(current_active_panel_index == ePanelParamChangeDefault){
-		/* Fill value of param*/
+		/* Fill value of parameter */
 		Shared_param_API_Read(eSharedParamActiveUiButtonIndex, &current_param);
-		uint32_t current_param_val = 0; //TODO: dont know which parameter is read
+		uint32_t current_param_val = 0;
 		Shared_param_API_Read(current_param, &current_param_val);
 		if(param_value_text[current_param].count == 0){
 			snprintf(current_param_value_text, 20, "%lu", current_param_val);
 		}else{
 			snprintf(current_param_value_text, 20, "%s", param_value_text[current_param].texts[current_param_val]);
 		}
-		/* Fill name of param */
+		/* Fill name of parameter */
 		sSharedParam_t current_shared_param_desc;
 		Shared_param_API_GetDesc(current_param, &current_shared_param_desc);
 		snprintf(current_param_name_text, 20, "%s", current_shared_param_desc.name);
 	}
-	/* RTC */
+	/* Update RTC timer */
 	RTC_TimeTypeDef time;
 	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 	RTC_DateTypeDef date; /* Need read date for value to update */
 	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 	snprintf(time_text, 20, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-	/* Battery indicator */
+	/* Update Battery indicator */
 	uint32_t battery_level = 0;
 	Shared_param_API_Read(eSharedParamBatteryLevel, &battery_level);
 	if(battery_level > 70){ //TODO: improve
